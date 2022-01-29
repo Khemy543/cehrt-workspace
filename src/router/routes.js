@@ -107,6 +107,32 @@ const errorPagesRoutes = [
 
 // administator routes
 
+// user mamangement routes
+const userManagementRoutes = [
+  {
+    path: '/user-managment',
+    name: 'User Management',
+    header: 'Apps',
+    icon: 'user-plus',
+    meta: { authRequired: true },
+    // create a container component
+    component: {
+      render(c) {
+        return c('router-view')
+      },
+    },
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+    children: [
+      {
+        name: 'Add Staff',
+        path: 'add-staff',
+        meta: { authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/administrator/user-management/add-staff/index.vue')),
+      },
+    ],
+  }
+];
 
 // finance routes
 
@@ -136,7 +162,6 @@ const calendarAppsRoutes = [
   {
     path: '/apps/calendar',
     name: 'Calendar',
-    header: 'Apps',
     icon: 'calendar',
     component: () => lazyLoadView(import('@views/pages/apps/calendar')),
     meta: { authRequired: true },
@@ -248,6 +273,7 @@ const taskAppsRoutes = [
 ];
 
 const appsRoutes = [
+  ...userManagementRoutes,
   ...calendarAppsRoutes,
   ...emailAppsRoutes,
   ...projectAppsRoutes,
