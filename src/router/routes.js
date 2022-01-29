@@ -20,6 +20,13 @@ const authRoutes = [
     },
   },
   {
+    path: '/departments',
+    name: 'departments',
+    component: () => lazyLoadView(import('@views/pages/account/chooseDepartment')),
+    meta: { authRequired: true },
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+  },
+  {
     path: '/register',
     name: 'register',
     component: () => lazyLoadView(import('@views/pages/account/register')),
@@ -114,6 +121,15 @@ const errorPagesRoutes = [
     redirect: '404',
   },
 ]
+
+// administator routes
+
+
+// finance routes
+
+// consulting routes
+
+
 
 // dashboard
 const dashboardRoutes = [

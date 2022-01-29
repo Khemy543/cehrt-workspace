@@ -26,10 +26,7 @@ export default {
 	methods: {
 		toggleMenu() {
 			this.$parent.toggleMenu()
-		},
-		toggleRightSidebar() {
-			this.$parent.toggleRightSidebar()
-		},
+		}
 	},
 }
 </script>
@@ -42,7 +39,7 @@ export default {
 			<a href="/" class="navbar-brand mr-0 mr-md-2 logo">
 				<span class="logo-lg">
 					<img src="@assets/images/logo.png" alt height="24" />
-					<span class="d-inline h5 ml-2 text-logo">Shreyu</span>
+					<span class="d-inline h5 ml-2 text-logo">CEHRT WORKSPACE</span>
 				</span>
 				<span class="logo-sm">
 					<img src="@assets/images/logo.png" alt height="24" />
@@ -81,64 +78,6 @@ export default {
 						</form>
 					</div>
 				</li>
-
-				<b-nav-item-dropdown
-					id="globe-tooltip"
-					right
-					variant="black"
-					class="dropdown d-none d-lg-block"
-					no-caret
-				>
-					<template v-slot:button-content>
-						<feather type="globe"></feather>
-					</template>
-					<b-tooltip target="globe-tooltip" placement="left"
-						>Change language</b-tooltip
-					>
-					<!-- item-->
-					<b-dropdown-text href="javascript:void(0);" class="notify-item">
-						<img
-							src="@assets/images/flags/germany.jpg"
-							alt="user-image"
-							class="mr-2"
-							height="12"
-						/>
-						<span class="align-middle">German</span>
-					</b-dropdown-text>
-
-					<!-- item-->
-					<b-dropdown-text href="javascript:void(0);" class="notify-item">
-						<img
-							src="@assets/images/flags/italy.jpg"
-							alt="user-image"
-							class="mr-2"
-							height="12"
-						/>
-						<span class="align-middle">Italian</span>
-					</b-dropdown-text>
-
-					<!-- item-->
-					<b-dropdown-text href="javascript:void(0);" class="notify-item">
-						<img
-							src="@assets/images/flags/spain.jpg"
-							alt="user-image"
-							class="mr-2"
-							height="12"
-						/>
-						<span class="align-middle">Spanish</span>
-					</b-dropdown-text>
-
-					<!-- item-->
-					<b-dropdown-text href="javascript:void(0);" class="notify-item">
-						<img
-							src="@assets/images/flags/russia.jpg"
-							alt="user-image"
-							class="mr-2"
-							height="12"
-						/>
-						<span class="align-middle">Russian</span>
-					</b-dropdown-text>
-				</b-nav-item-dropdown>
 
 				<b-nav-item-dropdown
 					id="bell-notification"
@@ -270,23 +209,6 @@ export default {
 						<i class="fi-arrow-right"></i>
 					</b-dropdown-text>
 				</b-nav-item-dropdown>
-
-				<li
-					id="setting-tooltip"
-					class="dropdown notification-list"
-					title="Settings"
-				>
-					<a
-						href="javascript:void(0);"
-						class="nav-link right-bar-toggle toggle-right"
-						@click="toggleRightSidebar"
-					>
-						<feather type="settings" class="toggle-right"></feather>
-					</a>
-					<b-tooltip target="setting-tooltip" placement="left"
-						>Settings</b-tooltip
-					>
-				</li>
 
 				<b-nav-item-dropdown
 					right
