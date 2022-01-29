@@ -27,23 +27,6 @@ const authRoutes = [
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
   {
-    path: '/register',
-    name: 'register',
-    component: () => lazyLoadView(import('@views/pages/account/register')),
-    meta: {
-      beforeResolve(routeTo, routeFrom, next) {
-        // If the user is already logged in
-        if (store.getters['auth/loggedIn']) {
-          // Redirect to the home page instead
-          next({ name: 'dashboard' })
-        } else {
-          // Continue to the login page
-          next()
-        }
-      },
-    },
-  },
-  {
     path: '/confirm-account',
     name: 'confirm-account',
     component: () => lazyLoadView(import('@views/pages/account/confirm')),
