@@ -4,30 +4,14 @@
  */
 export default {
   props: {
-    id: {
-        type: Number,
-        default: 0
-    },
-    title: {
-      type: String,
-      default: '',
-    },
-    value: {
-      type: Number,
-      default: 0,
-    },
-    icon: {
-      type: String,
-      default: '',
-    },
-    color: {
-      type: String,
-      default: '#5369f8',
-    },
+    department: {
+      type: Object,
+      required: true
+    }
   },
   methods : {
       selectDepartment(){
-          this.$emit('select-department', this.id)
+          this.$emit('select-department', this.department)
       }
   }
 }
@@ -40,15 +24,15 @@ export default {
         <div class="media-body">
           <span
             class="text-muted text-uppercase font-size-12 font-weight-bold"
-            >{{ title }}</span
+            >{{ department.name }}</span
           >
-          <h2 class="mb-0">{{ value }}</h2>
+          <h2 class="mb-0">{{ department.value }}</h2>
         </div>
         <div class="align-self-center">
           <span>
             <feather
-              :type="`${icon}`"
-              :class="`icon-lg align-middle icon-dual-${color}`"
+              :type="`${department.icon}`"
+              :class="`icon-lg align-middle icon-dual-${department.color}`"
             ></feather>
           </span>
         </div>

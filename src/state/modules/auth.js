@@ -1,21 +1,33 @@
 import axios from 'axios'
 
 export const state = {
-  currentUser: getSavedState('auth.currentUser'),
+  currentUser: null,
+  userInitials:null,
+  userToken: getSavedState('auth.token'),
+  userDepartment: getSavedState('user.department')
 }
 
 export const mutations = {
   SET_CURRENT_USER(state, newValue) {
+    const initials = newValue.name.match(/\b(\w)/g).join('').toUpperCase();
+    state.userInitials = initials
     state.currentUser = newValue
-    saveState('auth.currentUser', newValue)
+  },
+  SET_USER_TOKEN(state, token) {
+    state.userToken = token;
+    saveState('auth.token', token)
     setDefaultAuthHeaders(state)
   },
+  SET_USER_DEPARTMENT(state, department) {
+    state.userDepartment = department;
+    saveState('user.department', department)
+  }
 }
 
 export const getters = {
   // Whether the user is currently logged in.
   loggedIn(state) {
-    return !!state.currentUser
+    return !!state.userToken
   },
 }
 
@@ -28,33 +40,38 @@ export const actions = {
   },
 
   // Logs in the current user.
-  logIn({ commit, dispatch, getters }, { username, password } = {}) {
+  logIn({ commit, dispatch, getters }, { email, password } = {}) {
     if (getters.loggedIn) return dispatch('validate')
 
     return axios
-      .post('/api/session', { username, password })
+      .post('/auth/login', { email, password })
       .then((response) => {
-        const user = response.data
+        const {user, access_token:accessToken } = response.data
         commit('SET_CURRENT_USER', user)
+        commit('SET_USER_TOKEN', accessToken)
         return user
       })
+  },
+
+  // set user department
+  setDepartment({ commit }, department) {
+    commit('SET_USER_DEPARTMENT', department) ;
   },
 
   // Logs out the current user.
   logOut({ commit }) {
-    commit('SET_CURRENT_USER', null)
+    return axios
+      .post('/auth/logout')
+      .then((response) => {
+        commit('SET_CURRENT_USER', null);
+        commit('SET_USER_TOKEN', null)
+      })
   },
 
-  // register the user
-  register({ commit, dispatch, getters }, { fullname, email, password } = {}) {
-    if (getters.loggedIn) return dispatch('validate')
-
-    return axios
-      .post('/api/register', { fullname, email, password })
-      .then((response) => {
-        const user = response.data
-        return user
-      })
+  // clear user token
+  clearToken({ commit }) {
+    commit('SET_CURRENT_USER', null);
+    commit('SET_USER_TOKEN', null)
   },
 
   // register the user
@@ -70,10 +87,9 @@ export const actions = {
   // Validates the current user's token and refreshes it
   // with new data from the API.
   validate({ commit, state }) {
-    if (!state.currentUser) return Promise.resolve(null)
+    if (state.currentUser) return Promise.resolve(state.currentUser)
 
-    return axios
-      .get('/api/session')
+    return axios.get('/auth/user')
       .then((response) => {
         const user = response.data
         commit('SET_CURRENT_USER', user)
@@ -101,7 +117,7 @@ function saveState(key, state) {
 }
 
 function setDefaultAuthHeaders(state) {
-  axios.defaults.headers.common.Authorization = state.currentUser
-    ? state.currentUser.token
+  axios.defaults.headers.common.Authorization = state.userToken
+    ? `Bearer ${state.userToken}`
     : ''
 }

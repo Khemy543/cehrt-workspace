@@ -10,7 +10,8 @@ export default {
 		return {
 			isMenuCondensed: false,
 			isMobileMenuOpened: false,
-			user: this.$store ? this.$store.state.auth.currentUser : {} || {}
+			user: this.$store ? this.$store.state.auth.currentUser : {} || {},
+			department: this.$store ? this.$store.state.auth.userDepartment : {} || {}
 		}
 	},
 	computed: {
@@ -59,6 +60,7 @@ export default {
 		<SideBar
 			:is-condensed="isMenuCondensed"
 			:user="user"
+			:department="department"
 		/>
 		<!-- ============================================================== -->
 		<!-- Start Page Content here -->

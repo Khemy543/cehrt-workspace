@@ -1,6 +1,7 @@
 <script>
 import Layout from '@layouts/default'
 import appConfig from '@src/app.config'
+import { authMethods } from '@state/helpers'
 import DepartmentCard from '@components/department-card.vue'
 export default {
   page: {
@@ -32,13 +33,28 @@ export default {
           color: 'success',
         }
       ],
+      departments : this.$store.state.auth.currentUser ? this.$store.state.auth.currentUser.departments : [] || []
     }
   },
-  computed: {},
+  computed: {
+    vDepartments(){
+      return this.departments.map((department) => {
+        return {
+          ...department,
+          value: 12,
+          icon: 'lock',
+          color: 'success'
+        }
+      })
+    }
+  },
   methods: {
-      selecteDepartment(id) {
+    ...authMethods,
+
+      selecteDepartment(department) {
       const { redirectFrom } = this.$route.query;
-          this.$router.push( redirectFrom || { name:'Dashboard' })
+      this.setDepartment(department);
+      this.$router.push( redirectFrom || { name:'Dashboard' })
       }
   },
 }
@@ -50,12 +66,9 @@ export default {
       <div class="col-md-12">
         <div class="bg-pattern">
           <div class="p-4">
-            <div class="text-center w-75 m-auto">
-              <a href="/"> </a>
-            </div>
 
             <div class="mt-3 text-center">
-              <h3>Choose your department</h3>
+              <h3>Choose your department</h3> 
               <p class="text-muted mt-2">
                 Please select a department to continue.
               </p>
@@ -70,15 +83,12 @@ export default {
 
             <div class="row">
               <div
-                v-for="stat of statData"
-                :key="stat.title"
+                v-for="department of vDepartments"
+                :key="department.id"
                 class="col-md-6 col-xl-3"
               >
                 <DepartmentCard
-                  :title="stat.title"
-                  :value="stat.value"
-                  :icon="stat.icon"
-                  :color="stat.color"
+                  :department="department"
                   @select-department="selecteDepartment"
                 />
               </div>

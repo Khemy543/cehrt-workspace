@@ -14,26 +14,16 @@ export default {
 	components: { Layout },
 	data() {
 		return {
-			username: 'admin',
-			password: 'password',
+			email: '',
+			password: '',
 			authError: null,
 			tryingToLogIn: false,
 			isAuthError: false,
 		}
 	},
-	computed: {
-		placeholders() {
-			return process.env.NODE_ENV === 'production'
-				? {}
-				: {
-						username: 'Use "admin" to log in with the mock API',
-						password: 'Use "password" to log in with the mock API',
-				  }
-		},
-	},
 	methods: {
 		...authMethods,
-		// Try to log the user in with the username
+		// Try to log the user in with the email
 		// and password they provided.
 		tryToLogIn() {
 			this.tryingToLogIn = true
@@ -41,7 +31,7 @@ export default {
 			this.authError = null;
 			const { redirectFrom } = this.$route.query;
 			return this.logIn({
-				username: this.username,
+				email: this.email,
 				password: this.password,
 			})
 				.then((token) => {
@@ -52,7 +42,7 @@ export default {
 				})
 				.catch((error) => {
 					this.tryingToLogIn = false
-					this.authError = error.response ? error.response.data.message : ''
+					this.authError = error.response ? error.response.data.error : ''
 					this.isAuthError = true
 				})
 		},
@@ -109,10 +99,10 @@ export default {
 													</div>
 													<b-form-input
 														id="input-1"
-														v-model="username"
+														v-model="email"
 														type="text"
 														required
-														placeholder="Enter username"
+														placeholder="Enter email"
 													></b-form-input>
 												</div>
 											</div>

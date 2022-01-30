@@ -27,23 +27,6 @@ const authRoutes = [
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
   {
-    path: '/confirm-account',
-    name: 'confirm-account',
-    component: () => lazyLoadView(import('@views/pages/account/confirm')),
-    meta: {
-      beforeResolve(routeTo, routeFrom, next) {
-        // If the user is already logged in
-        if (store.getters['auth/loggedIn']) {
-          // Redirect to the home page instead
-          next({ name: 'dashboard' })
-        } else {
-          // Continue to the login page
-          next()
-        }
-      },
-    },
-  },
-  {
     path: '/forget-password',
     name: 'forget-password',
     component: () =>
@@ -64,19 +47,8 @@ const authRoutes = [
   {
     path: '/logout',
     name: 'logout',
-    meta: {
-      authRequired: true,
-      beforeResolve(routeTo, routeFrom, next) {
-        store.dispatch('auth/logOut')
-        const authRequiredOnPreviousRoute = routeFrom.matched.some(
-          (route) => route.meta.authRequired
-        )
-        // Navigate back to previous page, or home as a fallback
-        next(
-          authRequiredOnPreviousRoute ? { name: 'dashboard' } : { ...routeFrom }
-        )
-      },
-    },
+    component: () => lazyLoadView(import('@views/pages/account/logout.vue')),
+    meta: { authRequired: true },
   },
 ]
 

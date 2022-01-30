@@ -45,6 +45,9 @@ export default {
 				this.finalModel = Object.assign({}, this.finalModel, model)
 			}
 		},
+		addStaff(){
+			console.log('add-staff:',this.finalModel)
+		}
 	},
 }
 </script>
@@ -57,7 +60,7 @@ export default {
 				<div class="card">
 					<div class="card-body">
 						<h4 class="header-title mt-0 mb-1">Basic Wizard</h4>
-						<form-wizard color="#5369f8">
+						<form-wizard color="#5369f8" @submit.prevent="addStaff">
 							<tab-content title="Account">
 								<div class="row">
 									<div class="col-12">

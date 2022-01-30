@@ -264,7 +264,7 @@ export default {
 
 					<b-dropdown-divider></b-dropdown-divider>
 
-					<b-dropdown-item href="/logout" class="notify-item p-0">
+					<b-dropdown-item to="/logout" class="notify-item p-0">
 						<feather type="log-out" class="icon-dual icon-xs mr-2"></feather>
 						<span>Logout</span>
 					</b-dropdown-item>
