@@ -20,38 +20,11 @@ const authRoutes = [
     },
   },
   {
-    path: '/register',
-    name: 'register',
-    component: () => lazyLoadView(import('@views/pages/account/register')),
-    meta: {
-      beforeResolve(routeTo, routeFrom, next) {
-        // If the user is already logged in
-        if (store.getters['auth/loggedIn']) {
-          // Redirect to the home page instead
-          next({ name: 'dashboard' })
-        } else {
-          // Continue to the login page
-          next()
-        }
-      },
-    },
-  },
-  {
-    path: '/confirm-account',
-    name: 'confirm-account',
-    component: () => lazyLoadView(import('@views/pages/account/confirm')),
-    meta: {
-      beforeResolve(routeTo, routeFrom, next) {
-        // If the user is already logged in
-        if (store.getters['auth/loggedIn']) {
-          // Redirect to the home page instead
-          next({ name: 'dashboard' })
-        } else {
-          // Continue to the login page
-          next()
-        }
-      },
-    },
+    path: '/departments',
+    name: 'departments',
+    component: () => lazyLoadView(import('@views/pages/account/chooseDepartment')),
+    meta: { authRequired: true },
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
   {
     path: '/forget-password',
@@ -74,19 +47,8 @@ const authRoutes = [
   {
     path: '/logout',
     name: 'logout',
-    meta: {
-      authRequired: true,
-      beforeResolve(routeTo, routeFrom, next) {
-        store.dispatch('auth/logOut')
-        const authRequiredOnPreviousRoute = routeFrom.matched.some(
-          (route) => route.meta.authRequired
-        )
-        // Navigate back to previous page, or home as a fallback
-        next(
-          authRequiredOnPreviousRoute ? { name: 'dashboard' } : { ...routeFrom }
-        )
-      },
-    },
+    component: () => lazyLoadView(import('@views/pages/account/logout.vue')),
+    meta: { authRequired: true },
   },
 ]
 
@@ -115,6 +77,41 @@ const errorPagesRoutes = [
   },
 ]
 
+// administator routes
+
+// user mamangement routes
+const userManagementRoutes = [
+  {
+    path: '/user-managment',
+    name: 'User Management',
+    header: 'Apps',
+    icon: 'user-plus',
+    meta: { authRequired: true },
+    // create a container component
+    component: {
+      render(c) {
+        return c('router-view')
+      },
+    },
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+    children: [
+      {
+        name: 'Add Staff',
+        path: 'add-staff',
+        meta: { authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/administrator/user-management/add-staff/index.vue')),
+      },
+    ],
+  }
+];
+
+// finance routes
+
+// consulting routes
+
+
+
 // dashboard
 const dashboardRoutes = [
   {
@@ -137,7 +134,6 @@ const calendarAppsRoutes = [
   {
     path: '/apps/calendar',
     name: 'Calendar',
-    header: 'Apps',
     icon: 'calendar',
     component: () => lazyLoadView(import('@views/pages/apps/calendar')),
     meta: { authRequired: true },
@@ -249,6 +245,7 @@ const taskAppsRoutes = [
 ];
 
 const appsRoutes = [
+  ...userManagementRoutes,
   ...calendarAppsRoutes,
   ...emailAppsRoutes,
   ...projectAppsRoutes,

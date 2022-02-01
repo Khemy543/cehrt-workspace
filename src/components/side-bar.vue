@@ -13,97 +13,44 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		theme: {
-			type: String,
-			required: true,
-		},
-		type: {
-			type: String,
-			required: true,
-		},
-		width: { type: String, required: true },
 		user: {
 			type: Object,
 			required: false,
 			default: () => ({}),
 		},
+		department: {
+			type: Object,
+			required: false,
+			default: () => ({})
+		}
 	},
 	data() {
 		return {
 			settings: {
 				minScrollbarLength: 60,
 			},
+			initials: this.$store? this.$store.state.auth.userInitials : '' || ''
 		}
 	},
 	computed: {
 		...authComputed,
-	},
-	watch: {
-		theme: function(newVal, oldVal) {
-			if (newVal !== oldVal) {
-				switch (newVal) {
-					case 'dark':
-						document.body.classList.add('left-side-menu-dark')
-						document.body.classList.remove('left-side-menu-condensed')
-						document.body.classList.remove('boxed-layout')
-						break
-					default:
-						document.body.classList.remove('left-side-menu-dark')
-						break
-				}
-			}
-		},
-		type: function(newVal, oldVal) {
-			if (newVal !== oldVal) {
-				switch (newVal) {
-					case 'condensed':
-						document.body.classList.add('left-side-menu-condensed')
-						document.body.classList.remove('left-side-menu-dark')
-						document.body.classList.remove('boxed-layout')
-						break
-					default:
-						document.body.classList.remove('left-side-menu-condensed')
-						break
-				}
-			}
-		},
-		width: function(newVal, oldVal) {
-			if (newVal !== oldVal) {
-				switch (newVal) {
-					case 'boxed':
-						document.body.classList.add('left-side-menu-condensed')
-						document.body.classList.remove('left-side-menu-dark')
-						document.body.classList.add('boxed-layout')
-						break
-					default:
-						document.body.classList.remove('left-side-menu-condensed')
-						document.body.classList.remove('boxed-layout')
-						break
-				}
-			}
-		},
-	},
+	}
 }
 </script>
 
 <template>
 	<!-- ========== Left Sidebar Start ========== -->
 	<div class="left-side-menu">
-		<div class="media user-profile mt-2 mb-2">
-			<img
-				src="@assets/images/users/avatar-7.jpg"
-				class="avatar-sm rounded-circle mr-2"
-				alt="Shreyu"
-			/>
-			<img
-				src="@assets/images/users/avatar-7.jpg"
-				class="avatar-xs rounded-circle mr-2"
-				alt="Shreyu"
-			/>
+		<div class="media user-profile mt-2 mb-2 d-flex align-items-center">
+			<div 
+			style="width:40px; height:40px; border-radius:100px;"
+			class="mr-2 d-flex align-items-center justify-content-center bg-primary text-white font-weight-bold">
+				{{ initials }}
+			</div>
 
 			<div class="media-body">
 				<h6 class="pro-user-name mt-0 mb-0">{{ user.name }}</h6>
-				<span class="pro-user-desc">Administrator</span>
+				<span class="pro-user-desc">{{ department.name }}</span>
 			</div>
 			<b-dropdown variant="black" class="align-self-center" toggle-class="p-0">
 				<template v-slot:button-content>
@@ -144,7 +91,7 @@ export default {
 
 				<b-dropdown-divider></b-dropdown-divider>
 
-				<b-dropdown-item href="/logout" class="notify-item">
+				<b-dropdown-item to="/logout" class="notify-item">
 					<feather
 						type="log-out"
 						class="icon-dual icon-xs mr-2 align-middle"
