@@ -9,7 +9,7 @@ export const state = {
 
 export const mutations = {
   SET_CURRENT_USER(state, newValue) {
-    const initials = newValue.name.match(/\b(\w)/g).join('').toUpperCase();
+    const initials = `${newValue.firstname} ${newValue.lastname}`.match(/\b(\w)/g).join('').toUpperCase();
     state.userInitials = initials
     state.currentUser = newValue
   },
@@ -89,7 +89,7 @@ export const actions = {
   validate({ commit, state }) {
     if (state.currentUser) return Promise.resolve(state.currentUser)
 
-    return axios.get('/auth/user')
+    return axios.get(`${process.env.API_BASE_URL}auth/user`)
       .then((response) => {
         const user = response.data
         commit('SET_CURRENT_USER', user)

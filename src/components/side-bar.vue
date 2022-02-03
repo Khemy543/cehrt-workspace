@@ -49,7 +49,7 @@ export default {
 			</div>
 
 			<div class="media-body">
-				<h6 class="pro-user-name mt-0 mb-0">{{ user.name }}</h6>
+				<h6 class="pro-user-name mt-0 mb-0">{{ user.firstname }} {{ user.lastname }}</h6>
 				<span class="pro-user-desc">{{ department.name }}</span>
 			</div>
 			<b-dropdown variant="black" class="align-self-center" toggle-class="p-0">

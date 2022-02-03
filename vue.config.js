@@ -1,4 +1,5 @@
-const appConfig = require('./src/app.config')
+const appConfig = require('./src/app.config');
+const Dotenv = require('dotenv-webpack');
 
 /** @type import('@vue/cli-service').ProjectOptions */
 module.exports = {
@@ -18,6 +19,9 @@ module.exports = {
         !process.env.VUE_APP_TEST &&
         'warning',
     },
+    plugins: [
+      new Dotenv()
+    ]
   },
   css: {
     // Enable CSS source maps.
@@ -25,11 +29,5 @@ module.exports = {
   },
   // Configure Webpack's dev server.
   // https://cli.vuejs.org/guide/cli-service.html
-  devServer: {
-    ...(process.env.API_BASE_URL
-      ? // Proxy API endpoints to the production base URL.
-        { proxy: { '/api': { target: process.env.API_BASE_URL } } }
-      : // Proxy API endpoints a local mock API.
-        { before: require('./tests/mock-api') }),
-  },
+  devServer: { proxy: { '/api': { target: process.env.API_BASE_URL } } },
 }

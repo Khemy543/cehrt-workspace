@@ -26,6 +26,7 @@ export default {
 		// Try to log the user in with the email
 		// and password they provided.
 		tryToLogIn() {
+			console.log(process.env.API_BASE_URL)
 			this.tryingToLogIn = true
 			// Reset the authError if it existed.
 			this.authError = null;
@@ -42,7 +43,7 @@ export default {
 				})
 				.catch((error) => {
 					this.tryingToLogIn = false
-					this.authError = error.response ? error.response.data.error : ''
+					this.authError = error.response ? error.response.data.error : 'Something happened, please try again later'
 					this.isAuthError = true
 				})
 		},
