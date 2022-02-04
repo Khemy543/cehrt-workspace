@@ -82,7 +82,7 @@ const errorPagesRoutes = [
 // user mamangement routes
 const userManagementRoutes = [
   {
-    path: '/user-managment',
+    path: '/user-management',
     name: 'User Management',
     header: 'Apps',
     icon: 'user-plus',
@@ -95,6 +95,13 @@ const userManagementRoutes = [
     },
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
     children: [
+      {
+        name: 'View Staff',
+        path: 'staff',
+        meta: { authRequired: true },
+        component: () =>
+          lazyLoadView(import('@views/pages/administrator/user-management/staff.vue')),
+      },
       {
         name: 'Add Staff',
         path: 'add-staff',
