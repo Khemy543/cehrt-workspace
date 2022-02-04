@@ -1,15 +1,27 @@
 <script>
 import { required } from 'vuelidate/lib/validators'
+import Multiselect from 'vue-multiselect';
 
 export default {
+  components: {
+    Multiselect
+  },
   data() {
     return {
       title: '',
       supervisor: '',
       workLocation: '',
       workPhone:'',
-      startDate: ''
+      startDate: '',
+      departments:null,
+      departmentsOptions: [],
+      staffOptions: [],
+      staffId:null
     }
+  },
+  created(){
+    this.fetchDepartments();
+    this.fetchSuperviosrs()
   },
   validations: {
     title: {
@@ -27,9 +39,38 @@ export default {
     startDate: {
       required
     },
-    form: ['title', 'supervisor', 'workLocation', 'workPhone', 'startDate'],
+    departments: {
+      required
+    },
+    staffId: {
+      required
+    },
+
+    form: ['title', 'supervisor', 'workLocation', 'workPhone', 'startDate', 'departments', 'staffId'],
   },
   methods: {
+    async fetchDepartments() {
+      try {
+        const response = await this.$http.get('/admin/fetch/departments');
+
+        if(response && response.data){
+          this.departmentsOptions = response.data;
+        }
+      } catch (error) {
+        
+      }
+    },
+    async fetchSuperviosrs() {
+      try {
+        const response = await this.$http.get('/admin/fetch/staff');
+
+        if(response && response.data) {
+          this.staffOptions = response.data
+        }
+      } catch (error) {
+        
+      }
+    },
     validate() {
       this.$v.form.$touch()
       var isValid = !this.$v.form.$invalid
@@ -50,12 +91,7 @@ export default {
         >
           <label class="col-md-3 col-form-label">Title</label>
           <div class="col-md-12">
-            <input
-              v-model.trim="title"
-              class="form-control"
-              :class="{ 'is-invalid': $v.title.$error }"
-              placeholder="Title"
-            />
+            <multiselect v-model="title" :options="['Mr', 'Mrs']"></multiselect>
             <span
               v-if="$v.title.$error && !$v.title.required"
               class="help-block invalid-feedback"
@@ -67,6 +103,25 @@ export default {
       <div class="col-md-6">
         <div
           class="form-group mb-3"
+          :class="{ 'has-error': $v.departments.$error }"
+        >
+          <label class="col-md-3 col-form-label">Deparatments</label>
+          <div class="col-md-12">
+            <multiselect v-model="departments" :options="departmentsOptions" :multiple="true" label="name" track-by="id"></multiselect>
+            <span
+              v-if="$v.departments.$error && !$v.departments.required"
+              class="help-block invalid-feedback"
+              >departments is required</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class=" row">
+      <div class="col-md-6">
+      <div
+          class="form-group mb-3"
           :class="{ 'has-error': $v.supervisor.$error }"
         >
           <label class="col-md-3 col-form-label">Supervisor</label>
@@ -77,12 +132,34 @@ export default {
               :class="{ 'is-invalid': $v.supervisor.$error }"
             >
               <option disabled value="">Select supervisor</option>
-              <option value="emefa">Mrs. Emefa</option>
+              <option v-for="option in staffOptions" :key="option.id" :value="option.id">{{ option.firstname }} {{option.lastname}}</option>
             </select>
             <span
               v-if="$v.supervisor.$error && !$v.supervisor.required"
               class="help-block invalid-feedback"
               >supervisor is required</span
+            >
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-6">
+        <div
+          class="form-group mb-3"
+          :class="{ 'has-error': $v.workPhone.$error }"
+        >
+          <label class="col-md-12 col-form-label">Work Phone</label>
+          <div class="col-md-12">
+            <input
+              v-model.trim="workPhone"
+              class="form-control"
+              :class="{ 'is-invalid': $v.workPhone.$error }"
+              placeholder="Work phone"
+            />
+            <span
+              v-if="$v.workPhone.$error && !$v.workPhone.required"
+              class="help-block invalid-feedback"
+              >work phone is required</span
             >
           </div>
         </div>
@@ -114,30 +191,6 @@ export default {
       <div class="col-md-6">
         <div
           class="form-group mb-3"
-          :class="{ 'has-error': $v.workPhone.$error }"
-        >
-          <label class="col-md-12 col-form-label">Work Phone</label>
-          <div class="col-md-12">
-            <input
-              v-model.trim="workPhone"
-              class="form-control"
-              :class="{ 'is-invalid': $v.workPhone.$error }"
-              placeholder="Work phone"
-            />
-            <span
-              v-if="$v.workPhone.$error && !$v.workPhone.required"
-              class="help-block invalid-feedback"
-              >work phone is required</span
-            >
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class=" row">
-      <div class="col-md-6">
-        <div
-          class="form-group mb-3"
           :class="{ 'has-error': $v.startDate.$error }"
         >
           <label class="col-md-12 col-form-label">Start Date</label>
@@ -156,26 +209,30 @@ export default {
           </div>
         </div>
       </div>
-      <!-- <div class="col-md-6">
+    </div>
+
+     <div class=" row">
+      <div class="col-md-6">
         <div
           class="form-group mb-3"
-          :class="{ 'has-error': $v.username.$error }"
+          :class="{ 'has-error': $v.staffId.$error }"
         >
-          <label class="col-md-12 col-form-label">Email Address</label>
+          <label class="col-md-12 col-form-label">Staff Identification Number</label>
           <div class="col-md-12">
             <input
-              v-model.trim="username"
+              v-model.trim="staffId"
               class="form-control"
-              :class="{ 'is-invalid': $v.username.$error }"
+              :class="{ 'is-invalid': $v.staffId.$error }"
+              placeholder="Work location"
             />
             <span
-              v-if="$v.username.$error && !$v.username.required"
+              v-if="$v.staffId.$error && !$v.staffId.required"
               class="help-block invalid-feedback"
-              >Username is required</span
+              >Staff identification number is required</span
             >
           </div>
         </div>
-      </div> -->
+      </div>
     </div>
   </div>
 </template>
