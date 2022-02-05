@@ -44,9 +44,6 @@ export default {
       finalModel: {},
     }
   },
-  mounted() {
-    this.makeToast()
-  },
   methods: {
     validateStep(name) {
       var refToValidate = this.$refs[name]
@@ -63,14 +60,13 @@ export default {
     },
     makeToast({ title, message, type }) {
       this.$bvToast.toast(message, {
-        title: title,
+        title,
         autoHideDelay: 5000,
         appendToast: false,
         variant: type,
       })
     },
     async addStaff() {
-      console.log(this.finalModel)
       const {
         firstName,
         lastName,

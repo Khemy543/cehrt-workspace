@@ -20,7 +20,9 @@ export const authMethods = mapActions('auth', [
   'logIn',
   'logOut',
   'resetPassword',
+  'requestResetPassword',
   'setDepartment',
+  'changePassword',
   'clearToken'
 ])
 

@@ -10,7 +10,7 @@ export const state = {
 
 export const mutations = {
   SET_CURRENT_USER(state, newValue) {
-    const initials = `${newValue.firstname} ${newValue.lastname}`.match(/\b(\w)/g).join('').toUpperCase();
+    const initials = `${newValue && newValue.firstname} ${newValue && newValue.lastname}`.match(/\b(\w)/g).join('').toUpperCase();
     state.userInitials = initials
     state.currentUser = newValue
   },
@@ -59,52 +59,68 @@ export const actions = {
     commit('SET_USER_DEPARTMENT', department) ;
   },
 
+  async changePassword({ commit, getters }, { password, newPassword, firstTime } = {}) {
+    const response = await axios.post('/auth/change/password', {
+      new_password: newPassword,
+      first_time: firstTime,
+      ...(firstTime ? {} : { password })
+    });
+    if(response){
+      commit('SET_CURRENT_USER', { ...getters.currentUser, must_change_password: 1 });
+      return true;
+    }
+  }, 
+
   // Logs out the current user.
-  logOut({ commit }) {
-    return axios
-      .post('/auth/logout')
-      .then((response) => {
-        commit('SET_CURRENT_USER', null);
-        commit('SET_USER_TOKEN', null)
-      })
+  async logOut({ commit }) {
+    await axios.post('/auth/logout');
+    commit('SET_CURRENT_USER', null);
+    commit('SET_USER_TOKEN', null);
   },
 
   // clear user token
   clearToken({ commit }) {
+    router.push({ name:'login' })
     commit('SET_CURRENT_USER', null);
     commit('SET_USER_TOKEN', null)
   },
 
-  // register the user
-  resetPassword({ commit, dispatch, getters }, { email } = {}) {
+  // request the user
+  resetPassword({ commit, dispatch, getters }, { password, confirm_password:confirmPassword, token } = {}) {
     if (getters.loggedIn) return dispatch('validate')
 
-    return axios.post('/api/reset', { email }).then((response) => {
+    return axios.post('/auth/reset/password', { password, confirm_password:confirmPassword, token }).then((response) => {
       const message = response.data
       return message
     })
   },
 
+  requestResetPassword({ commit, dispatch, getters }, { email } = {}) {
+    if(getters.loggedIn) return dispatch('validate');
+    
+    return axios.post('/auth/send/password-reset/request', { email }).then((response) => {
+      const message = response.data;
+      return message;
+    })
+  },
+
   // Validates the current user's token and refreshes it
   // with new data from the API.
-  validate({ commit, state }) {
+  async validate({ commit, state }) {
     if (state.currentUser) return Promise.resolve(state.currentUser)
 
-    return axios.get(`${process.env.API_BASE_URL}auth/user`)
-      .then((response) => {
-        const user = response.data
-        commit('SET_CURRENT_USER', user)
-        return user
-      })
-      .catch((error) => {
-        console.log(error.response.status)
-        if (error.response && error.response.status === 401) {
-          console.log('here')
-          commit('SET_USER_TOKEN', null)
-          router.push('/login')
-        }
-        return null
-      })
+    try {
+      const response = await axios.get(`${process.env.API_BASE_URL}auth/user`);
+      const user = response.data;
+      commit('SET_CURRENT_USER', user);
+      return user;
+    } catch (error) {
+      console.log(error.response.status);
+      if (error.response && error.response.status === 401) {
+        commit('SET_USER_TOKEN', null);
+      }
+      return null;
+    }
   },
 }
 

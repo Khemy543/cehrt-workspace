@@ -57,7 +57,7 @@ export default {
 					<feather type="chevron-down" class="align-middle"></feather>
 				</template>
 
-				<b-dropdown-item href="/pages/profile" class="notify-item">
+				<b-dropdown-item to="/profile" class="notify-item">
 					<feather
 						type="user"
 						class="icon-dual icon-xs mr-2 align-middle"
@@ -65,29 +65,29 @@ export default {
 					<span>My Account</span>
 				</b-dropdown-item>
 
-				<b-dropdown-item href="javascript:void(0);" class="notify-item">
+				<!-- <b-dropdown-item href="javascript:void(0);" class="notify-item">
 					<feather
 						type="settings"
 						class="icon-dual icon-xs mr-2 align-middle"
 					></feather>
 					<span>Settings</span>
-				</b-dropdown-item>
+				</b-dropdown-item> -->
 
-				<b-dropdown-item href="javascript:void(0);" class="notify-item">
+				<!-- <b-dropdown-item href="javascript:void(0);" class="notify-item">
 					<feather
 						type="help-circle"
 						class="icon-dual icon-xs mr-2 align-middle"
 					></feather>
 					<span>Support</span>
-				</b-dropdown-item>
+				</b-dropdown-item> -->
 
-				<b-dropdown-item href="javascript: void(0);" class="notify-item">
+				<!-- <b-dropdown-item href="javascript: void(0);" class="notify-item">
 					<feather
 						type="lock"
 						class="icon-dual icon-xs mr-2 align-middle"
 					></feather>
 					<span>Lock Screen</span>
-				</b-dropdown-item>
+				</b-dropdown-item> -->
 
 				<b-dropdown-divider></b-dropdown-divider>
 

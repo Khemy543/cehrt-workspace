@@ -26,11 +26,10 @@ export default {
 				.then((token) => {
 					this.isAuthError = false
 					// Redirect to login page
-					this.$router.push({ name: 'login' })
+					this.clearToken()
 				})
-				.catch(() => {
-                    this.clearToken()
-                    this.$router.push({ name: 'login' })
+				.catch( async () => {
+                    this.clearToken();
 				})
 		},
 	},
@@ -44,7 +43,7 @@ export default {
 			<div class="container">
 				<div class="row justify-content-center align-items-center vh-100">
                     <div class=" text-center">
-                        <feather type="user"></feather>
+                         <b-spinner type="grow" variant="primary"></b-spinner>
                         <div>Loggin out...</div>
                     </div>
 				</div>
