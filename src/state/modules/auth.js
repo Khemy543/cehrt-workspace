@@ -1,4 +1,5 @@
-import axios from 'axios'
+import axios from 'axios';
+import router from '../../router';
 
 export const state = {
   currentUser: null,
@@ -96,8 +97,11 @@ export const actions = {
         return user
       })
       .catch((error) => {
+        console.log(error.response.status)
         if (error.response && error.response.status === 401) {
-          commit('SET_CURRENT_USER', null)
+          console.log('here')
+          commit('SET_USER_TOKEN', null)
+          router.push('/login')
         }
         return null
       })

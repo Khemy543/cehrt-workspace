@@ -18,7 +18,7 @@ export default {
     PersonalIformation,
     FormWizard,
     TabContent,
-    WorkInformation
+    WorkInformation,
   },
   data() {
     return {
@@ -28,10 +28,10 @@ export default {
           text: 'Cehrt',
           to: '/',
         },
-		{
-			text:'User Management',
-			to: '/user-management/staff'
-		},
+        {
+          text: 'User Management',
+          to: '/user-management/staff',
+        },
         {
           text: 'Add Staff',
           active: true,
@@ -44,8 +44,8 @@ export default {
       finalModel: {},
     }
   },
-  mounted(){
-	  this.makeToast()
+  mounted() {
+    this.makeToast()
   },
   methods: {
     validateStep(name) {
@@ -58,82 +58,84 @@ export default {
         this.finalModel = Object.assign({}, this.finalModel, model)
       }
     },
-	getIds(departments){
-		return departments.map((items) => items.id)
-	},
-	makeToast({ title, message, type }) {
-        this.$bvToast.toast(message, {
-          title: title,
-          autoHideDelay: 5000,
-		  appendToast:false,
-		  variant:type
-        })
+    getIds(departments) {
+      return departments.map((items) => items.id)
+    },
+    makeToast({ title, message, type }) {
+      this.$bvToast.toast(message, {
+        title: title,
+        autoHideDelay: 5000,
+        appendToast: false,
+        variant: type,
+      })
     },
     async addStaff() {
-		console.log(this.finalModel)
-		const {
-			firstName,
-			lastName,
-			address,
-			email,
-			phone,
-			title,
-			startDate,
-			maritalStatus,
-			birthDate,
-			nhia,
-			snnit,
-			otherNames,
-			preferredName,
-			supervisor,
-			spouseName,
-			spouseEmployer,
-			spousePhone,
-			alternatePhone,
-			departments,
-			staffId
-		} = this.finalModel
+      console.log(this.finalModel)
+      const {
+        firstName,
+        lastName,
+        address,
+        email,
+        phone,
+        title,
+        startDate,
+        maritalStatus,
+        birthDate,
+        nhia,
+        snnit,
+        otherNames,
+        preferredName,
+        supervisor,
+        spouseName,
+        spouseEmployer,
+        spousePhone,
+        alternatePhone,
+        departments,
+        staffId,
+      } = this.finalModel
       try {
-        const response = this.$http.post('/admin/add/staff', {
-			othernames:otherNames,
-			preferred_name: preferredName,
-			firstname:firstName,
-			lastname: lastName,
-			address,
-			email,
-			phone_number: phone,
-			title,
-			start_date: startDate,
-			marital_status: maritalStatus,
-			dob:birthDate,
-			NHIA_number: nhia,
-			SNNIT_number: snnit,
-			supervisor_id:Number(supervisor),
-			...(maritalStatus==='married' ? { 
-				spouse_name:spouseName,
-				spouse_employer:spouseEmployer,
-				spouse_work_phone:spousePhone,
-			 }: {}),
-			alternative_phone_number:alternatePhone,
-			department_ids:this.getIds(departments),
-			staff_id:staffId
-
-		})
+        const response = await this.$http.post('/admin/add/staff', {
+          othernames: otherNames,
+          preferred_name: preferredName,
+          firstname: firstName,
+          lastname: lastName,
+          address,
+          email,
+          phone_number: phone,
+          title,
+          start_date: startDate,
+          marital_status: maritalStatus,
+          dob: birthDate,
+          NHIA_number: nhia,
+          SNNIT_number: snnit,
+          supervisor_id: Number(supervisor),
+          ...(maritalStatus === 'married'
+            ? {
+                spouse_name: spouseName,
+                spouse_employer: spouseEmployer,
+                spouse_work_phone: spousePhone,
+              }
+            : {}),
+          alternative_phone_number: alternatePhone,
+          department_ids: this.getIds(departments),
+          staff_id: staffId,
+        })
 
         if (response && response.data) {
-			this.makeToast({
-				title:"Success",
-				message:'Staff created successfully',
-				type:"success"
-			})
+          this.makeToast({
+            title: 'Success',
+            message: 'Staff created successfully',
+            type: 'success',
+          })
+          this.$router.push('/user-management/staff')
         }
       } catch (error) {
-		  this.makeToast({
-			title:"Error",
-			message:'Something',
-			type:"danger"
-		  })
-	  }
+        this.makeToast({
+          title: 'Error',
+          message: 'Something',
+          type: 'danger',
+        })
+      }
     },
   },
 }

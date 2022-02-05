@@ -153,6 +153,7 @@ export default {
             tag="a"
             :to="`${item.path}/${subitem.path}`"
             class="side-nav-link-ref"
+            :class="subitem.invisible ? 'd-none' : ''"
             >{{ subitem.name }}</router-link
           >
 

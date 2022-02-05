@@ -18,15 +18,15 @@ export default {
       items: [
         {
           text: 'Cehrt',
-          href: '/',
+          to: '/',
         },
         {
           text: 'User Management',
-          href: '/user-management/staff',
+          to: '/user-management/staff',
         },
         {
           text: 'View Staff',
-          href: "/",
+          to: "/",
           active:true
         }
       ],
@@ -44,12 +44,11 @@ export default {
         const response = await this.$http.get('/admin/fetch/staff');
 
         if(response && response.data) {
-          this.staff = response.data
+          this.staff = response.data;
+          this.loading = false;
         }
       } catch (error) {
         
-      }finally{
-          this.loading = false
       }
     },
   }
@@ -89,7 +88,7 @@ export default {
                     <td>{{ user.email}}</td>
                     <td>{{ user.phone_number }}</td>
                     <td>
-                        <router-link to="/">
+                        <router-link :to="`/user-management/staff/${user.id}/view-staff`">
                             <feather type="eye" />
                         </router-link>
                     </td>

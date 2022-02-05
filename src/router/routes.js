@@ -100,7 +100,16 @@ const userManagementRoutes = [
         path: 'staff',
         meta: { authRequired: true },
         component: () =>
-          lazyLoadView(import('@views/pages/administrator/user-management/staff.vue')),
+          lazyLoadView(import('@views/pages/administrator/user-management/staff/index.vue')),
+      },
+      {
+        name: 'Staff',
+        path: 'staff/:id/view-staff',
+        meta: { authRequired: true },
+        invisible: true,
+        props: true,
+        component: () =>
+          lazyLoadView(import('@views/pages/administrator/user-management/staff/view-staff.vue')),
       },
       {
         name: 'Add Staff',
@@ -112,6 +121,18 @@ const userManagementRoutes = [
     ],
   }
 ];
+
+// departments route
+const departmentRoutes = [
+  {
+    path: '/department',
+    name: 'Department',
+    icon: 'layers',
+    component: () => lazyLoadView(import('@views/pages/administrator/departments/index.vue')),
+    meta: { authRequired: true },
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+  },
+]
 
 // finance routes
 
@@ -253,6 +274,7 @@ const taskAppsRoutes = [
 
 const appsRoutes = [
   ...userManagementRoutes,
+  ...departmentRoutes,
   ...calendarAppsRoutes,
   ...emailAppsRoutes,
   ...projectAppsRoutes,
