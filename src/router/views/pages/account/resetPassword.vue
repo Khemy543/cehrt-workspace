@@ -13,12 +13,12 @@ export default {
 	components: { Layout },
 	data() {
 		return {
-			email: '',
-			error: null,
+			error:"",
 			tryingToReset: false,
 			isResetError: false,
 			isSuccess: false,
 			successMessage: null,
+            form: {}
 		}
 	},
 	computed: {},
@@ -27,17 +27,28 @@ export default {
 		// Try to register the user in with the email, fullname
 		// and password they provided.
 		tryToReset() {
-			this.tryingToReset = true
+			const { password, confirm_password:confirmPassword } = this.form;
+
+			if(password !== confirmPassword) {
+				this.error = 'Passwords must be the same'
+				this.isResetError = true
+				return;
+			}
+			this.tryingToReset = true;
+			this.form = { ...this.form, token: this.$route.query.token };
 			// Reset the authError if it existed.
 			this.error = null
-			return this.requestResetPassword({
-				email: this.email,
-			})
+			return this.resetPassword(this.form)
 				.then((data) => {
 					this.tryingToReset = false
 					this.isResetError = false
-					this.isSuccess = true
-					this.successMessage = data.message
+					this.$bvToast.toast('Password reset successful', {
+						title: 'Success',
+						autoHideDelay: 5000,
+						appendToast: false,
+						variant: 'success',
+					})
+					this.$router.push({ name: 'login' })
 				})
 				.catch((error) => {
 					this.tryingToReset = false
@@ -55,11 +66,11 @@ export default {
 		<div class="account-pages my-5">
 			<div class="container">
 				<div class="row justify-content-center">
-					<div class="col-xl-10">
+					<div class="col-xl-6">
 						<div class="card">
 							<div class="card-body p-0">
 								<div class="row">
-									<div class="col-6 p-5">
+									<div class="col-12 p-5">
 										<div class="mx-auto mb-5">
 											<a href="/">
 												<img src="@assets/images/logo.png" alt height="24" />
@@ -69,10 +80,9 @@ export default {
 											</a>
 										</div>
 
-										<h6 class="h5 mb-0 mt-4">Forgot Password?</h6>
+										<h6 class="h5 mb-0 mt-4">Reset Password</h6>
 										<p class="text-muted mt-1 mb-5"
-											>Enter your email address and we'll send you an email with
-											instructions to reset your password.</p
+											>Enter a new password.</p
 										>
 
 										<b-alert
@@ -94,20 +104,37 @@ export default {
 											@submit.prevent="tryToReset"
 										>
 											<div class="form-group">
-												<label class="form-control-label">Email Address</label>
+												<label class="form-control-label">New Password</label>
 												<div class="input-group input-group-merge">
 													<div class="input-group-prepend">
 														<span class="input-group-text">
-															<feather type="mail" class="icon-dual"></feather>
+															<feather type="lock" class="icon-dual"></feather>
 														</span>
 													</div>
 													<input
-														id="email"
-														v-model="email"
-														type="email"
+														id="password"
+														v-model="form.password"
+														type="password"
 														class="form-control"
-														placeholder="hello@coderthemes.com"
-														required
+														placeholder="Password"
+													/>
+												</div>
+											</div>
+
+                                            <div class="form-group">
+												<label class="form-control-label">Confirm Password</label>
+												<div class="input-group input-group-merge">
+													<div class="input-group-prepend">
+														<span class="input-group-text">
+															<feather type="lock" class="icon-dual"></feather>
+														</span>
+													</div>
+													<input
+														id="cpassword"
+														v-model="form.confirm_password"
+														type="password"
+														class="form-control"
+														placeholder="Confirm password"
 													/>
 												</div>
 											</div>
@@ -118,20 +145,6 @@ export default {
 												>
 											</div>
 										</form>
-									</div>
-									<div class="col-lg-6 d-none d-md-inline-block">
-										<div class="auth-page-sidebar">
-											<div class="overlay"></div>
-											<div class="auth-user-testimonial">
-												<p class="font-size-24 font-weight-bold text-white mb-1"
-													>I simply love it!</p
-												>
-												<p class="lead"
-													>"It's a elegent templete. I love it very much!"</p
-												>
-												<p>- Admin User</p>
-											</div>
-										</div>
 									</div>
 								</div>
 							</div>

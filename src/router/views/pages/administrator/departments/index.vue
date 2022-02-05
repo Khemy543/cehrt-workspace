@@ -172,6 +172,7 @@ export default {
                   <tr>
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
+                    <th scope="col">Description</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
@@ -183,6 +184,7 @@ export default {
                   >
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ department.name }}</td>
+                    <td>{{ department.description }}</td>
                     <td class=" d-flex">
                       <div class=" mr-4">
                         <feather
@@ -207,7 +209,7 @@ export default {
         </div>
       </div>
     </div>
-    <b-modal v-model="show" :title="formtitle" title-class="font-18">
+    <b-modal v-model="show" :title="formtitle" title-class="font-18" hide-footer>
       <form @submit.prevent="handleSubmit">
         <b-form-group
           id="input-group-1"
@@ -232,9 +234,6 @@ export default {
         </b-form-group>
         <button type="submit" class="btn btn-primary">Submit</button>
       </form>
-      <template v-slot:modal-footer>
-        <div></div>
-      </template>
     </b-modal>
   </Layout>
 </template>

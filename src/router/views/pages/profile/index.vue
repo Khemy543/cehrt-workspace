@@ -38,12 +38,8 @@ export default {
 			title: 'Profile',
 			items: [
 				{
-					text: 'Shreyu',
-					href: '/',
-				},
-				{
-					text: 'Pages',
-					href: '/',
+					text: 'Cehrt',
+					to: '/',
 				},
 				{
 					text: 'Profile',
@@ -59,11 +55,11 @@ export default {
 	<Layout>
 		<PageHeader :title="title" :items="items" />
 		<div class="row">
-			<div class="col-lg-3">
+			<div class="col-lg-4">
 				<UserCard />
 			</div>
 
-			<div class="col-lg-9">
+			<div class="col-lg-8">
 				<div class="card">
 					<div class="card-body">
 						<b-tabs class="navtab-bg" pills justified>

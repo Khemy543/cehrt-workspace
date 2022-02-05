@@ -22,7 +22,8 @@ const authRoutes = [
   {
     path: '/departments',
     name: 'departments',
-    component: () => lazyLoadView(import('@views/pages/account/chooseDepartment')),
+    component: () =>
+      lazyLoadView(import('@views/pages/account/chooseDepartment')),
     meta: { authRequired: true },
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
@@ -31,6 +32,24 @@ const authRoutes = [
     name: 'forget-password',
     component: () =>
       lazyLoadView(import('@views/pages/account/forgetPassword')),
+    meta: {
+      beforeResolve(routeTo, routeFrom, next) {
+        // If the user is already logged in
+        if (store.getters['auth/loggedIn']) {
+          // Redirect to the home page instead
+          next({ name: 'dashboard' })
+        } else {
+          // Continue to the login page
+          next()
+        }
+      },
+    },
+  },
+  {
+    path: '/reset-password',
+    name: 'reset-password',
+    component: () =>
+      lazyLoadView(import('@views/pages/account/resetPassword.vue')),
     meta: {
       beforeResolve(routeTo, routeFrom, next) {
         // If the user is already logged in
@@ -100,7 +119,9 @@ const userManagementRoutes = [
         path: 'staff',
         meta: { authRequired: true },
         component: () =>
-          lazyLoadView(import('@views/pages/administrator/user-management/staff/index.vue')),
+          lazyLoadView(
+            import('@views/pages/administrator/user-management/staff/index.vue')
+          ),
       },
       {
         name: 'Staff',
@@ -109,18 +130,22 @@ const userManagementRoutes = [
         invisible: true,
         props: true,
         component: () =>
-          lazyLoadView(import('@views/pages/administrator/user-management/staff/view-staff.vue')),
+          lazyLoadView(
+            import('@views/pages/administrator/user-management/staff/view-staff.vue')
+          ),
       },
       {
         name: 'Add Staff',
         path: 'add-staff',
         meta: { authRequired: true },
         component: () =>
-          lazyLoadView(import('@views/pages/administrator/user-management/add-staff/index.vue')),
+          lazyLoadView(
+            import('@views/pages/administrator/user-management/add-staff/index.vue')
+          ),
       },
     ],
-  }
-];
+  },
+]
 
 // departments route
 const departmentRoutes = [
@@ -128,9 +153,23 @@ const departmentRoutes = [
     path: '/department',
     name: 'Department',
     icon: 'layers',
-    component: () => lazyLoadView(import('@views/pages/administrator/departments/index.vue')),
-    meta: { authRequired: true },
+    component: {
+      render(c) {
+        return c('router-view')
+      },
+    },
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
+    children: [
+      {
+        name: 'View Departments',
+        path: 'view-departments',
+        meta: { authRequired: true },
+        component: () =>
+          lazyLoadView(
+            import('@views/pages/administrator/departments/index.vue')
+          ),
+      },
+    ]
   },
 ]
 
@@ -138,7 +177,32 @@ const departmentRoutes = [
 
 // consulting routes
 
-
+const workFlowRoutes = [
+  {
+    path: '/work-flow',
+    name: 'Work Flows',
+    icon: 'activity',
+    meta: { authRequired: true },
+    // create a container component
+    component: {
+      render(c) {
+        return c('router-view')
+      },
+    },
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+    children: [
+      {
+        name: 'View Work Flows',
+        path: 'view-workflows',
+        meta: { authRequired: true },
+        component: () =>
+          lazyLoadView(
+            import('@views/pages/consulting/workflows/workflows.vue')
+          ),
+      }
+    ],
+  }
+]
 
 // dashboard
 const dashboardRoutes = [
@@ -166,8 +230,8 @@ const calendarAppsRoutes = [
     component: () => lazyLoadView(import('@views/pages/apps/calendar')),
     meta: { authRequired: true },
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
-  }
-];
+  },
+]
 
 const emailAppsRoutes = [
   {
@@ -187,8 +251,7 @@ const emailAppsRoutes = [
         name: 'Inbox',
         path: 'inbox',
         meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/apps/email/inbox')),
+        component: () => lazyLoadView(import('@views/pages/apps/email/inbox')),
       },
       {
         path: 'read',
@@ -205,8 +268,8 @@ const emailAppsRoutes = [
           lazyLoadView(import('@views/pages/apps/email/emailcompose')),
       },
     ],
-  }
-];
+  },
+]
 
 const projectAppsRoutes = [
   {
@@ -226,8 +289,7 @@ const projectAppsRoutes = [
         path: 'list',
         name: 'List',
         meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/apps/project/list')),
+        component: () => lazyLoadView(import('@views/pages/apps/project/list')),
       },
       {
         path: 'detail',
@@ -237,8 +299,8 @@ const projectAppsRoutes = [
           lazyLoadView(import('@views/pages/apps/project/detail')),
       },
     ],
-  }
-];
+  },
+]
 
 const taskAppsRoutes = [
   {
@@ -269,16 +331,25 @@ const taskAppsRoutes = [
           lazyLoadView(import('@views/pages/apps/tasks/task-board')),
       },
     ],
-  }
-];
+  },
+]
+
+const profileRoute = [
+  {
+    path: '/profile',
+    name: 'Profile',
+    meta: { authRequired: true },
+    component: () => lazyLoadView(import('@views/pages/profile')),
+  },
+]
 
 const appsRoutes = [
   ...userManagementRoutes,
-  ...departmentRoutes,
+  ...departmentRoutes /* 
   ...calendarAppsRoutes,
   ...emailAppsRoutes,
   ...projectAppsRoutes,
-  ...taskAppsRoutes
+  ...taskAppsRoutes */,
 ]
 
 // pages
@@ -305,11 +376,6 @@ const pagesRoutes = [
         path: 'invoice',
         name: 'Invoice',
         component: () => lazyLoadView(import('@views/pages/secondary/invoice')),
-      },
-      {
-        path: 'profile',
-        name: 'Profile',
-        component: () => lazyLoadView(import('@views/pages/secondary/profile/')),
       },
       {
         path: 'activity',
@@ -470,17 +536,22 @@ const chartsRoutes = [
   },
 ]
 
-
 const authProtectedRoutes = [
   ...dashboardRoutes,
   ...appsRoutes,
+  ...workFlowRoutes,
   ...pagesRoutes,
-  ...uiRoutes,
+  /* ...uiRoutes,
   ...formsRoutes,
   ...chartsRoutes,
-  ...tablesRoutes
+  ...tablesRoutes, */
 ]
-const allRoutes = [...authRoutes, ...authProtectedRoutes, ...errorPagesRoutes]
+const allRoutes = [
+  ...authRoutes,
+  ...authProtectedRoutes,
+  ...errorPagesRoutes,
+  ...profileRoute,
+]
 
 export { allRoutes, authProtectedRoutes }
 
