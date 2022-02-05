@@ -222,7 +222,7 @@ const dashboardRoutes = [
 ]
 
 // apps
-const calendarAppsRoutes = [
+/* const calendarAppsRoutes = [
   {
     path: '/apps/calendar',
     name: 'Calendar',
@@ -332,7 +332,7 @@ const taskAppsRoutes = [
       },
     ],
   },
-]
+] */
 
 const profileRoute = [
   {
@@ -393,7 +393,7 @@ const pagesRoutes = [
 ]
 
 // ui
-const uiRoutes = [
+/* const uiRoutes = [
   {
     path: '/ui',
     name: 'UI Elements',
@@ -534,7 +534,7 @@ const chartsRoutes = [
     meta: { authRequired: true },
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
-]
+] */
 
 const authProtectedRoutes = [
   ...dashboardRoutes,
