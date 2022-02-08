@@ -129,15 +129,15 @@ export default {
 
     async deleteDepartment(id) {
       try {
-        const response = await this.$http.delete(`/admin/delete/${id}/department`);
+        const response = await this.$http.delete(
+          `/admin/delete/${id}/department`
+        )
 
-        if(response && response.data){
-          this.departments =  this.departments.filter(item => item.id !== id);
+        if (response && response.data) {
+          this.departments = this.departments.filter((item) => item.id !== id)
         }
-      } catch (error) {
-        
-      }
-    }
+      } catch (error) {}
+    },
   },
 }
 </script>
@@ -160,9 +160,13 @@ export default {
                 </p>
               </div>
               <div>
-                <b-button variant="primary" @click="show = true"
-                  >Add Department</b-button
+                <button
+                  type="button"
+                  class="btn btn-danger mr-4 mb-3 mb-sm-0"
+                  @click="show = true"
                 >
+                  <i class="uil-plus mr-1"></i> Add Department
+                </button>
               </div>
             </div>
 
@@ -173,7 +177,7 @@ export default {
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
                     <th scope="col">Description</th>
-                    <th scope="col">Action</th>
+                    <th scope="col" class=" text-center">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -185,20 +189,26 @@ export default {
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ department.name }}</td>
                     <td>{{ department.description }}</td>
-                    <td class=" d-flex">
-                      <div class=" mr-4">
-                        <feather
-                          type="edit"
-                          class="icon-dual-primary cursor-pointer"
-                          @click="openModal(department.id)"
-                        />
-                      </div>
-                      <div>
-                        <feather
-                          type="x-circle"
-                          class="icon-dual-danger"
-                          @click="deleteDepartment(department.id)"
-                        />
+                    <td class=" d-flex justify-content-center">
+                      <div class="col-sm-4 col-xl-6 text-sm-right">
+                        <div class="btn-group ml-2 d-none d-sm-inline-block">
+                          <button
+                            type="button"
+                            class="btn btn-soft-primary btn-sm"
+                            @click="openModal(department.id)"
+                          >
+                            <i class="uil uil-edit mr-1"></i>
+                          </button>
+                        </div>
+                        <div class="btn-group d-none d-sm-inline-block ml-3">
+                          <button
+                            type="button"
+                            class="btn btn-soft-danger btn-sm"
+                            @click="deleteDepartment(department.id)"
+                          >
+                            <i class="uil uil-trash-alt mr-1"></i>
+                          </button>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -209,7 +219,12 @@ export default {
         </div>
       </div>
     </div>
-    <b-modal v-model="show" :title="formtitle" title-class="font-18" hide-footer>
+    <b-modal
+      v-model="show"
+      :title="formtitle"
+      title-class="font-18"
+      hide-footer
+    >
       <form @submit.prevent="handleSubmit">
         <b-form-group
           id="input-group-1"

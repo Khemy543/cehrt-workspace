@@ -10,7 +10,7 @@ export default {
   },
   components: {
     Layout,
-    PageHeader
+    PageHeader,
   },
   data() {
     return {
@@ -26,32 +26,30 @@ export default {
         },
         {
           text: 'View Staff',
-          to: "/",
-          active:true
-        }
+          to: '/',
+          active: true,
+        },
       ],
-      staff : [],
-      loading:false
+      staff: [],
+      loading: false,
     }
   },
-  created(){
-      this.fetchStaff()
+  created() {
+    this.fetchStaff()
   },
   methods: {
-      async fetchStaff() {
+    async fetchStaff() {
       this.loading = true
       try {
-        const response = await this.$http.get('/admin/fetch/staff');
+        const response = await this.$http.get('/admin/fetch/staff')
 
-        if(response && response.data) {
-          this.staff = response.data;
-          this.loading = false;
+        if (response && response.data) {
+          this.staff = response.data
+          this.loading = false
         }
-      } catch (error) {
-        
-      }
+      } catch (error) {}
     },
-  }
+  },
 }
 </script>
 
@@ -59,7 +57,7 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <div v-if="loading" class=" d-flex justify-content-center">
-        <b-spinner type="grow" variant="primary"></b-spinner>
+      <b-spinner type="grow" variant="primary"></b-spinner>
     </div>
     <div v-else class="row">
       <div class="col-lg-12">
@@ -67,7 +65,7 @@ export default {
           <div class="card-body">
             <h4 class="header-title mt-0 mb-1">View Staff</h4>
             <p class="sub-header">
-                View all staff members
+              View all staff members
             </p>
 
             <div class="table-responsive">
@@ -84,13 +82,24 @@ export default {
                 <tbody>
                   <tr v-for="user in staff" :key="user.id">
                     <th scope="row">{{ user.staff_id }}</th>
-                    <td>{{ user.firstname }} {{ user.lastname }} {{ user.other_names }}</td>
-                    <td>{{ user.email}}</td>
+                    <td
+                      >{{ user.firstname }} {{ user.lastname }}
+                      {{ user.other_names }}</td
+                    >
+                    <td>{{ user.email }}</td>
                     <td>{{ user.phone_number }}</td>
                     <td>
-                        <router-link :to="`/user-management/staff/${user.id}/view-staff`">
-                            <feather type="eye" />
-                        </router-link>
+                      <router-link
+                        :to="`/user-management/staff/${user.id}/view-staff`"
+                        class="btn-group ml-2 d-none d-sm-inline-block"
+                      >
+                        <button
+                          type="button"
+                          class="btn btn-soft-primary btn-sm"
+                        >
+                          <i class="uil uil-eye mr-1"></i>
+                        </button>
+                      </router-link>
                     </td>
                   </tr>
                 </tbody>
@@ -99,6 +108,6 @@ export default {
           </div>
         </div>
       </div>
-      </div>
+    </div>
   </Layout>
 </template>

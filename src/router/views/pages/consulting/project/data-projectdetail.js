@@ -10,31 +10,31 @@ const widgetData = [
     text: 'Total Tasks Completed',
   },
   {
-    icon: 'users',
-    value: 12,
-    text: 'Total Team Size',
-  },
-  {
     icon: 'clock',
     value: 2500,
-    text: 'Total Hours Spent',
+    text: 'Total Pending Task',
+  },
+  {
+    icon: 'users',
+    value: 12,
+    text: 'Total Assignees',
   },
 ]
 
 const projectActivity = [
   {
     id: 1,
-    avatar: '09',
-    title: 'Bryan',
-    text: 'Neque porro quisquam est',
-    color: 'primary',
+    title: 'Inception Report',
+    status: 'Pending',
+    task:4
   },
   {
     id: 2,
-    avatar: '08',
-    title: 'Everett',
+    title: 'Scopping Report',
     text: 'Ut enim ad minima veniam quis velit',
     color: 'success',
+    status: 'Completed',
+    task:4
   },
   {
     id: 3,
@@ -42,6 +42,8 @@ const projectActivity = [
     title: 'Richard',
     text: 'Quis autem vel eum iure',
     color: 'warning',
+    status: 'Pending',
+    task:4
   },
   {
     id: 4,
@@ -49,28 +51,9 @@ const projectActivity = [
     title: 'Jery',
     text: 'Quis autem vel eum iure',
     color: 'info',
-  },
-  {
-    id: 5,
-    avatar: '07',
-    title: 'Bryan',
-    text: 'Neque porro quisquam est',
-    color: 'primary',
-  },
-  {
-    id: 6,
-    avatar: '06',
-    title: 'Everett',
-    text: 'Ut enim ad minima veniam quis velit',
-    color: 'success',
-  },
-  {
-    id: 7,
-    avatar: '05',
-    title: 'Richard',
-    text: 'Quis autem vel eum iure',
-    color: 'warning',
-  },
+    status: 'Completed',
+    task:4
+  }
 ]
 
 export { widgetData, projectActivity }

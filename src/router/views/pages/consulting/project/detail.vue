@@ -1,31 +1,32 @@
 <script>
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
+import PageHeader from '@components/page-header'
 
 import { widgetData, projectActivity } from './data-projectdetail'
 
 export default {
   page: {
-    title: 'Basic Tables',
+    title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout },
+  components: { Layout, PageHeader },
   data() {
     return {
       widgetData: widgetData,
       projectActivity: projectActivity,
-      title: 'Basic Tables',
+      title: 'Project Overview',
       items: [
         {
-          text: 'Shreyu',
-          href: '/',
+          text: 'Cehrt',
+          to: '/',
         },
         {
-          text: 'Tables',
-          href: '/',
+          text: 'Projects',
+          to: '/',
         },
         {
-          text: 'Basic',
+          text: 'Landing page Design',
           active: true,
         },
       ],
@@ -36,40 +37,44 @@ export default {
 
 <template>
   <Layout>
-    <div class="row page-title">
-      <div class="col-sm-8 col-xl-6">
-        <h4 class="mb-1 mt-0">
-          Project: Landing page Design
-          <div class="badge badge-success font-size-13 font-weight-normal"
-            >Completed</div
-          >
-          <div
-            class="badge badge-soft-primary font-size-13 font-weight-normal ml-1"
-            >Web Design</div
-          >
-        </h4>
-      </div>
-      <div class="col-sm-4 col-xl-6 text-sm-right">
-        <div class="btn-group ml-2 d-none d-sm-inline-block">
-          <button type="button" class="btn btn-soft-primary btn-sm">
-            <i class="uil uil-edit mr-1"></i>Edit
-          </button>
-        </div>
-        <div class="btn-group d-none d-sm-inline-block ml-1">
-          <button type="button" class="btn btn-soft-danger btn-sm">
-            <i class="uil uil-trash-alt mr-1"></i>Delete
-          </button>
-        </div>
-      </div>
-    </div>
+    <PageHeader :title="title" :items="items" />
 
     <div class="row">
       <div class="col">
         <div class="card">
           <div class="card-body p-0">
-            <h6 class="card-title border-bottom p-3 mb-0 header-title"
-              >Project Overview</h6
+            <div
+              class="card-title border-bottom p-3 mb-0 w-100 d-flex justify-content-between"
             >
+              <div class="row page-title" style="padding:0">
+                <div class="col-sm-12 col-xl-12">
+                  <h4 class="mt-0">
+                    Project: Landing page Design
+                    <div
+                      class="badge badge-success font-size-13 font-weight-normal"
+                      >Completed</div
+                    >
+                    <div
+                      class="badge badge-soft-primary font-size-13 font-weight-normal ml-1"
+                      >Web Design</div
+                    >
+                  </h4>
+                </div>
+              </div>
+
+              <div class="col-sm-4 col-xl-6 text-sm-right">
+                <div class="btn-group ml-2 d-none d-sm-inline-block">
+                  <button type="button" class="btn btn-soft-primary btn-sm">
+                    <i class="uil uil-edit mr-1"></i>Edit
+                  </button>
+                </div>
+                <div class="btn-group d-none d-sm-inline-block ml-1">
+                  <button type="button" class="btn btn-soft-danger btn-sm">
+                    <i class="uil uil-trash-alt mr-1"></i>Delete
+                  </button>
+                </div>
+              </div>
+            </div>
             <div class="row py-1">
               <!-- Widget -->
 
@@ -123,32 +128,6 @@ export default {
                 <li>Et harum quidem rerum</li>
                 <li>Nam libero cum soluta</li>
               </ul>
-
-              <div class="tags">
-                <h6 class="font-weight-bold">Tags</h6>
-                <div class="text-uppercase">
-                  <a
-                    href="javascript: void(0);"
-                    class="badge badge-soft-primary mr-2"
-                    >Html</a
-                  >
-                  <a
-                    href="javascript: void(0);"
-                    class="badge badge-soft-primary mr-2"
-                    >Css</a
-                  >
-                  <a
-                    href="javascript: void(0);"
-                    class="badge badge-soft-primary mr-2"
-                    >Bootstrap</a
-                  >
-                  <a
-                    href="javascript: void(0);"
-                    class="badge badge-soft-primary mr-2"
-                    >JQuery</a
-                  >
-                </div>
-              </div>
 
               <div class="row">
                 <div class="col-lg-3 col-md-6">
@@ -543,7 +522,7 @@ export default {
       <div class="col-xl-4">
         <div class="card">
           <div class="card-body">
-            <h6 class="mt-0 header-title">Project Activities</h6>
+            <h6 class="mt-0 header-title">Project Deliverables</h6>
 
             <ul class="list-unstyled activity-widget">
               <li
@@ -552,44 +531,43 @@ export default {
                 class="activity-list"
               >
                 <div class="media">
-                  <div class="text-center mr-3">
-                    <div class="avatar-sm">
-                      <span
-                        class="avatar-title rounded-circle"
-                        :class="{
-                          'bg-soft-primary text-primary':
-                            `${project.color}` === 'primary',
-                          'bg-soft-success text-success':
-                            `${project.color}` === 'success',
-                          'bg-soft-warning text-warning':
-                            `${project.color}` === 'warning',
-                          'bg-soft-info text-info':
-                            `${project.color}` === 'info',
-                        }"
-                        >{{ project.avatar }}</span
-                      >
-                    </div>
-                    <p class="text-muted font-size-13 mb-0">Jan</p>
-                  </div>
                   <div class="media-body overflow-hidden">
                     <h5 class="font-size-15 mt-2 mb-1">
-                      <a href="javascript: void(0);" class="text-dark">{{
+                      <router-link :to="`/project/deliverable/${project.id}`" class="text-dark">{{
                         project.title
-                      }}</a>
+                      }}</router-link>
                     </h5>
-                    <p class="text-muted font-size-13 text-truncate mb-0">{{
-                      project.text
-                    }}</p>
+                    <div class=" d-flex justify-content-between">
+                      <div>
+                        <a
+                          :id="`task-tooltip-${project.id}`"
+                          href="javascript: void(0)"
+                          class="text-muted d-inline-block bg-transparent"
+                        >
+                          <b-tooltip
+                            :target="`task-tooltip-${project.id}`"
+                            triggers="hover"
+                            placement="top"
+                            >Tasks</b-tooltip
+                          >
+                          <i class="uil uil-bars mr-1"></i>
+                          {{ project.task }} task(s)
+                        </a>
+                      </div>
+                      <div
+                        class="badge badge-success float-right"
+                        :class="{
+                          'badge-warning': `${project.status}` === 'Pending',
+                        }"
+                        >{{ project.status }}</div
+                      >
+                    </div>
                   </div>
+
+                  <div class=""> </div>
                 </div>
               </li>
             </ul>
-            <div class="text-center">
-              <a href="javascript:void(0);" class="btn btn-sm border btn-white">
-                <feather type="loader" class="icon-dual icon-xs mr-2"></feather
-                >Load more
-              </a>
-            </div>
           </div>
         </div>
       </div>

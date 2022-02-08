@@ -20,7 +20,7 @@ export default {
   computed: {
     ...layoutComputed,
     show() {
-      return this.user.must_change_password === 0
+      return this.user.must_change_password ? this.user.must_change_password === 0 : false
     },
   },
   created: () => {

@@ -269,11 +269,11 @@ const emailAppsRoutes = [
       },
     ],
   },
-]
+] */
 
 const projectAppsRoutes = [
   {
-    path: '/apps/project',
+    path: '/project',
     name: 'Project',
     icon: 'briefcase',
     meta: { authRequired: true },
@@ -287,22 +287,39 @@ const projectAppsRoutes = [
     children: [
       {
         path: 'list',
-        name: 'List',
+        name: 'View Projects',
         meta: { authRequired: true },
-        component: () => lazyLoadView(import('@views/pages/apps/project/list')),
+        component: () => lazyLoadView(import('@views/pages/consulting/project/list')),
       },
       {
-        path: 'detail',
+        path: 'details/:id',
         name: 'Detail',
+        invisible:true,
         meta: { authRequired: true },
         component: () =>
-          lazyLoadView(import('@views/pages/apps/project/detail')),
+          lazyLoadView(import('@views/pages/consulting/project/detail')),
+      },
+      {
+        path: 'deliverable/:id',
+        name: 'Task List',
+        invisible:true,
+        meta: { authRequired: true },
+        component: () =>
+        lazyLoadView(import('@views/pages/consulting/tasks/task-board')),
+      },
+      {
+        path: 'task-board',
+        name: 'Kanban Board',
+        invisible:true,
+        meta: { authRequired: true },
+        component: () =>
+        lazyLoadView(import('@views/pages/consulting/tasks/task-list')),
       },
     ],
   },
 ]
 
-const taskAppsRoutes = [
+/* const taskAppsRoutes = [
   {
     path: '/apps/task',
     name: 'Task',
@@ -332,8 +349,8 @@ const taskAppsRoutes = [
       },
     ],
   },
-] */
-
+]
+ */
 const profileRoute = [
   {
     path: '/profile',
@@ -345,15 +362,14 @@ const profileRoute = [
 
 const appsRoutes = [
   ...userManagementRoutes,
-  ...departmentRoutes /* 
+  ...departmentRoutes ,/* 
   ...calendarAppsRoutes,
-  ...emailAppsRoutes,
+  ...emailAppsRoutes, */
   ...projectAppsRoutes,
-  ...taskAppsRoutes */,
 ]
 
 // pages
-const pagesRoutes = [
+/* const pagesRoutes = [
   {
     path: '/pages',
     name: 'Pages',
@@ -393,7 +409,7 @@ const pagesRoutes = [
 ]
 
 // ui
-/* const uiRoutes = [
+const uiRoutes = [
   {
     path: '/ui',
     name: 'UI Elements',
@@ -444,6 +460,7 @@ const pagesRoutes = [
     ],
   },
 ]
+
 
 // forms
 const formsRoutes = [
@@ -540,8 +557,8 @@ const authProtectedRoutes = [
   ...dashboardRoutes,
   ...appsRoutes,
   ...workFlowRoutes,
-  ...pagesRoutes,
-  /* ...uiRoutes,
+  /* ...pagesRoutes,
+  ...uiRoutes,
   ...formsRoutes,
   ...chartsRoutes,
   ...tablesRoutes, */
