@@ -22,19 +22,19 @@ export default {
 			title: 'Project Tasks Board',
 			items: [
 				{
-					text: 'Shreyu',
+					text: 'Cehrt',
+					to: '/',
+				},
+				{
+					text: 'Projects',
+					to: '/',
+				},
+				{
+					text: 'Project Name',
 					href: '/',
 				},
 				{
-					text: 'Apps',
-					href: '/',
-				},
-				{
-					text: 'Tasks',
-					href: '/',
-				},
-				{
-					text: 'Tasks Board',
+					text: 'Deliverable',
 					active: true,
 				},
 			],
@@ -61,10 +61,10 @@ export default {
 							<div class="col">
 								<label class="font-weight-bold d-inline mr-2">
 									<feather
-										type="hard-drive"
+										type="activity"
 										class="icon-dual icon-xs mr-2 align-middle"
 									></feather
-									>Project:
+									>Work Flows:
 								</label>
 								<b-dropdown
 									class="d-inline"
@@ -72,7 +72,7 @@ export default {
 									toggle-class="font-weight-bold p-0 align-middle"
 								>
 									<template v-slot:button-content>
-										Shreyu Design
+										No work flow Selected
 										<i class="uil uil-angle-down font-size-16 align-middle"></i>
 									</template>
 									<a class="dropdown-item" href="#">
