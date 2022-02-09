@@ -66,7 +66,7 @@ export const actions = {
       ...(firstTime ? {} : { password })
     });
     if(response){
-      commit('SET_CURRENT_USER', { ...getters.currentUser, must_change_password: 1 });
+      commit('SET_CURRENT_USER', { ...getters.currentUser, must_change_password: 0 });
       return true;
     }
   }, 

@@ -81,13 +81,13 @@ export default {
 					<span>Support</span>
 				</b-dropdown-item> -->
 
-				<!-- <b-dropdown-item href="javascript: void(0);" class="notify-item">
+				<b-dropdown-item to="/departments" class="notify-item">
 					<feather
-						type="lock"
+						type="repeat"
 						class="icon-dual icon-xs mr-2 align-middle"
 					></feather>
-					<span>Lock Screen</span>
-				</b-dropdown-item> -->
+					<span>Switch Department</span>
+				</b-dropdown-item>
 
 				<b-dropdown-divider></b-dropdown-divider>
 
@@ -109,11 +109,11 @@ export default {
 				:settings="settings"
 			>
 				<div id="sidebar-menu">
-					<Appmenu />
+					<Appmenu :department="department" />
 				</div>
 			</VuePerfectScrollbar>
 			<div v-else id="sidebar-menu">
-				<Appmenu />
+				<Appmenu :department="department" />
 			</div>
 		</div>
 		<!-- Sidebar -left -->

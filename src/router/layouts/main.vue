@@ -20,7 +20,7 @@ export default {
   computed: {
     ...layoutComputed,
     show() {
-      return this.user.must_change_password ? this.user.must_change_password === 0 : false
+      return this.user.must_change_password ? this.user.must_change_password === 1 : false
     },
   },
   created: () => {
@@ -107,6 +107,7 @@ export default {
       cancel-disabled
       hide-header-close
       no-close-on-backdrop
+      no-close-on-esc
     >
       <form @submit.prevent="tryChangePassword">
         <b-form-group id="input-group-1" label="Password" label-for="input-1">
