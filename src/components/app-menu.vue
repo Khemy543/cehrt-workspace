@@ -1,3 +1,86 @@
+<template>
+  <!--- Sidemenu -->
+
+  <ul id="side-menu" class="metismenu">
+    <li
+      v-for="item in menuItems"
+      v-show="department.name === item.department || item.department === 'all'"
+      :key="`item-${item.name}`"
+      class="side-nav-title side-nav-item"
+    >
+      <p v-if="item.header" class="menu-title mb-0">{{ item.header }}</p>
+
+      <a v-if="hasItems(item)" href="javascript:void(0);" class="side-nav-link">
+        <feather v-if="item.icon" :type="item.icon"></feather>
+        <span>{{ item.name }}</span>
+        <span class="menu-arrow"></span>
+      </a>
+
+      <router-link
+        v-if="!hasItems(item)"
+        tag="a"
+        :to="`${item.path}`"
+        class="side-nav-link side-nav-link-ref"
+      >
+        <feather v-if="item.icon" :type="item.icon"></feather>
+        <span>{{ item.name }}</span>
+        <span
+          v-if="item.badge"
+          :class="
+            'badge badge-' + item.badge.varient + ' float-right font-size-11'
+          "
+          >{{ item.badge.text }}</span
+        >
+      </router-link>
+
+      <ul v-if="hasItems(item)" class="nav-second-level">
+        <li
+          v-for="subitem in item.children"
+          :key="`sub-item-${subitem.name}`"
+          :class="{ 'side-nav-item': hasItems(subitem) }"
+        >
+          <a
+            v-if="hasItems(subitem)"
+            href="javascript:void(0);"
+            class="side-nav-link-a-ref"
+          >
+            {{ subitem.name }}
+            <span class="menu-arrow"></span>
+          </a>
+
+          <router-link
+            v-if="!hasItems(subitem)"
+            tag="a"
+            :to="`${item.path}/${subitem.path}`"
+            class="side-nav-link-ref"
+            :class="subitem.invisible ? 'd-none' : ''"
+            >{{ subitem.name }}</router-link
+          >
+
+          <ul
+            v-if="hasItems(subitem)"
+            class="nav-third-level"
+            aria-expanded="false"
+          >
+            <li
+              v-for="subSubitem in subitem.children"
+              :key="`sub-sub-item-${subSubitem.name}`"
+            >
+              <router-link
+                tag="a"
+                :to="`${item.path}/${subitem.path}/${subSubitem.path}`"
+                class="side-nav-link-ref"
+                >{{ subSubitem.name }}</router-link
+              >
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+
+  <!-- End Sidebar -->
+</template>
 <script>
 import MetisMenu from 'metismenujs/dist/metismenujs'
 
@@ -14,6 +97,10 @@ export default {
       type: String,
       default: 'vertical',
     },
+    department: {
+      type:Object,
+      default: () => {}
+    }
   },
   data() {
     return {
@@ -98,86 +185,3 @@ export default {
   },
 }
 </script>
-
-<template>
-  <!--- Sidemenu -->
-
-  <ul id="side-menu" class="metismenu">
-    <li
-      v-for="item in menuItems"
-      :key="`item-${item.name}`"
-      class="side-nav-title side-nav-item"
-    >
-      <p v-if="item.header" class="menu-title mb-0">{{ item.header }}</p>
-
-      <a v-if="hasItems(item)" href="javascript:void(0);" class="side-nav-link">
-        <feather v-if="item.icon" :type="item.icon"></feather>
-        <span>{{ item.name }}</span>
-        <span class="menu-arrow"></span>
-      </a>
-
-      <router-link
-        v-if="!hasItems(item)"
-        tag="a"
-        :to="`${item.path}`"
-        class="side-nav-link side-nav-link-ref"
-      >
-        <feather v-if="item.icon" :type="item.icon"></feather>
-        <span>{{ item.name }}</span>
-        <span
-          v-if="item.badge"
-          :class="
-            'badge badge-' + item.badge.varient + ' float-right font-size-11'
-          "
-          >{{ item.badge.text }}</span
-        >
-      </router-link>
-
-      <ul v-if="hasItems(item)" class="nav-second-level">
-        <li
-          v-for="subitem in item.children"
-          :key="`sub-item-${subitem.name}`"
-          :class="{ 'side-nav-item': hasItems(subitem) }"
-        >
-          <a
-            v-if="hasItems(subitem)"
-            href="javascript:void(0);"
-            class="side-nav-link-a-ref"
-          >
-            {{ subitem.name }}
-            <span class="menu-arrow"></span>
-          </a>
-
-          <router-link
-            v-if="!hasItems(subitem)"
-            tag="a"
-            :to="`${item.path}/${subitem.path}`"
-            class="side-nav-link-ref"
-            :class="subitem.invisible ? 'd-none' : ''"
-            >{{ subitem.name }}</router-link
-          >
-
-          <ul
-            v-if="hasItems(subitem)"
-            class="nav-third-level"
-            aria-expanded="false"
-          >
-            <li
-              v-for="subSubitem in subitem.children"
-              :key="`sub-sub-item-${subSubitem.name}`"
-            >
-              <router-link
-                tag="a"
-                :to="`${item.path}/${subitem.path}/${subSubitem.path}`"
-                class="side-nav-link-ref"
-                >{{ subSubitem.name }}</router-link
-              >
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </li>
-  </ul>
-
-  <!-- End Sidebar -->
-</template>

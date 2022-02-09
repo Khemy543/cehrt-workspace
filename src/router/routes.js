@@ -105,6 +105,7 @@ const userManagementRoutes = [
     name: 'User Management',
     header: 'Apps',
     icon: 'user-plus',
+    department: 'Administration',
     meta: { authRequired: true },
     // create a container component
     component: {
@@ -153,6 +154,7 @@ const departmentRoutes = [
     path: '/department',
     name: 'Department',
     icon: 'layers',
+    department: 'Administration',
     component: {
       render(c) {
         return c('router-view')
@@ -182,6 +184,7 @@ const workFlowRoutes = [
     path: '/work-flow',
     name: 'Work Flows',
     icon: 'activity',
+    department: 'Consultancy',
     meta: { authRequired: true },
     // create a container component
     component: {
@@ -210,6 +213,7 @@ const dashboardRoutes = [
     path: '/',
     name: 'Dashboard',
     header: 'Navigation',
+    department: 'all',
     icon: 'home',
     badge: {
       text: '1',
@@ -276,6 +280,7 @@ const projectAppsRoutes = [
     path: '/project',
     name: 'Project',
     icon: 'briefcase',
+    department: 'Consultancy',
     meta: { authRequired: true },
     // create a container component
     component: {
