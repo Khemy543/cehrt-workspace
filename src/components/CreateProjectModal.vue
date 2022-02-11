@@ -1,13 +1,13 @@
 <template>
   <b-modal
     :visible="show"
-    :title="formtitle"
+    :title="formTitle"
     :hide="close"
     :close="close"
     title-class="font-18"
     hide-footer
   >
-    <form @submit.prevent="handleSubmit">
+    <form @submit.prevent="action(form)">
       <b-form-group
         id="input-group-1"
         label="Project Title"
@@ -110,19 +110,40 @@ export default {
       type: Function,
       required: true,
     },
-    formtitle: {
+    formTitle: {
       type: String,
-      default: 'Create New Project',
+      required: true
     },
+    action: {
+      type: Function,
+      required: true
+    },
+    project: {
+      type: Object,
+      default: () => {}
+    }
   },
   data() {
     return {
       form: {
         project_type_id: '',
         project_sector_id: '',
+        ...this.project
       },
       projectTypes: [],
       sectors: [],
+    }
+  },
+
+  watch: {
+    project(newValue) {
+      this.form = {
+        ...newValue,
+        project_type_id: newValue.project_type.id || '',
+        project_sector_id: newValue.project_sector.id || '',
+        start_date: newValue.raw_start_date,
+        end_date: newValue.raw_end_date
+      }
     }
   },
   created() {
@@ -130,36 +151,6 @@ export default {
     this.getProjectTypes()
   },
   methods: {
-    async handleSubmit() {
-      try {
-        const response = await this.$http.post('/create/project', this.form)
-
-        if (response) {
-          this.form = {}
-          this.$emit('addNewProject', response.data.project)
-        }
-      } catch (error) {
-        if(error.response) {
-          const { status, data } = error.response;
-          if(status === 422) {
-            const { errors } = data;
-             return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
-              title: 'Error',
-              autoHideDelay: 5000,
-              appendToast: false,
-              variant: 'danger',
-            })
-          }
-        }
-        this.$bvToast.toast('Something happened, Please try again later', {
-          title: 'Error',
-          autoHideDelay: 5000,
-          appendToast: false,
-          variant: 'danger',
-          toastClass:'text-white'
-        })
-      }
-    },
     async getSectors() {
       try {
         const response = await this.$http.get('/fetch/project/sectors')

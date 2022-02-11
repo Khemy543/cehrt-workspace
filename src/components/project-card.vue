@@ -18,7 +18,7 @@ export default {
 </script>
 
 <template>
-  <router-link :to="`details/1`" class="col-xl-4 col-lg-6">
+  <router-link :to="`details/${project.id}`" class="col-xl-4 col-lg-6">
     <div class="card border">
       <div class="card-body">
         <div
@@ -103,7 +103,7 @@ export default {
                     >Comments</b-tooltip
                   >
                   <i class="uil uil-comments-alt mr-1"></i>
-                  {{ project.comment || 0 }}
+                  {{ project.comments || 0 }}
                 </a>
               </li>
             </ul>

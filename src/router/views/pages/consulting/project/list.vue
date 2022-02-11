@@ -13,6 +13,7 @@ export default {
   data() {
     return {
       projectData: [],
+      links: {},
       title: 'Projects',
       items: [
         {
@@ -38,32 +39,64 @@ export default {
     this.getProjects()
   },
   methods: {
-    async getProjects() {
+    async getProjects(link) {
       try {
         this.loading = true
-        const response = await this.$http.get('/fetch/projects')
+        const response = await this.$http.get(link || '/fetch/projects')
 
         if (response) {
-          this.projectData = response.data
+          const { data, links } = response.data;
+          this.projectData = [...this.projectData, ...data];
+          this.links = links
           this.loading = false
         }
-      } catch (error) {}
+      } catch (error) {
+        console.log(error)
+      }
     },
     closeModal() {
       this.show = false
     },
-    addNewProject(project) {
-      this.projectData.push(project)
+    async addNewProject(form) {
+      try {
+        const response = await this.$http.post('/create/project', form)
 
-      this.closeModal()
+        if (response) {
+          this.form = {}
 
-      this.$bvToast.toast('New project added successfully', {
-        title: 'Success',
-        autoHideDelay: 5000,
-        appendToast: false,
-        variant: 'success',
-        toastClass:'text-white'
-      })
+          this.projectData.push(response.data.project)
+
+          this.closeModal()
+
+          this.$bvToast.toast('New project added successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+            toastClass:'text-white'
+          })
+        }
+      } catch (error) {
+        if(error.response) {
+          const { status, data } = error.response;
+          if(status === 422) {
+            const { errors } = data;
+             return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass:'text-white'
+        })
+      }
     },
   },
 }
@@ -116,26 +149,25 @@ export default {
         :project="project"
       />
     </div>
-    <!-- <div class="row mb-3 mt-2">
+    <div v-if="links.next" class="row mb-3 mt-2">
 			<div class="col-12">
 				<div class="text-center">
-					<a href="javascript:void(0);" class="btn btn-white">
+					<div class="btn btn-white" @click="getProjects(links.next)">
 						<feather
 							type="loader"
 							class="icon-dual icon-xs mr-2 align-middle"
 						></feather
 						>Load more
-					</a>
+					</div>
 				</div>
 			</div>
-		</div> -->
-    <!-- end row -->
+		</div>
 
     <CreateProjectModal
       :show="show"
       :form-title="formtitle"
       :close="closeModal"
-      @addNewProject="addNewProject"
+      :action="addNewProject"
     />
   </Layout>
 </template>
