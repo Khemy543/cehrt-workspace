@@ -225,12 +225,22 @@ const proposalRoutes = [
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
     children: [
       {
-        name: 'View Proposals',
+        name: 'Proposals',
         path: 'view-proposals',
         meta: { authRequired: true },
         component: () =>
           lazyLoadView(
             import('@views/pages/consulting/proposals/index.vue')
+          ),
+      },
+      {
+        name: 'Proposals details',
+        path: '/proposals/details/:id',
+        invisible: true,
+        meta: { authRequired: true },
+        component: () =>
+          lazyLoadView(
+            import('@views/pages/consulting/proposals/details.vue')
           ),
       }
     ],
@@ -256,11 +266,12 @@ const dashboardRoutes = [
 ]
 
 // apps
-/* const calendarAppsRoutes = [
+const calendarAppsRoutes = [
   {
     path: '/apps/calendar',
     name: 'Calendar',
     icon: 'calendar',
+    department: 'Consultancy',
     component: () => lazyLoadView(import('@views/pages/apps/calendar')),
     meta: { authRequired: true },
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
@@ -272,6 +283,7 @@ const emailAppsRoutes = [
     path: '/apps/email',
     name: 'Email',
     icon: 'inbox',
+    department: 'Consultancy',
     meta: { authRequired: true },
     // create a container component
     component: {
@@ -303,7 +315,7 @@ const emailAppsRoutes = [
       },
     ],
   },
-] */
+]
 
 const projectAppsRoutes = [
   {
@@ -397,20 +409,21 @@ const profileRoute = [
 
 const appsRoutes = [
   ...userManagementRoutes,
-  ...departmentRoutes ,/* 
+  ...departmentRoutes ,
   ...calendarAppsRoutes,
-  ...emailAppsRoutes, */
+  ...emailAppsRoutes,
   ...proposalRoutes,
   ...projectAppsRoutes,
 ]
 
 // pages
-/* const pagesRoutes = [
+const pagesRoutes = [
   {
     path: '/pages',
     name: 'Pages',
     icon: 'file-text',
     header: 'Custom',
+    department: "Consultancy",
     meta: { authRequired: true },
     // create a container component
     component: {
@@ -443,7 +456,7 @@ const appsRoutes = [
     ],
   },
 ]
-
+/*
 // ui
 const uiRoutes = [
   {
@@ -593,8 +606,8 @@ const authProtectedRoutes = [
   ...dashboardRoutes,
   ...appsRoutes,
   ...workFlowRoutes,
-  /* ...pagesRoutes,
-  ...uiRoutes,
+  ...pagesRoutes,
+  /* ...uiRoutes,
   ...formsRoutes,
   ...chartsRoutes,
   ...tablesRoutes, */
