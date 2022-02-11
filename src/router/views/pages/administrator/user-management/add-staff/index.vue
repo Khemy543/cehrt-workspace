@@ -128,7 +128,7 @@ export default {
       } catch (error) {
         this.makeToast({
           title: 'Error',
-          message: 'Something',
+          message: 'Something happend, Please try again later',
           type: 'danger',
         })
       }
@@ -175,7 +175,7 @@ export default {
                       <h2 class="mt-0">
                         <i class="mdi mdi-check-all"></i>
                       </h2>
-                      <h3 class="mt-0">Thank you !</h3>
+                      <h3 class="mt-0">Add New Staff !</h3>
 
                       <p class="w-75 mb-2 mx-auto">
                         Quisque nec turpis at urna dictum luctus. Suspendisse
@@ -183,7 +183,7 @@ export default {
                         dui. Aliquam mattis dictum aliquet.
                       </p>
 
-                      <div class="mb-3">
+                      <!-- <div class="mb-3">
                         <div class="custom-control custom-checkbox">
                           <input
                             id="customCheck1"
@@ -194,7 +194,7 @@ export default {
                             >I agree with the Terms and Conditions</label
                           >
                         </div>
-                      </div>
+                      </div> -->
                     </div>
                   </div>
                   <!-- end col -->

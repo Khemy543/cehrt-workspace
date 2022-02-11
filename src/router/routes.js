@@ -207,6 +207,36 @@ const workFlowRoutes = [
   }
 ]
 
+// proposal routes
+
+const proposalRoutes = [
+  {
+    path: '/proposals',
+    name: 'Proposals',
+    icon: 'bookmark',
+    department: 'Consultancy',
+    meta: { authRequired: true },
+    // create a container component
+    component: {
+      render(c) {
+        return c('router-view')
+      },
+    },
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+    children: [
+      {
+        name: 'View Proposals',
+        path: 'view-proposals',
+        meta: { authRequired: true },
+        component: () =>
+          lazyLoadView(
+            import('@views/pages/consulting/proposals/index.vue')
+          ),
+      }
+    ],
+  }
+] 
+
 // dashboard
 const dashboardRoutes = [
   {
@@ -370,6 +400,7 @@ const appsRoutes = [
   ...departmentRoutes ,/* 
   ...calendarAppsRoutes,
   ...emailAppsRoutes, */
+  ...proposalRoutes,
   ...projectAppsRoutes,
 ]
 

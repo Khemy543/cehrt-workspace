@@ -12,12 +12,16 @@ import vco from 'v-click-outside'
 import VueRouter from 'vue-router'
 import VueFeather from 'vue-feather'
 import flatPickr from 'vue-flatpickr-component'
+import VueSweetalert2 from 'vue-sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
 
 Vue.use(VueFeather)
 Vue.use(flatPickr)
 
 Vue.use(VueRouter)
 Vue.use(vco)
+
+Vue.use(VueSweetalert2);
 
 // Don't warn about using the dev version of Vue in development.
 Vue.config.productionTip = process.env.NODE_ENV === 'production'

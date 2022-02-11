@@ -14622,6 +14622,11 @@ swap-case@^1.1.0:
     lower-case "^1.1.1"
     upper-case "^1.1.1"
 
+sweetalert2@11.x:
+  version "11.4.0"
+  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-11.4.0.tgz#d5cb4b711af4cb5f580e4eef4389b95dbc417427"
+  integrity sha512-+p0jT2LxUQGreWa60j7nm1frJfqbcmamZcpZi4puEGAJ0CmyPqQ4UGmBqbB4WxkJYKsn8qcOA9ufqn0MWtQWLQ==
+
 symbol-observable@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/symbol-observable/-/symbol-observable-1.0.1.tgz#8340fc4702c3122df5d22288f88283f513d3fdd4"
@@ -15676,6 +15681,13 @@ vue-style-loader@^4.1.0:
   dependencies:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"
+
+vue-sweetalert2@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/vue-sweetalert2/-/vue-sweetalert2-5.0.2.tgz#b34f21f551aaefb88d94991daf7528913f66cefe"
+  integrity sha512-28pcpmvaFxwoXIUkOWwhZhmsV749jXxha8JicwPoSKyFKR5FhIaZU6UHO5WlUCLIVUI6sAWY6WngK2x/iXYwZg==
+  dependencies:
+    sweetalert2 "11.x"
 
 vue-template-compiler@^2.5.16, vue-template-compiler@^2.6.14:
   version "2.6.14"
