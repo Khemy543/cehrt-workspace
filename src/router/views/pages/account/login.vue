@@ -26,7 +26,6 @@ export default {
 		// Try to log the user in with the email
 		// and password they provided.
 		tryToLogIn() {
-			console.log(process.env.API_BASE_URL)
 			this.tryingToLogIn = true
 			// Reset the authError if it existed.
 			this.authError = null;
