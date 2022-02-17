@@ -91,7 +91,7 @@ export default {
         >
           <label class="col-md-3 col-form-label">Title</label>
           <div class="col-md-12">
-            <multiselect v-model="title" :options="['Mr', 'Mrs']"></multiselect>
+            <multiselect v-model="title" :options="['Mr', 'Mrs', 'Miss']"></multiselect>
             <span
               v-if="$v.title.$error && !$v.title.required"
               class="help-block invalid-feedback"
