@@ -10,7 +10,6 @@ export default {
     return {
       isMenuCondensed: false,
       isMobileMenuOpened: false,
-      user: this.$store ? this.$store.state.auth.currentUser : {} || {},
       department: this.$store
         ? this.$store.state.auth.userDepartment
         : {} || {},
@@ -19,9 +18,12 @@ export default {
   },
   computed: {
     ...layoutComputed,
+    user() {
+      return this.$store ? this.$store.state.auth.currentUser : {} || {}
+    },
     show() {
       return this.user.must_change_password ? this.user.must_change_password === 1 : false
-    },
+    }
   },
   created: () => {
     document.body.classList.remove('authentication-bg')
