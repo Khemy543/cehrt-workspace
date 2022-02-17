@@ -225,7 +225,7 @@ const proposalRoutes = [
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
     children: [
       {
-        name: 'Proposals',
+        name: 'View Proposals',
         path: 'view-proposals',
         meta: { authRequired: true },
         component: () =>

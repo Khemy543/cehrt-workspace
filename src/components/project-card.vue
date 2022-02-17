@@ -58,7 +58,7 @@ export default {
         <div>
           <div>
             <ul class="list-inline">
-              <li class="list-inline-item pr-2">
+              <li class="list-inline-item pr-1">
                 <a
                   :id="`date-tooltip-${project.id}`"
                   href="javascript: void(0)"
@@ -74,7 +74,7 @@ export default {
                   {{ project.end_date }}
                 </a>
               </li>
-              <li class="list-inline-item pr-2">
+              <li class="list-inline-item pr-1">
                 <a
                   :id="`task-tooltip-${project.id}`"
                   href="javascript: void(0)"
@@ -106,11 +106,27 @@ export default {
                   {{ project.comments || 0 }}
                 </a>
               </li>
+              <li class="list-inline-item pr-2">
+                <a
+                  :id="`date-tooltip-${project.id}`"
+                  href="javascript: void(0)"
+                  class="text-muted d-inline-block bg-transparent"
+                >
+                  <b-tooltip
+                    :target="`date-tooltip-${project.progress}`"
+                    triggers="hover"
+                    placement="top"
+                    ></b-tooltip
+                  >
+                  <i class="uil uil-check-square mr-1"></i>
+                  {{ project.progress }}%
+                </a>
+              </li>
             </ul>
           </div>
           <div class="pt-2">
             <b-progress
-              :value="project.progress || 10"
+              :value="project.progress || 0"
               variant="danger"
               height="5px"
               class="m-0"

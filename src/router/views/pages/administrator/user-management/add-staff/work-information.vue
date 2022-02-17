@@ -223,7 +223,7 @@ export default {
               v-model.trim="staffId"
               class="form-control"
               :class="{ 'is-invalid': $v.staffId.$error }"
-              placeholder="Work location"
+              placeholder="Enter staff Identification number"
             />
             <span
               v-if="$v.staffId.$error && !$v.staffId.required"

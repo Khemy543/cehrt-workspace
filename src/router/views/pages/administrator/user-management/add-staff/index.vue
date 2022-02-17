@@ -76,9 +76,11 @@ export default {
         title,
         startDate,
         maritalStatus,
+        workLocation,
+        workPhone,
         birthDate,
         nhia,
-        snnit,
+        ghanaCardId,
         otherNames,
         preferredName,
         supervisor,
@@ -103,7 +105,7 @@ export default {
           marital_status: maritalStatus,
           dob: birthDate,
           NHIA_number: nhia,
-          SNNIT_number: snnit,
+          ghana_card_number: ghanaCardId,
           supervisor_id: Number(supervisor),
           ...(maritalStatus === 'married'
             ? {
@@ -115,9 +117,11 @@ export default {
           alternative_phone_number: alternatePhone,
           department_ids: this.getIds(departments),
           staff_id: staffId,
+          work_location: workLocation,
+          work_phone_number: workPhone,
         })
 
-        if (response && response.data) {
+        if (response) {
           this.makeToast({
             title: 'Success',
             message: 'Staff created successfully',
@@ -126,9 +130,17 @@ export default {
           this.$router.push('/user-management/staff')
         }
       } catch (error) {
+        let message = 'Something happend, Please try again later'
+        if (error.response) {
+          const { status, data } = error.response
+
+          if (status === 422) {
+            message = data.errors[Object.keys(data.errors)[0]]
+          }
+        }
         this.makeToast({
           title: 'Error',
-          message: 'Something happend, Please try again later',
+          message,
           type: 'danger',
         })
       }
