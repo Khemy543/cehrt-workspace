@@ -1,11 +1,15 @@
 <script>
 export default {
-  data() {
-    return {
-      user: this.$store ? this.$store.state.auth.currentUser : {} || {},
-      initials: this.$store ? this.$store.state.auth.userInitials : '' || '',
+  props: {
+    user: {
+      type: Object,
+      default: () => {}
+    },
+    initials: {
+      type: String,
+      default: ''
     }
-  },
+  }
 }
 </script>
 <template>

@@ -74,7 +74,7 @@ export default {
       return this.changePassword({ ...this.form, firstTime: true })
         .then((data) => {
           this.$bvToast.toast('Password changed successfully', {
-            title: 'Error',
+            title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
             variant: 'success',

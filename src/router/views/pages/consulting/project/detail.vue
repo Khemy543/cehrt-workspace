@@ -102,38 +102,40 @@ export default {
 
     deleteProject() {
       this.$swal({
-          title: 'Do you want to delete this project?',
-          showDenyButton: true,
-          confirmButtonText: 'Delete',
-          denyButtonText: `Cancel`,
-          confirmButtonColor:'#ff5c75',
-          denyButtonColor:'#4b4b5a'
-        }).then( async ({ isConfirmed, isDenied }) => {
-          if(isConfirmed) {
-            try {
-              const response = await this.$http.delete(`/delete/${this.project.id}/project`);
-      
-              if(response) {
-                this.$bvToast.toast('Project deleted successfully', {
-                  title: 'Success',
-                  autoHideDelay: 5000,
-                  appendToast: false,
-                  variant: 'success',
-                  toastClass: 'text-white',
-                });
-                this.$router.push('/project/list')
-              }
-            } catch (error) {
-              this.$bvToast.toast('Something happened, Please try again later', {
-                title: 'Error',
+        title: 'Do you want to delete this project?',
+        showDenyButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.delete(
+              `/delete/${this.project.id}/project`
+            )
+
+            if (response) {
+              this.$bvToast.toast('Project deleted successfully', {
+                title: 'Success',
                 autoHideDelay: 5000,
                 appendToast: false,
-                variant: 'danger',
+                variant: 'success',
                 toastClass: 'text-white',
               })
+              this.$router.push('/project/list')
             }
+          } catch (error) {
+            this.$bvToast.toast('Something happened, Please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+              toastClass: 'text-white',
+            })
           }
-        })
+        }
+      })
     },
     closeModal() {
       this.show = false
@@ -193,7 +195,11 @@ export default {
                     </button>
                   </div>
                   <div class="btn-group d-none d-sm-inline-block ml-1">
-                    <button type="button" class="btn btn-soft-danger btn-sm" @click="deleteProject">
+                    <button
+                      type="button"
+                      class="btn btn-soft-danger btn-sm"
+                      @click="deleteProject"
+                    >
                       <i class="uil uil-trash-alt mr-1"></i>Delete
                     </button>
                   </div>
@@ -203,19 +209,65 @@ export default {
                 <!-- Widget -->
 
                 <div
-                  v-for="widget in widgetData"
-                  :key="widget.icon"
                   class="col-xl-3 col-sm-6"
                 >
                   <!-- stat 1 -->
                   <div class="media p-3">
                     <feather
-                      :type="widget.icon"
+                      type="grid"
                       class="align-self-center icon-dual icon-lg mr-4"
                     ></feather>
                     <div class="media-body">
-                      <h4 class="mt-0 mb-0">{{ widget.value }}</h4>
-                      <span class="text-muted">{{ widget.text }}</span>
+                      <h4 class="mt-0 mb-0">{{ project.tasks }}</h4>
+                      <span class="text-muted">Total Task</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="col-xl-3 col-sm-6"
+                >
+                  <!-- stat 1 -->
+                  <div class="media p-3">
+                    <feather
+                      type="check-square"
+                      class="align-self-center icon-dual icon-lg mr-4"
+                    ></feather>
+                    <div class="media-body">
+                      <h4 class="mt-0 mb-0">{{ project.no_of_completed_tasks }}</h4>
+                      <span class="text-muted">Total Tasks Completed</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="col-xl-3 col-sm-6"
+                >
+                  <!-- stat 1 -->
+                  <div class="media p-3">
+                    <feather
+                      type="clock"
+                      class="align-self-center icon-dual icon-lg mr-4"
+                    ></feather>
+                    <div class="media-body">
+                      <h4 class="mt-0 mb-0">{{ project.no_of_pending_tasks }}</h4>
+                      <span class="text-muted">Total Pending Task</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="col-xl-3 col-sm-6"
+                >
+                  <!-- stat 1 -->
+                  <div class="media p-3">
+                    <feather
+                      type="users"
+                      class="align-self-center icon-dual icon-lg mr-4"
+                    ></feather>
+                    <div class="media-body">
+                      <h4 class="mt-0 mb-0">{{ project.assignees }}</h4>
+                      <span class="text-muted">Total Assignees</span>
                     </div>
                   </div>
                 </div>
@@ -277,37 +329,40 @@ export default {
 
                 <div class="assign team mt-4">
                   <h6 class="font-weight-bold">Assign To</h6>
-                  <a href="javascript: void(0);">
-                    <img
-                      src="@assets/images/users/avatar-2.jpg"
-                      alt
-                      class="avatar-sm m-1 rounded-circle"
-                    />
-                  </a>
-                  <a href="javascript: void(0);">
-                    <img
-                      src="@assets/images/users/avatar-3.jpg"
-                      alt
-                      class="avatar-sm m-1 rounded-circle"
-                    />
-                  </a>
-                  <a href="javascript: void(0);">
-                    <img
-                      src="@assets/images/users/avatar-9.jpg"
-                      alt
-                      class="avatar-sm m-1 rounded-circle"
-                    />
-                  </a>
-                  <a href="javascript: void(0);">
-                    <img
-                      src="@assets/images/users/avatar-10.jpg"
-                      alt
-                      class="avatar-sm m-1 rounded-circle"
-                    />
-                  </a>
+                  <div v-if="project.assignees !== 0">
+                    <a href="javascript: void(0);">
+                      <img
+                        src="@assets/images/users/avatar-2.jpg"
+                        alt
+                        class="avatar-sm m-1 rounded-circle"
+                      />
+                    </a>
+                    <a href="javascript: void(0);">
+                      <img
+                        src="@assets/images/users/avatar-3.jpg"
+                        alt
+                        class="avatar-sm m-1 rounded-circle"
+                      />
+                    </a>
+                    <a href="javascript: void(0);">
+                      <img
+                        src="@assets/images/users/avatar-9.jpg"
+                        alt
+                        class="avatar-sm m-1 rounded-circle"
+                      />
+                    </a>
+                    <a href="javascript: void(0);">
+                      <img
+                        src="@assets/images/users/avatar-10.jpg"
+                        alt
+                        class="avatar-sm m-1 rounded-circle"
+                      />
+                    </a>
+                  </div>
+                  <h5>No Assignees</h5>
                 </div>
 
-                <div class="mt-4">
+                <!-- <div class="mt-4">
                   <h6 class="font-weight-bold">Attached Files</h6>
 
                   <div class="row">
@@ -362,7 +417,7 @@ export default {
                       </div>
                     </div>
                   </div>
-                </div>
+                </div> -->
               </div>
             </div>
           </div>

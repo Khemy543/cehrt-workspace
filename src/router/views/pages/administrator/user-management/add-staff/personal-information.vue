@@ -13,7 +13,7 @@ export default {
       phone: '',
       alternatePhone: '',
       birthDate: '',
-      snnit: '',
+      ghanaCardId: '',
       maritalStatus: '',
       nhia: '',
       spouseName: '',
@@ -49,7 +49,7 @@ export default {
     birthDate: {
       required,
     },
-    snnit: {
+    ghanaCardId: {
       required,
     },
     nhia: {
@@ -77,7 +77,7 @@ export default {
       'phone',
       'alternatePhone',
       'birthDate',
-      'snnit',
+      'ghanaCardId',
       'nhia',
       'maritalStatus',
       'spouseName',
@@ -271,19 +271,19 @@ export default {
         </div>
       </div>
       <div class="col-md-6">
-        <div class="form-group mb-3" :class="{ 'has-error': $v.snnit.$error }">
-          <label class="col-md-12 col-form-label">SNNIT Number</label>
+        <div class="form-group mb-3" :class="{ 'has-error': $v.ghanaCardId.$error }">
+          <label class="col-md-12 col-form-label">Ghana Card ID</label>
           <div class="col-md-12">
             <input
-              v-model.trim="snnit"
+              v-model.trim="ghanaCardId"
               class="form-control"
-              :class="{ 'is-invalid': $v.snnit.$error }"
-              placeholder="SNNIT number"
+              :class="{ 'is-invalid': $v.ghanaCardId.$error }"
+              placeholder="Ghana Card ID"
             />
             <span
-              v-if="$v.snnit.$error && !$v.snnit.required"
+              v-if="$v.ghanaCardId.$error && !$v.ghanaCardId.required"
               class="help-block invalid-feedback"
-              >snnit number is required</span
+              >ghana card id is required</span
             >
           </div>
         </div>

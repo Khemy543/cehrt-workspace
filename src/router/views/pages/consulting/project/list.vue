@@ -45,8 +45,8 @@ export default {
         const response = await this.$http.get(link || '/fetch/projects')
 
         if (response) {
-          const { data, links } = response.data;
-          this.projectData = [...this.projectData, ...data];
+          const { data, links } = response.data
+          this.projectData = [...this.projectData, ...data]
           this.links = links
           this.loading = false
         }
@@ -73,15 +73,15 @@ export default {
             autoHideDelay: 5000,
             appendToast: false,
             variant: 'success',
-            toastClass:'text-white'
+            toastClass: 'text-white',
           })
         }
       } catch (error) {
-        if(error.response) {
-          const { status, data } = error.response;
-          if(status === 422) {
-            const { errors } = data;
-             return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
               title: 'Error',
               autoHideDelay: 5000,
               appendToast: false,
@@ -94,7 +94,7 @@ export default {
           autoHideDelay: 5000,
           appendToast: false,
           variant: 'danger',
-          toastClass:'text-white'
+          toastClass: 'text-white',
         })
       }
     },
@@ -149,19 +149,25 @@ export default {
         :project="project"
       />
     </div>
+
     <div v-if="links.next" class="row mb-3 mt-2">
-			<div class="col-12">
-				<div class="text-center">
-					<div class="btn btn-white" @click="getProjects(links.next)">
-						<feather
-							type="loader"
-							class="icon-dual icon-xs mr-2 align-middle"
-						></feather
-						>Load more
-					</div>
-				</div>
-			</div>
-		</div>
+      <div class="col-12">
+        <div class="text-center">
+          <div class="btn btn-white" @click="getProjects(links.next)">
+            <feather
+              type="loader"
+              class="icon-dual icon-xs mr-2 align-middle"
+            ></feather
+            >Load more
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div v-if="!loading && projectData.length <= 0" class=" w-100 d-flex justify-content-center">
+      <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:50%" />
+    </div>
 
     <CreateProjectModal
       :show="show"

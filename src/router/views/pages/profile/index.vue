@@ -4,84 +4,87 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 
 import UserCard from './user-card'
-import Activities from './activities'
-import Messages from './messages'
 import Projects from './projects'
 import Tasks from './tasks'
-import Files from './files'
+import EditProfile from './edit-profile.vue'
+import ChangePassword from './change-password.vue'
 import { activities, messageData, projectData, tasks } from './data-profile'
 
 /**
  * Profile component
  */
 export default {
-	page: {
-		title: 'Profile',
-		meta: [{ name: 'description', content: appConfig.description }],
-	},
-	components: {
-		Layout,
-		PageHeader,
-		UserCard,
-		Activities,
-		Messages,
-		Projects,
-		Tasks,
-		Files,
-	},
-	data() {
-		return {
-			activities: activities,
-			messageData: messageData,
-			projectData: projectData,
-			tasks: tasks,
-			title: 'Profile',
-			items: [
-				{
-					text: 'Cehrt',
-					to: '/',
-				},
-				{
-					text: 'Profile',
-					active: true,
-				},
-			],
-		}
-	},
+  page: {
+    title: 'Profile',
+    meta: [{ name: 'description', content: appConfig.description }],
+  },
+  components: {
+    Layout,
+    PageHeader,
+    UserCard,
+    Projects,
+    Tasks,
+    EditProfile,
+	ChangePassword
+  },
+  data() {
+    return {
+      activities: activities,
+      messageData: messageData,
+      projectData: projectData,
+      tasks: tasks,
+      title: 'Profile',
+      items: [
+        {
+          text: 'Cehrt',
+          to: '/',
+        },
+        {
+          text: 'Profile',
+          active: true,
+        },
+      ],
+    }
+  },
+  computed: {
+    user() {
+      return this.$store ? this.$store.state.auth.currentUser : {} || {}
+    },
+    initials() {
+      return this.$store ? this.$store.state.auth.userInitials : '' || ''
+    },
+  },
 }
 </script>
 
 <template>
-	<Layout>
-		<PageHeader :title="title" :items="items" />
-		<div class="row">
-			<div class="col-lg-4">
-				<UserCard />
-			</div>
+  <Layout>
+    <PageHeader :title="title" :items="items" />
+    <div class="row">
+      <div class="col-lg-4">
+        <UserCard :user="user" :initials="initials" />
+      </div>
 
-			<div class="col-lg-8">
-				<div class="card">
-					<div class="card-body">
-						<b-tabs class="navtab-bg" pills justified>
-							<b-tab title="Activity" active>
-								<Activities :activities="activities" />
-							</b-tab>
-							<b-tab title="Messages">
-								<Messages :messages="messageData" />
-							</b-tab>
-							<b-tab title="Projects">
-								<Projects :projects="projectData" />
-							</b-tab>
-							<b-tab title="Tasks">
-								<Tasks :tasks="tasks" />
-							</b-tab>
-							<b-tab title="Files">
-								<Files />
-							</b-tab>
-						</b-tabs>
-					</div>
-				</div>
-			</div>
-		</div>
-	</Layout>
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-body">
+            <b-tabs class="navtab-bg" pills justified>
+              <b-tab title="Projects" active>
+                <Projects :projects="projectData" />
+              </b-tab>
+              <b-tab title="Tasks">
+                <Tasks :tasks="tasks" />
+              </b-tab>
+              <b-tab title="Edit Profile">
+                <EditProfile :user="user" :initials="initials" />
+              </b-tab>
+              <b-tab title="Change Password">
+                <ChangePassword />
+              </b-tab>
+            </b-tabs>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Layout>
 </template>
