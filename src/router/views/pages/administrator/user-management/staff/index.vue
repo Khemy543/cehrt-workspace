@@ -89,7 +89,7 @@ export default {
                     <td>{{ user.email }}</td>
                     <td>{{ user.phone_number }}</td>
                     <td>
-                      <router-link
+                      <!-- <router-link
                         :to="`/user-management/staff/${user.id}/view-staff`"
                         class="btn-group ml-2 d-none d-sm-inline-block"
                       >
@@ -99,7 +99,35 @@ export default {
                         >
                           <i class="uil uil-eye mr-1"></i>
                         </button>
-                      </router-link>
+                      </router-link> -->
+                      <b-dropdown
+                        variant="link"
+                        class=" position-absolute"
+                        toggle-class="p-0 text-muted arrow-none"
+                      >
+                        <template v-slot:button-content>
+                          <i class="uil uil-ellipsis-v font-size-14"></i>
+                        </template>
+                        <b-dropdown-item
+                          :to="`/user-management/staff/${user.id}/view-staff`"
+                          variant="secondary"
+                          ><i class="uil uil-exit mr-2"></i
+                          >View</b-dropdown-item
+                        >
+                        <b-dropdown-divider></b-dropdown-divider>
+                        <b-dropdown-item
+                          href="javascript: void(0);"
+                          variant="success"
+                        >
+                          <i class="uil uil-unlock-alt mr-2"></i>Active
+                        </b-dropdown-item>
+                        <b-dropdown-item
+                          href="javascript: void(0);"
+                          variant="danger"
+                        >
+                          <i class="uil uil-lock mr-2"></i>Deactive
+                        </b-dropdown-item>
+                      </b-dropdown>
                     </td>
                   </tr>
                 </tbody>

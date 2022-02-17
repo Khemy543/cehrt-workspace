@@ -183,6 +183,7 @@ const workFlowRoutes = [
   {
     path: '/work-flow',
     name: 'Work Flows',
+    header: 'Setups',
     icon: 'activity',
     department: 'Consultancy',
     meta: { authRequired: true },
@@ -277,7 +278,7 @@ const calendarAppsRoutes = [
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
 ]
-
+/* 
 const emailAppsRoutes = [
   {
     path: '/apps/email',
@@ -315,7 +316,7 @@ const emailAppsRoutes = [
       },
     ],
   },
-]
+] */
 
 const projectAppsRoutes = [
   {
@@ -411,13 +412,13 @@ const appsRoutes = [
   ...userManagementRoutes,
   ...departmentRoutes ,
   ...calendarAppsRoutes,
-  ...emailAppsRoutes,
+  /* ...emailAppsRoutes, */
   ...proposalRoutes,
   ...projectAppsRoutes,
 ]
 
 // pages
-const pagesRoutes = [
+/* const pagesRoutes = [
   {
     path: '/pages',
     name: 'Pages',
@@ -455,7 +456,7 @@ const pagesRoutes = [
       },
     ],
   },
-]
+] */
 /*
 // ui
 const uiRoutes = [
@@ -606,7 +607,7 @@ const authProtectedRoutes = [
   ...dashboardRoutes,
   ...appsRoutes,
   ...workFlowRoutes,
-  ...pagesRoutes,
+  /* ...pagesRoutes, */
   /* ...uiRoutes,
   ...formsRoutes,
   ...chartsRoutes,
