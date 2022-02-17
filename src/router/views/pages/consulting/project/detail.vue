@@ -693,7 +693,7 @@ export default {
 
               <ul class="list-unstyled activity-widget">
                 <li
-                  v-for="deliverable in projectActivity"
+                  v-for="deliverable in project.project_type && project.project_type.deliverables"
                   :key="deliverable.id"
                   class="activity-list"
                 >
@@ -703,7 +703,7 @@ export default {
                         <router-link
                           :to="`/project/deliverable/${deliverable.id}`"
                           class="text-dark"
-                          >{{ deliverable.title }}</router-link
+                          >{{ deliverable.deliverable_name }}</router-link
                         >
                       </h5>
                       <div class=" d-flex justify-content-between">
@@ -720,17 +720,9 @@ export default {
                               >Tasks</b-tooltip
                             >
                             <i class="uil uil-bars mr-1"></i>
-                            {{ deliverable.task }} task(s)
+                            {{ deliverable.task || 0 }} task(s)
                           </a>
                         </div>
-                        <div
-                          class="badge badge-success float-right"
-                          :class="{
-                            'badge-warning':
-                              `${deliverable.status}` === 'Pending',
-                          }"
-                          >{{ deliverable.status }}</div
-                        >
                       </div>
                     </div>
 

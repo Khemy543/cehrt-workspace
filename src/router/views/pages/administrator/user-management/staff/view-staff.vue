@@ -83,15 +83,6 @@ export default {
             <div>
               <p class="sub-header">
                   Work Information 
-                  <!-- title: '',
-                  supervisor: '',
-                  workLocation: '',
-                  workPhone:'',
-                  startDate: '',
-                  departments:null,
-                  departmentsOptions: [],
-                  staffOptions: [],
-                  staffId:null -->
               </p>
               <div>
                 <div>
@@ -109,7 +100,12 @@ export default {
                   <br/>
                   Departments 
                   <div v-for="depart in staff.department" :key="depart.id">
-						    	  <b-button variant="primary">{{ depart.name }}</b-button>
+						    	  <div
+                  class="badge badge-soft-primary font-size-13 font-weight-normal ml-1"
+                  >{{
+                    depart.name
+                  }}</div
+                >
                   </div>
                 </div>
               </div>

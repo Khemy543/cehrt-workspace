@@ -2,6 +2,7 @@
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
+import CreateWorkFlowModal from '@components/CreateWorkFlowModal.vue'
 
 export default {
   page: {
@@ -11,6 +12,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    CreateWorkFlowModal,
   },
   props: {
     id: {
@@ -33,7 +35,7 @@ export default {
         },
       ],
       workFlows: [],
-      loading: false
+      loading: false,
     }
   },
   created() {
@@ -49,7 +51,41 @@ export default {
           this.workFlows = response.data.workflow || []
           this.loading = false
         }
-      } catch (error) {}
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
+    },
+
+    async createWorkFlow(form) {
+      try {
+        const respoonse = await this.$http.post('/add/workflow', form)
+
+        if (respoonse) {
+          this.workFlows.push(respoonse.data.workflow)
+        }
+      } catch (error) {
+        if (error.response) {
+          let message = 'Something happened, Please try again later'
+          const { status, data } = error.response
+
+          if (status === 422) {
+            message = message = data.errors[Object.keys(data.errors)[0]]
+          }
+
+          this.$bvToast.toast(message, {
+            title: 'Error',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'danger',
+          })
+        }
+      }
     },
   },
 }
@@ -73,9 +109,13 @@ export default {
                 </p>
               </div>
               <div>
-                <b-button variant="primary" @click="show = true"
-                  >Add Work Flow</b-button
+                <button
+                  type="button"
+                  class="btn btn-danger mr-4 mb-3 mb-sm-0"
+                  @click="show = true"
                 >
+                  <i class="uil-plus mr-1"></i> Add Work Flow
+                </button>
               </div>
             </div>
 
@@ -122,5 +162,6 @@ export default {
         </div>
       </div>
     </div>
+    <CreateWorkFlowModal :action="createWorkFlow"/>
   </Layout>
 </template>
