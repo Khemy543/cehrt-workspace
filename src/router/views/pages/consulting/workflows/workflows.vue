@@ -36,6 +36,7 @@ export default {
       ],
       workFlows: [],
       loading: false,
+      show: false
     }
   },
   created() {
@@ -87,6 +88,18 @@ export default {
         }
       }
     },
+
+    editWorkFlow() {
+      
+    },
+
+    viewWorkFlow() {
+
+    },
+
+    deleteWorkFlow() {
+
+    }
   },
 }
 </script>
@@ -125,7 +138,7 @@ export default {
                   <tr>
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
-                    <th scope="col">Description</th>
+                    <th scope="col">Number of Tasks</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
@@ -137,22 +150,39 @@ export default {
                   >
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ work.name }}</td>
-                    <td>{{ work.description }}</td>
+                    <td>{{ work.work_flow_tasks && work.work_flow_tasks.length }}</td>
                     <td class=" d-flex">
-                      <div class=" mr-4">
-                        <feather
-                          type="edit"
-                          class="icon-dual-primary cursor-pointer"
-                          @click="openModal(work.id)"
-                        />
-                      </div>
-                      <div>
-                        <feather
-                          type="x-circle"
-                          class="icon-dual-danger"
-                          @click="deleteDepartment(work.id)"
-                        />
-                      </div>
+                      <b-dropdown
+                        variant="link"
+                        class=" position-absolute"
+                        toggle-class="p-0 text-muted arrow-none"
+                      >
+                        <template v-slot:button-content>
+                          <i class="uil uil-ellipsis-v font-size-14"></i>
+                        </template>
+                        <b-dropdown-item
+                          href="javascript: void(0);"
+                          variant="secondary"
+                          @click="viewWorkFlow(work)"
+                          ><i class="uil uil-exit mr-2"></i
+                          >View</b-dropdown-item
+                        >
+                        <b-dropdown-divider></b-dropdown-divider>
+                        <b-dropdown-item
+                          href="javascript: void(0);"
+                          variant="secondary"
+                          @click="editWorkflow(work)"
+                        >
+                          <i class="uil uil-edit mr-2"></i>Edit
+                        </b-dropdown-item>
+                        <b-dropdown-item
+                          href="javascript: void(0);"
+                          variant="danger"
+                          @click="deleteWorkFlow(work)"
+                        >
+                          <i class="uil uil-trash-alt mr-2"></i>Delete
+                        </b-dropdown-item>
+                      </b-dropdown>
                     </td>
                   </tr>
                 </tbody>
@@ -162,6 +192,10 @@ export default {
         </div>
       </div>
     </div>
-    <CreateWorkFlowModal :action="createWorkFlow"/>
+
+    <div v-if="!loading && workFlows.length <= 0" class=" w-100 d-flex justify-content-center">
+      <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:50%" />
+    </div>
+    <CreateWorkFlowModal :action="createWorkFlow" :show="show"/>
   </Layout>
 </template>

@@ -103,7 +103,6 @@ const userManagementRoutes = [
   {
     path: '/user-management',
     name: 'User Management',
-    header: 'Apps',
     icon: 'user-plus',
     department: 'Administration',
     meta: { authRequired: true },

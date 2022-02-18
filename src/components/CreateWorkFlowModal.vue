@@ -58,6 +58,10 @@ export default {
       action: {
           type: Function,
           required: true
+      },
+      show: {
+        type: Boolean,
+        default: false
       }
   },
   data() {
@@ -70,8 +74,7 @@ export default {
             task_name: '',
           },
         ],
-      },
-      show: true,
+      }
     }
   },
   methods: {
