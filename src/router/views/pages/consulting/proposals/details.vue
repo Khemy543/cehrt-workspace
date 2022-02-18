@@ -7,17 +7,10 @@
           <div class="card">
             <div class="card-body">
               <div class="row align-items-center">
-                <div class="col-xl-2 col-lg-3 col-6">
-                  <img
-                    src="@assets/images/cal.png"
-                    class="mr-4 align-self-center img-fluid"
-                    alt="cal"
-                  />
-                </div>
                 <div class="col-xl-10 col-lg-9">
                   <div class="mt-4 mt-lg-0">
                     <h5 class="mt-0 mb-1 font-weight-bold"
-                      >Welcome to Your Calendar</h5
+                      >Name of Proposal</h5
                     >
                     <p class="text-muted mb-2">
                       The calendar shows the events synced from all your linked
@@ -28,13 +21,13 @@
 
                     <button
                       id="btn-new-event"
-                      class="btn btn-primary mt-2 mr-1"
+                      class="btn btn-primary mt-2 mr-3"
                       @click="showmodal = true"
                     >
-                      <i class="uil-plus-circle"></i> Create New Event
+                      <i class="uil-plus-circle"></i> Create New Report
                     </button>
                     <button class="btn btn-white mt-2">
-                      <i class="uil-sync"></i> Link Calendars
+                      <i class="uil-sync"></i> Create Project
                     </button>
                   </div>
                 </div>

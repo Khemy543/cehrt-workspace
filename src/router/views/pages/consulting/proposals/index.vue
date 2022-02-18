@@ -208,13 +208,34 @@ export default {
                     }}</td>
                     <td>{{ proposal.funding_option }}</td>
                     <td>
-                      <router-link
-                        :to="`/proposals/details/${proposal.id}`"
-                        type="button"
-                        class="btn btn-soft-primary btn-sm"
+                      <b-dropdown
+                        variant="link"
+                        class=" position-absolute"
+                        toggle-class="p-0 text-muted arrow-none"
                       >
-                        <i class="uil uil-eye mr-1"></i>
-                      </router-link>
+                        <template v-slot:button-content>
+                          <i class="uil uil-ellipsis-v font-size-14"></i>
+                        </template>
+                        <b-dropdown-item
+                          :to="`/proposals/details/${proposal.id}`"
+                          variant="secondary"
+                          ><i class="uil uil-exit mr-2"></i
+                          >View</b-dropdown-item
+                        >
+                        <b-dropdown-divider></b-dropdown-divider>
+                        <b-dropdown-item
+                          href="javascript: void(0);"
+                          variant="secondary"
+                        >
+                          <i class="uil uil-edit mr-2"></i>Edit
+                        </b-dropdown-item>
+                        <b-dropdown-item
+                          href="javascript: void(0);"
+                          variant="danger"
+                        >
+                          <i class="uil uil-trash-alt mr-2"></i>Delete
+                        </b-dropdown-item>
+                      </b-dropdown>
                     </td>
                   </tr>
                 </tbody>
