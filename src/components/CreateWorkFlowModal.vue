@@ -1,9 +1,7 @@
 <template>
   <b-modal
-    :visible="show"
+    v-model="show"
     title="Create Work Flow"
-    :hide="close"
-    :close="close"
     title-class="font-18"
     hide-footer
   >
@@ -59,7 +57,7 @@ export default {
           type: Function,
           required: true
       },
-      show: {
+      value: {
         type: Boolean,
         default: false
       }
@@ -77,8 +75,17 @@ export default {
       }
     }
   },
+  computed: {
+    show: {
+      get() {
+        return this.value
+      },
+      set(val) {
+        this.$emit('input', val)
+      }
+    }
+  },
   methods: {
-    close() {},
     addNewRow() {
       const lastIndex = this.form.tasks.length - 1;
       if (this.form.tasks[lastIndex].task_name !== '') {
