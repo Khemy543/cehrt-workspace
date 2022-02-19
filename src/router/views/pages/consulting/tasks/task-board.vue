@@ -4,6 +4,7 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import CreateTaskModal from '@components/CreateTaskModal.vue'
+import CreateDeliverable from '@components/CreateDeliverable'
 
 import Task from './board-task'
 import { tasks } from './data-taskboard'
@@ -13,7 +14,14 @@ export default {
     title: 'Project Tasks Board',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { draggable, Layout, PageHeader, Task, CreateTaskModal },
+  components: {
+    draggable,
+    Layout,
+    PageHeader,
+    Task,
+    CreateTaskModal,
+    CreateDeliverable,
+  },
   data() {
     return {
       todoTasks: [...tasks[0].items],
@@ -43,7 +51,9 @@ export default {
       loading: false,
       workflows: [],
       selectedWorkflow: { id: null, name: 'No work flow Selected' },
-	  show: false
+      show: false,
+      deliverableShow: false,
+      deliverable: {},
     }
   },
   computed: {
@@ -51,6 +61,9 @@ export default {
       return {
         group: 'tasks',
       }
+    },
+    showCreateDeliverable() {
+      return !this.deliverable.deadline
     },
   },
   created() {
@@ -78,9 +91,18 @@ export default {
       this.selectedWorkflow = workflow
     },
 
-	createTask() {
+    createTask() {},
+    async createDeliverable(form) {
+      try {
+        const response = await this.$http.post(
+          `/project/${this.$route.params.project_id}/create-deliverable`,
+          { ...form, project_type_deliverable_id: this.$route.params.deliverable_id }
+        )
 
-	}
+        if (response) {
+        }
+      } catch (error) {}
+    },
   },
 }
 </script>
@@ -120,10 +142,14 @@ export default {
                   >
                     {{ workflow.name }}
                   </b-dropdown-item>
-				</b-dropdown>
+                </b-dropdown>
               </div>
               <div class="col text-right">
-                <button id="btn-new-event" class="btn btn-primary" @click="show = true">
+                <button
+                  id="btn-new-event"
+                  class="btn btn-primary"
+                  @click="show = true"
+                >
                   <i class="uil-plus mr-1"></i>Add New
                 </button>
               </div>
@@ -228,6 +254,15 @@ export default {
       />
     </div>
 
-	<CreateTaskModal :action="createTask" :value="show" @input="show = $event"/>
+    <CreateTaskModal
+      :action="createTask"
+      :value="show"
+      @input="show = $event"
+    />
+
+    <CreateDeliverable
+      :action="createDeliverable"
+      :show="showCreateDeliverable"
+    />
   </Layout>
 </template>

@@ -100,10 +100,6 @@
 <script>
 export default {
   props: {
-    close: {
-      type: Function,
-      required: true,
-    },
     formTitle: {
       type: String,
       required: true,

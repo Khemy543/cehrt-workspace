@@ -2,6 +2,7 @@
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
+import CreateProposalModal from '@components/CreateProposalModal.vue'
 
 export default {
   page: {
@@ -11,6 +12,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    CreateProposalModal,
   },
   props: {
     id: {
@@ -33,19 +35,14 @@ export default {
         },
       ],
       proposals: [],
-      projectTypes: [],
       loading: false,
       show: false,
-      form: {
-        project_type_id: '',
-        funding_option: '',
-      },
-      formtitle: 'Create Proposal',
+      formTitle: 'Create Proposal',
+      proposal: null,
     }
   },
   created() {
     this.fetchProposals()
-    this.getProjectTypes()
   },
   methods: {
     async fetchProposals() {
@@ -60,24 +57,19 @@ export default {
       } catch (error) {}
     },
 
-    async getProjectTypes() {
-      try {
-        const response = await this.$http.get('/fetch/project/types')
-
-        if (response) {
-          this.projectTypes = response.data
-        }
-      } catch (error) {}
+    openCreateProposal() {
+      this.proposal = {}
+      this.formTitle = 'Create Proposal'
+      this.show = true
     },
 
-    async createProposal() {
+    async createProposal(form) {
       try {
-        const response = await this.$http.post('/create/proposal', this.form)
+        const response = await this.$http.post('/create/proposal', form)
 
         if (response && response.data) {
           this.proposals.push(response.data.proposal)
           this.show = false
-          this.form = {}
           this.$bvToast.toast('Proposal created successfully', {
             title: 'Success',
             autoHideDelay: 5000,
@@ -86,28 +78,36 @@ export default {
           })
         }
       } catch (error) {
-        this.$bvToast.toast('Something happend, please try again', {
-          title: 'Error',
-          autoHideDelay: 5000,
-          appendToast: false,
-          variant: 'danger',
-        })
+        if (error.response) {
+          let message = 'Something happened, Please try again later'
+          const { status, data } = error.response
+
+          if (status === 422) {
+            message = message = data.errors[Object.keys(data.errors)[0]]
+          }
+
+          this.$bvToast.toast(message, {
+            title: 'Error',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'danger',
+          })
+        }
       }
     },
 
-    async updateDepartment(id) {
+    async updateProposal(form) {
       try {
         const response = await this.$http.put(
-          `/admin/update/${id}/department`,
-          this.form
+          `/update/${form.id}/proposal`,
+          form
         )
 
-        if (response && response.data) {
-          const index = this.departments.findIndex((item) => item.id === id)
-          this.departments[index] = response.data
+        if (response) {
+          const index = this.proposals.findIndex((item) => item.id === form.id)
+          this.proposals[index] = response.data
           this.show = false
-          this.form = {}
-          this.$bvToast.toast('Department updated successfully', {
+          this.$bvToast.toast('Proposal updated successfully', {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
@@ -115,40 +115,73 @@ export default {
           })
         }
       } catch (error) {
-        this.$bvToast.toast('Something happend, please try again', {
-          title: 'Error',
-          autoHideDelay: 5000,
-          appendToast: false,
-          variant: 'danger',
-        })
-      } finally {
-        this.formtitle = 'Create Proposal'
+        if (error.response) {
+          let message = 'Something happened, Please try again later'
+          const { status, data } = error.response
+
+          if (status === 422) {
+            message = message = data.errors[Object.keys(data.errors)[0]]
+          }
+
+          this.$bvToast.toast(message, {
+            title: 'Error',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'danger',
+          })
+        }
       }
     },
 
-    handleSubmit() {
-      if (this.form.id) {
-        return this.updateDepartment(this.form.id)
+    handleSubmit(form) {
+      if (this.proposal) {
+        return this.updateProposal(form)
       }
-      return this.createProposal()
+      return this.createProposal(form)
     },
 
-    openModal(id) {
-      this.form = this.departments.find((item) => item.id === id)
-      this.formtitle = 'Edit Proposal'
+    openModal(proposal) {
+      this.proposal = proposal
+      this.formTitle = 'Edit Proposal'
       this.show = true
     },
 
-    async deleteDepartment(id) {
-      try {
-        const response = await this.$http.delete(
-          `/admin/delete/${id}/department`
-        )
+    async deleteProposal(id) {
+      this.$swal({
+        title: 'Do you want to delete this proposal?',
+        showDenyButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.delete(
+              `/delete/${id}/proposal`
+            )
 
-        if (response && response.data) {
-          this.departments = this.departments.filter((item) => item.id !== id)
+            if (response) {
+              this.workFlows = this.proposals.filter(
+                (item) => item.id !== id
+              )
+              this.$bvToast.toast('Proposal deleted successfully', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success'
+              })
+            }
+          } catch (error) {
+            this.$bvToast.toast('Something happened, Please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger'
+            })
+          }
         }
-      } catch (error) {}
+      })
     },
   },
 }
@@ -175,7 +208,7 @@ export default {
                 <button
                   type="button"
                   class="btn btn-danger mr-4 mb-3 mb-sm-0"
-                  @click="show = true"
+                  @click="openCreateProposal"
                 >
                   <i class="uil-plus mr-1"></i> New Proposal
                 </button>
@@ -196,17 +229,17 @@ export default {
                 </thead>
                 <tbody>
                   <tr
-                    v-for="(proposal, index) in proposals"
-                    :key="proposal.id"
-                    :title="proposal.description"
+                    v-for="(vproposal, index) in proposals"
+                    :key="vproposal.id"
+                    :title="vproposal.description"
                   >
                     <th scope="row">{{ index + 1 }}</th>
-                    <td>{{ proposal.title }}</td>
-                    <td>{{ proposal.client }}</td>
+                    <td>{{ vproposal.title }}</td>
+                    <td>{{ vproposal.client }}</td>
                     <td>{{
-                      proposal.project_type && proposal.project_type.name
+                      vproposal.project_type && vproposal.project_type.name
                     }}</td>
-                    <td>{{ proposal.funding_option }}</td>
+                    <td>{{ vproposal.funding_option }}</td>
                     <td>
                       <b-dropdown
                         variant="link"
@@ -217,7 +250,7 @@ export default {
                           <i class="uil uil-ellipsis-v font-size-14"></i>
                         </template>
                         <b-dropdown-item
-                          :to="`/proposals/details/${proposal.id}`"
+                          :to="`/proposals/details/${vproposal.id}`"
                           variant="secondary"
                           ><i class="uil uil-exit mr-2"></i
                           >View</b-dropdown-item
@@ -226,12 +259,14 @@ export default {
                         <b-dropdown-item
                           href="javascript: void(0);"
                           variant="secondary"
+                          @click="openModal(vproposal)"
                         >
                           <i class="uil uil-edit mr-2"></i>Edit
                         </b-dropdown-item>
                         <b-dropdown-item
                           href="javascript: void(0);"
                           variant="danger"
+                          @click="deleteProposal(vproposal.id)"
                         >
                           <i class="uil uil-trash-alt mr-2"></i>Delete
                         </b-dropdown-item>
@@ -245,70 +280,12 @@ export default {
         </div>
       </div>
     </div>
-    <b-modal
-      v-model="show"
-      :title="formtitle"
-      title-class="font-18"
-      hide-footer
-    >
-      <form @submit.prevent="handleSubmit">
-        <b-form-group
-          id="input-group-1"
-          label="Name of Proposal"
-          label-for="input-1"
-        >
-          <b-form-input
-            id="input-1"
-            v-model="form.title"
-            type="text"
-            required
-            placeholder="Proposal name"
-          ></b-form-input>
-        </b-form-group>
-
-        <b-form-group id="input-group-1" label="Client" label-for="input-1">
-          <b-form-input
-            id="input-1"
-            v-model="form.client"
-            type="text"
-            required
-            placeholder="Project client"
-          ></b-form-input>
-        </b-form-group>
-
-        <b-form-group
-          id="input-group-1"
-          label="Project Type"
-          label-for="input-1"
-        >
-          <b-form-select v-model="form.project_type_id" class="mb-2">
-            <option value="" disabled>Select project type</option>
-            <option
-              v-for="type in projectTypes"
-              :key="type.id"
-              :value="type.id"
-              >{{ type.name }}</option
-            >
-          </b-form-select>
-        </b-form-group>
-
-        <b-form-group
-          id="input-group-1"
-          label="Funding Option"
-          label-for="input-1"
-        >
-          <b-form-select v-model="form.funding_option" class="mb-2">
-            <option value="" disabled>Select funding option</option>
-            <option
-              v-for="fund in ['World Bank', 'IFC', 'Private']"
-              :key="fund"
-              :value="fund"
-              >{{ fund }}</option
-            >
-          </b-form-select>
-        </b-form-group>
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </form>
-    </b-modal>
+    <CreateProposalModal
+      :form-title="formTitle"
+      :proposal="proposal"
+      :action="handleSubmit"
+      :value="show"
+      @input="show = $event"
+    />
   </Layout>
 </template>
