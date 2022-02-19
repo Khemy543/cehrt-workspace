@@ -170,10 +170,11 @@ export default {
     </div>
 
     <CreateProjectModal
-      :show="show"
+      :value="show" 
       :form-title="formtitle"
       :close="closeModal"
       :action="addNewProject"
+      @input="show = $event"
     />
   </Layout>
 </template>

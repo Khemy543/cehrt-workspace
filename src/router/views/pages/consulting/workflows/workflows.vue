@@ -196,6 +196,6 @@ export default {
     <div v-if="!loading && workFlows.length <= 0" class=" w-100 d-flex justify-content-center">
       <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:50%" />
     </div>
-    <CreateWorkFlowModal :action="createWorkFlow" :show="show"/>
+    <CreateWorkFlowModal :action="createWorkFlow" :value="show" @input="show = $event"/>
   </Layout>
 </template>

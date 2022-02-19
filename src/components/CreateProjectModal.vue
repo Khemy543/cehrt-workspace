@@ -1,9 +1,7 @@
 <template>
   <b-modal
-    :visible="show"
+    v-model="show"
     :title="formTitle"
-    :hide="close"
-    :close="close"
     title-class="font-18"
     hide-footer
   >
@@ -102,25 +100,25 @@
 <script>
 export default {
   props: {
-    show: {
-      type: Boolean,
-      default: false,
-    },
     close: {
       type: Function,
       required: true,
     },
     formTitle: {
       type: String,
-      required: true
+      required: true,
     },
     action: {
       type: Function,
-      required: true
+      required: true,
     },
     project: {
       type: Object,
-      default: () => {}
+      default: () => {},
+    },
+    value: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -128,13 +126,22 @@ export default {
       form: {
         project_type_id: '',
         project_sector_id: '',
-        ...this.project
+        ...this.project,
       },
       projectTypes: [],
       sectors: [],
     }
   },
-
+  computed: {
+    show: {
+      get() {
+        return this.value
+      },
+      set(val) {
+        this.$emit('input', val)
+      }
+    }
+  },
   watch: {
     project(newValue) {
       this.form = {
@@ -142,9 +149,9 @@ export default {
         project_type_id: newValue.project_type.id || '',
         project_sector_id: newValue.project_sector.id || '',
         start_date: newValue.raw_start_date,
-        end_date: newValue.raw_end_date
+        end_date: newValue.raw_end_date,
       }
-    }
+    },
   },
   created() {
     this.getSectors()

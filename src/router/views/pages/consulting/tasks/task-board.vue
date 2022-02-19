@@ -228,6 +228,6 @@ export default {
       />
     </div>
 
-	<CreateTaskModal :action="createTask" :show="show"/>
+	<CreateTaskModal :action="createTask" :value="show" @input="show = $event"/>
   </Layout>
 </template>

@@ -1,9 +1,7 @@
 <template>
   <b-modal
-    :visible="show"
+    v-model="show"
     title="Create Task"
-    :hide="close"
-    :close="close"
     title-class="font-18"
     hide-footer
   >
@@ -67,7 +65,7 @@ export default {
       type: Function,
       required: true,
     },
-    show: {
+    value: {
         type: Boolean,
         default: false
     }
@@ -79,9 +77,16 @@ export default {
       },
     }
   },
-  methods: {
-    close() {},
-  },
+  computed: {
+    show: {
+      get() {
+        return this.value
+      },
+      set(val) {
+        this.$emit('input', val)
+      }
+    } 
+  }
 }
 </script>
 
