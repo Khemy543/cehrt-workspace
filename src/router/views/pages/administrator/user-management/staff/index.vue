@@ -47,7 +47,92 @@ export default {
           this.staff = response.data
           this.loading = false
         }
-      } catch (error) {}
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
+    activateAccount(user) {
+      this.$swal({
+        title: 'Activate user account?',
+        showDenyButton: true,
+        confirmButtonText: 'Activate',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.patch(
+              `/admin/unblock/${user.id}/account`
+            )
+
+            if (response) {
+              const index = this.staff.findIndex((item) => item.id === user.id)
+              this.staff[index] = { ...user, is_active: 1 }
+              this.$bvToast.toast('User account activated', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success',
+              })
+            }
+          } catch (error) {
+            this.$bvToast.toast('Something happened, Please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+      })
+    },
+
+    deactivateAccount(user) {
+      this.$swal({
+        title: 'Deactive user account?',
+        showDenyButton: true,
+        confirmButtonText: 'Deactive',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.patch(
+              `/admin/block/${user.id}/account`
+            )
+
+            if (response) {
+              const index = this.staff.findIndex((item) => item.id === user.id)
+              console.log(this.staff[index])
+              this.staff[index] = {...user, is_active: 0}
+              console.log(this.staff[index])
+              this.$bvToast.toast(
+                'User account deactivated',
+                {
+                  title: 'Success',
+                  autoHideDelay: 5000,
+                  appendToast: false,
+                  variant: 'success',
+                }
+              )
+            }
+          } catch (error) {
+            this.$bvToast.toast('Something happened, Please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+      })
     },
   },
 }
@@ -61,14 +146,14 @@ export default {
     </div>
     <div v-else class="row">
       <div class="col-lg-12">
-        <div class="card">
+        <div class="card" style="overflow-x: auto">
           <div class="card-body">
             <h4 class="header-title mt-0 mb-1">View Staff</h4>
             <p class="sub-header">
               View all staff members
             </p>
 
-            <div class="table-responsive">
+            <div class="">
               <table class="table mb-0">
                 <thead class="thead-light">
                   <tr>
@@ -82,24 +167,18 @@ export default {
                 <tbody>
                   <tr v-for="user in staff" :key="user.id">
                     <th scope="row">{{ user.staff_id }}</th>
-                    <td
-                      >{{ user.firstname }} {{ user.lastname }}
+                    <td>
+                      <i
+                        v-if="user.is_active === 0"
+                        class="uil uil-lock mr-2"
+                      ></i>
+                      <i v-else class="uil uil-unlock-alt mr-2"></i>
+                      {{ user.firstname }} {{ user.lastname }}
                       {{ user.other_names }}</td
                     >
                     <td>{{ user.email }}</td>
                     <td>{{ user.phone_number }}</td>
                     <td>
-                      <!-- <router-link
-                        :to="`/user-management/staff/${user.id}/view-staff`"
-                        class="btn-group ml-2 d-none d-sm-inline-block"
-                      >
-                        <button
-                          type="button"
-                          class="btn btn-soft-primary btn-sm"
-                        >
-                          <i class="uil uil-eye mr-1"></i>
-                        </button>
-                      </router-link> -->
                       <b-dropdown
                         variant="link"
                         class=" position-absolute"
@@ -116,14 +195,18 @@ export default {
                         >
                         <b-dropdown-divider></b-dropdown-divider>
                         <b-dropdown-item
+                          v-if="user.is_active === 0"
                           href="javascript: void(0);"
                           variant="success"
+                          @click="activateAccount(user)"
                         >
                           <i class="uil uil-unlock-alt mr-2"></i>Active
                         </b-dropdown-item>
                         <b-dropdown-item
+                          v-else
                           href="javascript: void(0);"
                           variant="danger"
+                          @click="deactivateAccount(user)"
                         >
                           <i class="uil uil-lock mr-2"></i>Deactive
                         </b-dropdown-item>

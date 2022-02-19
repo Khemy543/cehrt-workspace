@@ -35,10 +35,18 @@ export default {
           active: true,
         },
       ],
+      projectDeliverables: []
+    }
+  },
+  computed: {
+    vProjectDeliverables() {
+      const deliverbales = this.project.project_type && this.project.project_type.deliverbales || [];
+      return deliverbales
     }
   },
   created() {
     this.getProjectDetials()
+    this.getProjectDeliverables()
   },
   methods: {
     async getProjectDetials() {
@@ -53,7 +61,26 @@ export default {
           this.items[2].text = response.data.name
           this.loading = false
         }
-      } catch (error) {}
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger'
+        })
+      }
+    },
+
+    async getProjectDeliverables() {
+      try {
+        const response = await this.$http.get(`fetch/${this.$route.params.id}/deliverables`);
+
+        if(response) {
+          this.projectDeliverables = response.data
+        }
+      } catch (error) {
+        
+      }
     },
     async editProject(form) {
       try {
@@ -63,18 +90,15 @@ export default {
         )
 
         if (response) {
-          const { project } = response.data
+          this.project = response.data.project
 
-          this.project = project
-
-          this.closeModal()
+          this.show = false
 
           this.$bvToast.toast('Project edited successfully', {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
-            variant: 'success',
-            toastClass: 'text-white',
+            variant: 'success'
           })
         }
       } catch (error) {
@@ -94,8 +118,7 @@ export default {
           title: 'Error',
           autoHideDelay: 5000,
           appendToast: false,
-          variant: 'danger',
-          toastClass: 'text-white',
+          variant: 'danger'
         })
       }
     },
@@ -130,15 +153,11 @@ export default {
               title: 'Error',
               autoHideDelay: 5000,
               appendToast: false,
-              variant: 'danger',
-              toastClass: 'text-white',
+              variant: 'danger'
             })
           }
         }
       })
-    },
-    closeModal() {
-      this.show = false
     },
   },
 }
@@ -148,11 +167,11 @@ export default {
   <Layout>
     <PageHeader :title="title" :items="items" />
     <CreateProjectModal
-      :show="show"
+      :value="show"
       :form-title="formtitle"
-      :close="closeModal"
       :action="editProject"
       :project="project"
+      @input="show = $event"
     />
     <div v-if="loading" class=" d-flex justify-content-center">
       <b-spinner type="grow" variant="primary"></b-spinner>
@@ -208,9 +227,7 @@ export default {
               <div class="row py-1">
                 <!-- Widget -->
 
-                <div
-                  class="col-xl-3 col-sm-6"
-                >
+                <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
                     <feather
@@ -224,9 +241,7 @@ export default {
                   </div>
                 </div>
 
-                <div
-                  class="col-xl-3 col-sm-6"
-                >
+                <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
                     <feather
@@ -234,15 +249,15 @@ export default {
                       class="align-self-center icon-dual icon-lg mr-4"
                     ></feather>
                     <div class="media-body">
-                      <h4 class="mt-0 mb-0">{{ project.no_of_completed_tasks }}</h4>
+                      <h4 class="mt-0 mb-0">{{
+                        project.no_of_completed_tasks
+                      }}</h4>
                       <span class="text-muted">Total Tasks Completed</span>
                     </div>
                   </div>
                 </div>
 
-                <div
-                  class="col-xl-3 col-sm-6"
-                >
+                <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
                     <feather
@@ -250,15 +265,15 @@ export default {
                       class="align-self-center icon-dual icon-lg mr-4"
                     ></feather>
                     <div class="media-body">
-                      <h4 class="mt-0 mb-0">{{ project.no_of_pending_tasks }}</h4>
+                      <h4 class="mt-0 mb-0">{{
+                        project.no_of_pending_tasks
+                      }}</h4>
                       <span class="text-muted">Total Pending Task</span>
                     </div>
                   </div>
                 </div>
 
-                <div
-                  class="col-xl-3 col-sm-6"
-                >
+                <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
                     <feather
@@ -361,63 +376,6 @@ export default {
                   </div>
                   <h5>No Assignees</h5>
                 </div>
-
-                <!-- <div class="mt-4">
-                  <h6 class="font-weight-bold">Attached Files</h6>
-
-                  <div class="row">
-                    <div class="col-xl-4 col-md-6">
-                      <div class="p-2 border rounded mb-2">
-                        <div class="media">
-                          <div class="avatar-sm font-weight-bold mr-3">
-                            <span
-                              class="avatar-title rounded bg-soft-primary text-primary"
-                            >
-                              <i class="uil-file-plus-alt font-size-18"></i>
-                            </span>
-                          </div>
-                          <div class="media-body">
-                            <a
-                              href="javascript: void(0);"
-                              class="d-inline-block mt-2"
-                              >Landing 1.psd</a
-                            >
-                          </div>
-                          <div class="float-right mt-1">
-                            <a href="javascript: void(0);" class="p-2">
-                              <i class="uil-download-alt font-size-18"></i>
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-xl-4 col-md-6">
-                      <div class="p-2 border rounded mb-2">
-                        <div class="media">
-                          <div class="avatar-sm font-weight-bold mr-3">
-                            <span
-                              class="avatar-title rounded bg-soft-primary text-primary"
-                            >
-                              <i class="uil-file-plus-alt font-size-18"></i>
-                            </span>
-                          </div>
-                          <div class="media-body">
-                            <a
-                              href="javascript: void(0);"
-                              class="d-inline-block mt-2"
-                              >Landing 2.psd</a
-                            >
-                          </div>
-                          <div class="float-right mt-1">
-                            <a href="javascript: void(0);" class="p-2">
-                              <i class="uil-download-alt font-size-18"></i>
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div> -->
               </div>
             </div>
           </div>
@@ -693,7 +651,8 @@ export default {
 
               <ul class="list-unstyled activity-widget">
                 <li
-                  v-for="deliverable in project.project_type && project.project_type.deliverables"
+                  v-for="deliverable in project.project_type &&
+                    project.project_type.deliverables"
                   :key="deliverable.id"
                   class="activity-list"
                 >
@@ -701,7 +660,7 @@ export default {
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
                         <router-link
-                          :to="`/project/deliverable/${deliverable.id}`"
+                          :to="`/project/${$route.params.id}/deliverable/${deliverable.id}`"
                           class="text-dark"
                           >{{ deliverable.deliverable_name }}</router-link
                         >

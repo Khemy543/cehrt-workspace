@@ -3,6 +3,7 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import CreateWorkFlowModal from '@components/CreateWorkFlowModal.vue'
+import ViewWorkFlowModal from '@components/ViewWorkFlowModal.vue'
 
 export default {
   page: {
@@ -13,6 +14,7 @@ export default {
     Layout,
     PageHeader,
     CreateWorkFlowModal,
+    ViewWorkFlowModal
   },
   props: {
     id: {
@@ -35,14 +37,22 @@ export default {
         },
       ],
       workFlows: [],
+      workflow: null,
       loading: false,
-      show: false
+      show: false,
+      formTitle: 'Create Work Flow',
+      viewShow: false
     }
   },
   created() {
     this.fetchWorkFlows()
   },
   methods: {
+    openCreateWorkFlow() {
+      this.workflow = null;
+      this.formTitle = "Create Work Flow"
+      this.show = true
+    },
     async fetchWorkFlows() {
       this.loading = true
       try {
@@ -58,7 +68,6 @@ export default {
           autoHideDelay: 5000,
           appendToast: false,
           variant: 'danger',
-          toastClass: 'text-white',
         })
       }
     },
@@ -69,6 +78,13 @@ export default {
 
         if (respoonse) {
           this.workFlows.push(respoonse.data.workflow)
+          this.show = false
+          this.$bvToast.toast('Work flow created successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
         }
       } catch (error) {
         if (error.response) {
@@ -89,17 +105,102 @@ export default {
       }
     },
 
-    editWorkFlow() {
-      
+    editWorkFlow(workflow) {
+      this.workflow = workflow
+      this.formTitle = 'Edit Work Flow'
+      this.show = true
     },
 
-    viewWorkFlow() {
-
+    action(workflow) {
+      if (this.workflow) {
+        return this.updateWorkflow(workflow)
+      }
+      return this.createWorkFlow(workflow)
     },
 
-    deleteWorkFlow() {
+    async updateWorkflow(workflow) {
+      try {
+        const response = await this.$http.put(`/update/${workflow.id}/workflow`, workflow)
 
-    }
+        if (response) {
+          const index = this.workFlows.findIndex(
+            (item) => item.id === workflow.id
+          )
+          this.workFlows[index] = response.data.workflow
+          this.workflow = null
+          this.formTitle = 'Create Work Flow'
+          this.show = false
+
+          this.$bvToast.toast('Work flow updated successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
+        }
+      } catch (error) {
+        if (error.response) {
+          let message = 'Something happened, Please try again later'
+          const { status, data } = error.response
+
+          if (status === 422) {
+            message = message = data.errors[Object.keys(data.errors)[0]]
+          }
+
+          this.$bvToast.toast(message, {
+            title: 'Error',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'danger',
+          })
+        }
+      }
+    },
+
+    viewWorkFlow(workflow) {
+      this.workflow = workflow;
+      this.viewShow = true
+    },
+
+    deleteWorkFlow(workflow) {
+      this.$swal({
+        title: 'Do you want to delete this work flow?',
+        showDenyButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.delete(
+              `/delete/${workflow.id}/workflow`
+            )
+
+            if (response) {
+              this.workFlows = this.workFlows.filter(
+                (item) => item.id !== workflow.id
+              )
+              this.$bvToast.toast('Work flow deleted successfully', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success',
+                toastClass: 'text-white',
+              })
+            }
+          } catch (error) {
+            this.$bvToast.toast('Something happened, Please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+              toastClass: 'text-white',
+            })
+          }
+        }
+      })
+    },
   },
 }
 </script>
@@ -125,7 +226,7 @@ export default {
                 <button
                   type="button"
                   class="btn btn-danger mr-4 mb-3 mb-sm-0"
-                  @click="show = true"
+                  @click="openCreateWorkFlow"
                 >
                   <i class="uil-plus mr-1"></i> Add Work Flow
                 </button>
@@ -150,7 +251,9 @@ export default {
                   >
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ work.name }}</td>
-                    <td>{{ work.work_flow_tasks && work.work_flow_tasks.length }}</td>
+                    <td>{{
+                      work.work_flow_tasks && work.work_flow_tasks.length
+                    }}</td>
                     <td class=" d-flex">
                       <b-dropdown
                         variant="link"
@@ -171,7 +274,7 @@ export default {
                         <b-dropdown-item
                           href="javascript: void(0);"
                           variant="secondary"
-                          @click="editWorkflow(work)"
+                          @click="editWorkFlow(work)"
                         >
                           <i class="uil uil-edit mr-2"></i>Edit
                         </b-dropdown-item>
@@ -193,9 +296,28 @@ export default {
       </div>
     </div>
 
-    <div v-if="!loading && workFlows.length <= 0" class=" w-100 d-flex justify-content-center">
-      <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:50%" />
+    <div
+      v-if="!loading && workFlows.length <= 0"
+      class=" w-100 d-flex justify-content-center"
+    >
+      <img
+        :src="require('@assets/svgs/empty.svg')"
+        alt="no projects"
+        style="width:50%"
+      />
     </div>
-    <CreateWorkFlowModal :action="createWorkFlow" :value="show" @input="show = $event"/>
+    <CreateWorkFlowModal
+      :action="action"
+      :value="show"
+      :workflow="workflow"
+      :form-title="formTitle"
+      @input="show = $event"
+    />
+
+    <ViewWorkFlowModal 
+      :value="viewShow"
+      :work-flow="workflow"
+      @input="viewShow = $event"
+    />
   </Layout>
 </template>

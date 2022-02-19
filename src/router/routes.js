@@ -347,7 +347,7 @@ const projectAppsRoutes = [
           lazyLoadView(import('@views/pages/consulting/project/detail')),
       },
       {
-        path: 'deliverable/:id',
+        path: ':project_id/deliverable/:deliverable_id',
         name: 'Task List',
         invisible:true,
         meta: { authRequired: true },
@@ -417,7 +417,7 @@ const appsRoutes = [
 ]
 
 // pages
-/* const pagesRoutes = [
+const pagesRoutes = [
   {
     path: '/pages',
     name: 'Pages',
@@ -455,7 +455,7 @@ const appsRoutes = [
       },
     ],
   },
-] */
+]
 /*
 // ui
 const uiRoutes = [
@@ -606,7 +606,7 @@ const authProtectedRoutes = [
   ...dashboardRoutes,
   ...appsRoutes,
   ...workFlowRoutes,
-  /* ...pagesRoutes, */
+  ...pagesRoutes,
   /* ...uiRoutes,
   ...formsRoutes,
   ...chartsRoutes,

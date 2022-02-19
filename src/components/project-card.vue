@@ -119,7 +119,7 @@ export default {
                     ></b-tooltip
                   >
                   <i class="uil uil-check-square mr-1"></i>
-                  {{ project.progress }}%
+                  {{ project.progress || 0 }}%
                 </a>
               </li>
             </ul>
