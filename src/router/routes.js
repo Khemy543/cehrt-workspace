@@ -417,7 +417,7 @@ const appsRoutes = [
 ]
 
 // pages
-const pagesRoutes = [
+/* const pagesRoutes = [
   {
     path: '/pages',
     name: 'Pages',
@@ -455,7 +455,7 @@ const pagesRoutes = [
       },
     ],
   },
-]
+] */
 /*
 // ui
 const uiRoutes = [
@@ -606,7 +606,7 @@ const authProtectedRoutes = [
   ...dashboardRoutes,
   ...appsRoutes,
   ...workFlowRoutes,
-  ...pagesRoutes,
+  /* ...pagesRoutes, */
   /* ...uiRoutes,
   ...formsRoutes,
   ...chartsRoutes,
