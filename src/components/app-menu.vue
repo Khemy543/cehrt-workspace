@@ -33,7 +33,7 @@
         >
       </router-link>
 
-      <ul v-if="hasItems(item)" class="nav-second-level">
+      <!-- <ul v-if="hasItems(item)" class="nav-second-level">
         <li
           v-for="subitem in item.children"
           :key="`sub-item-${subitem.name}`"
@@ -75,7 +75,7 @@
             </li>
           </ul>
         </li>
-      </ul>
+      </ul> -->
     </li>
   </ul>
 

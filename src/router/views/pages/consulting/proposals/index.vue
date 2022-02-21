@@ -58,7 +58,7 @@ export default {
     },
 
     openCreateProposal() {
-      this.proposal = {}
+      this.proposal = null
       this.formTitle = 'Create Proposal'
       this.show = true
     },
@@ -97,15 +97,17 @@ export default {
     },
 
     async updateProposal(form) {
+      const fakeForm = { ...form};
+      delete fakeForm['submission_date']
       try {
         const response = await this.$http.put(
           `/update/${form.id}/proposal`,
-          form
+          fakeForm
         )
 
         if (response) {
           const index = this.proposals.findIndex((item) => item.id === form.id)
-          this.proposals[index] = response.data
+          this.proposals[index] = response.data.proposal
           this.show = false
           this.$bvToast.toast('Proposal updated successfully', {
             title: 'Success',

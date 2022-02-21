@@ -3,7 +3,7 @@
     <form @submit.prevent="action(form)">
       <b-form-group
         id="input-group-1"
-        label="Name of Proposal"
+        label="Name of Project"
         label-for="input-1"
       >
         <b-form-input
@@ -11,7 +11,7 @@
           v-model="form.title"
           type="text"
           required
-          placeholder="Proposal name"
+          placeholder="Enter project name"
         ></b-form-input>
       </b-form-group>
 

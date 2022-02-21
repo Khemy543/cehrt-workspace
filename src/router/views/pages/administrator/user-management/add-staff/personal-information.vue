@@ -53,7 +53,7 @@ export default {
       required,
     },
     nhia: {
-      required,
+      required: false,
     },
     maritalStatus: {
       required,
