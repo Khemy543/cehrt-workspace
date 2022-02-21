@@ -101,82 +101,56 @@ const errorPagesRoutes = [
 // user mamangement routes
 const userManagementRoutes = [
   {
-    path: '/user-management',
+    path: '/user-management/staff',
     name: 'User Management',
     icon: 'user-plus',
     department: 'Administration',
     meta: { authRequired: true },
     // create a container component
-    component: {
-      render(c) {
-        return c('router-view')
-      },
-    },
+    component: () =>
+      lazyLoadView(
+        import('@views/pages/administrator/user-management/staff/index.vue')
+      ),
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
-    children: [
-      {
-        name: 'View Staff',
-        path: 'staff',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(
-            import('@views/pages/administrator/user-management/staff/index.vue')
-          ),
-      },
-      {
-        name: 'Staff',
-        path: 'staff/:id/view-staff',
-        meta: { authRequired: true },
-        invisible: true,
-        props: true,
-        component: () =>
-          lazyLoadView(
-            import(
-              '@views/pages/administrator/user-management/staff/view-staff.vue'
-            )
-          ),
-      },
-      {
-        name: 'Add Staff',
-        path: 'add-staff',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(
-            import(
-              '@views/pages/administrator/user-management/add-staff/index.vue'
-            )
-          ),
-      },
-    ],
+  },
+  {
+    name: 'Staff',
+    path: '/user-management/staff/:id/view-staff',
+    meta: { authRequired: true },
+    invisible: true,
+    props: true,
+    component: () =>
+      lazyLoadView(
+        import(
+          '@views/pages/administrator/user-management/staff/view-staff.vue'
+        )
+      ),
+  },
+  {
+    name: 'Add Staff',
+    path: '/user-management/add-staff',
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(
+        import('@views/pages/administrator/user-management/add-staff/index.vue')
+      ),
   },
 ]
 
 // departments route
-const departmentRoutes = [
+/* const departmentRoutes = [
   {
-    path: '/department',
+    path: '/department/view-departments',
     name: 'Department',
     icon: 'layers',
     department: 'Administration',
-    component: {
-      render(c) {
-        return c('router-view')
-      },
-    },
-    props: (route) => ({ user: store.state.auth.currentUser || {} }),
-    children: [
-      {
-        name: 'View Departments',
-        path: 'view-departments',
-        meta: { authRequired: true },
-        component: () =>
+    component: () =>
           lazyLoadView(
             import('@views/pages/administrator/departments/index.vue')
           ),
-      },
-    ],
+    props: (route) => ({ user: store.state.auth.currentUser || {} })
   },
-]
+] */
 
 // finance routes
 
@@ -372,7 +346,7 @@ const profileRoute = [
 
 const appsRoutes = [
   ...userManagementRoutes,
-  ...departmentRoutes,
+  /* ...departmentRoutes, */
   ...calendarAppsRoutes,
   /* ...emailAppsRoutes, */
   ...proposalRoutes,
