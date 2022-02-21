@@ -131,7 +131,9 @@ const userManagementRoutes = [
         props: true,
         component: () =>
           lazyLoadView(
-            import('@views/pages/administrator/user-management/staff/view-staff.vue')
+            import(
+              '@views/pages/administrator/user-management/staff/view-staff.vue'
+            )
           ),
       },
       {
@@ -140,7 +142,9 @@ const userManagementRoutes = [
         meta: { authRequired: true },
         component: () =>
           lazyLoadView(
-            import('@views/pages/administrator/user-management/add-staff/index.vue')
+            import(
+              '@views/pages/administrator/user-management/add-staff/index.vue'
+            )
           ),
       },
     ],
@@ -170,7 +174,7 @@ const departmentRoutes = [
             import('@views/pages/administrator/departments/index.vue')
           ),
       },
-    ]
+    ],
   },
 ]
 
@@ -187,65 +191,35 @@ const workFlowRoutes = [
     department: 'Consultancy',
     meta: { authRequired: true },
     // create a container component
-    component: {
-      render(c) {
-        return c('router-view')
-      },
-    },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/workflows/workflows.vue')),
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
-    children: [
-      {
-        name: 'View Work Flows',
-        path: 'view-workflows',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(
-            import('@views/pages/consulting/workflows/workflows.vue')
-          ),
-      }
-    ],
-  }
+  },
 ]
 
 // proposal routes
 
 const proposalRoutes = [
   {
-    path: '/proposals',
+    path: '/proposals/view-proposals',
     name: 'Proposals',
     icon: 'bookmark',
     department: 'Consultancy',
     meta: { authRequired: true },
     // create a container component
-    component: {
-      render(c) {
-        return c('router-view')
-      },
-    },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/proposals/index.vue')),
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
-    children: [
-      {
-        name: 'View Proposals',
-        path: 'view-proposals',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(
-            import('@views/pages/consulting/proposals/index.vue')
-          ),
-      },
-      {
-        name: 'Proposals details',
-        path: '/proposals/details/:id',
-        invisible: true,
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(
-            import('@views/pages/consulting/proposals/details.vue')
-          ),
-      }
-    ],
-  }
-] 
+  },
+  {
+    name: 'Proposals details',
+    path: '/proposals/details/:id',
+    invisible: true,
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/proposals/details.vue')),
+  },
+]
 
 // dashboard
 const dashboardRoutes = [
@@ -319,50 +293,39 @@ const emailAppsRoutes = [
 
 const projectAppsRoutes = [
   {
-    path: '/project',
+    path: '/project/list',
     name: 'Project',
     icon: 'briefcase',
     department: 'Consultancy',
     meta: { authRequired: true },
     // create a container component
-    component: {
-      render(c) {
-        return c('router-view')
-      },
-    },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/project/list')),
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
-    children: [
-      {
-        path: 'list',
-        name: 'View Projects',
-        meta: { authRequired: true },
-        component: () => lazyLoadView(import('@views/pages/consulting/project/list')),
-      },
-      {
-        path: 'details/:id',
-        name: 'Detail',
-        invisible:true,
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/consulting/project/detail')),
-      },
-      {
-        path: ':project_id/deliverable/:deliverable_id',
-        name: 'Task List',
-        invisible:true,
-        meta: { authRequired: true },
-        component: () =>
-        lazyLoadView(import('@views/pages/consulting/tasks/task-board')),
-      },
-      {
-        path: 'task-board',
-        name: 'Kanban Board',
-        invisible:true,
-        meta: { authRequired: true },
-        component: () =>
-        lazyLoadView(import('@views/pages/consulting/tasks/task-list')),
-      },
-    ],
+  },
+  {
+    path: '/project/details/:id',
+    name: 'Detail',
+    invisible: true,
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/project/detail')),
+  },
+  {
+    path: '/project/:project_id/deliverable/:deliverable_id',
+    name: 'Task List',
+    invisible: true,
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/tasks/task-board')),
+  },
+  {
+    path: '/project/task-board',
+    name: 'Kanban Board',
+    invisible: true,
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/tasks/task-list')),
   },
 ]
 
@@ -409,7 +372,7 @@ const profileRoute = [
 
 const appsRoutes = [
   ...userManagementRoutes,
-  ...departmentRoutes ,
+  ...departmentRoutes,
   ...calendarAppsRoutes,
   /* ...emailAppsRoutes, */
   ...proposalRoutes,
@@ -456,7 +419,6 @@ const appsRoutes = [
     ],
   },
 ] */
-/*
 // ui
 const uiRoutes = [
   {
@@ -464,13 +426,10 @@ const uiRoutes = [
     name: 'UI Elements',
     icon: 'package',
     header: 'Components',
+    department: 'all',
     meta: { authRequired: true },
     // create a container component
-    component: {
-      render(c) {
-        return c('router-view')
-      },
-    },
+    component: () => lazyLoadView(import('@views/pages/ui/icons/unicons')),
     children: [
       {
         path: 'bootstrap',
@@ -509,7 +468,7 @@ const uiRoutes = [
     ],
   },
 ]
-
+/*
 
 // forms
 const formsRoutes = [
@@ -606,6 +565,7 @@ const authProtectedRoutes = [
   ...dashboardRoutes,
   ...appsRoutes,
   ...workFlowRoutes,
+  ...uiRoutes,
   /* ...pagesRoutes, */
   /* ...uiRoutes,
   ...formsRoutes,

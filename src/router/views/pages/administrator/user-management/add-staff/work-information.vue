@@ -34,7 +34,7 @@ export default {
       required
     },
     workPhone: {
-      required
+      required: false
     },
     startDate: {
       required
@@ -91,7 +91,7 @@ export default {
         >
           <label class="col-md-3 col-form-label">Title</label>
           <div class="col-md-12">
-            <multiselect v-model="title" :options="['Mr', 'Mrs', 'Miss']"></multiselect>
+            <multiselect v-model="title" :options="['Mr', 'Mrs', 'Miss', 'Ing', 'Dr', 'Prof', 'other']"></multiselect>
             <span
               v-if="$v.title.$error && !$v.title.required"
               class="help-block invalid-feedback"
