@@ -656,7 +656,7 @@ export default {
                   :key="deliverable.id"
                   class="activity-list"
                 >
-                  <div class="media">
+                  <div class="media d-flex justify-content-between">
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
                         <router-link
@@ -685,7 +685,12 @@ export default {
                       </div>
                     </div>
 
-                    <div class=""> </div>
+                    <button
+                      type="button"
+                      class="btn btn-soft-primary btn-sm"
+                    >
+                      <i class="uil uil-plus"></i>
+                    </button>
                   </div>
                 </li>
               </ul>
