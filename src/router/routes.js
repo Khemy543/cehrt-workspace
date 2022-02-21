@@ -420,7 +420,7 @@ const appsRoutes = [
   },
 ] */
 // ui
-const uiRoutes = [
+/* const uiRoutes = [
   {
     path: '/ui',
     name: 'UI Elements',
@@ -468,7 +468,6 @@ const uiRoutes = [
     ],
   },
 ]
-/*
 
 // forms
 const formsRoutes = [
@@ -565,7 +564,6 @@ const authProtectedRoutes = [
   ...dashboardRoutes,
   ...appsRoutes,
   ...workFlowRoutes,
-  ...uiRoutes,
   /* ...pagesRoutes, */
   /* ...uiRoutes,
   ...formsRoutes,
