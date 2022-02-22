@@ -190,9 +190,7 @@ export default {
                       <h3 class="mt-0">Add New Staff !</h3>
 
                       <p class="w-75 mb-2 mx-auto">
-                        Quisque nec turpis at urna dictum luctus. Suspendisse
-                        convallis dignissim eros at volutpat. In egestas mattis
-                        dui. Aliquam mattis dictum aliquet.
+                        Click on the finish button to add staff.
                       </p>
 
                       <!-- <div class="mb-3">

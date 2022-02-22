@@ -92,6 +92,9 @@ export default {
                     <h5>
                       {{ staff.title }} {{ staff.firstname }}
                       {{ staff.lastname }} {{ staff.other_names }}
+                      <br/>
+                      <br/>
+                      Preferred name: {{ staff.preferred_name }}
                     </h5>
                     <div>
                       {{ staff.work_location }}
@@ -99,6 +102,7 @@ export default {
                     <div>
                       {{ staff.work_phone }}
                     </div>
+                       Email:  {{ staff. email }}
                     <div class="sub-header">
                       <br />
                       <br />
@@ -109,6 +113,10 @@ export default {
                           >{{ depart.name }}</div
                         >
                       </div>
+                    </div>
+
+                    <div>
+                      <!-- {{staff}} -->
                     </div>
                   </div>
                   <div> </div>
