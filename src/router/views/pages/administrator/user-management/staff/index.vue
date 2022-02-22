@@ -111,17 +111,14 @@ export default {
             if (response) {
               const index = this.staff.findIndex((item) => item.id === user.id)
               console.log(this.staff[index])
-              this.staff[index] = {...user, is_active: 0}
+              this.staff[index] = { ...user, is_active: 0 }
               console.log(this.staff[index])
-              this.$bvToast.toast(
-                'User account deactivated',
-                {
-                  title: 'Success',
-                  autoHideDelay: 5000,
-                  appendToast: false,
-                  variant: 'success',
-                }
-              )
+              this.$bvToast.toast('User account deactivated', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success',
+              })
             }
           } catch (error) {
             this.$bvToast.toast('Something happened, Please try again later', {
@@ -148,10 +145,22 @@ export default {
       <div class="col-lg-12">
         <div class="card" style="overflow-x: auto">
           <div class="card-body">
-            <h4 class="header-title mt-0 mb-1">View Staff</h4>
-            <p class="sub-header">
-              View all staff members
-            </p>
+            <div class=" d-flex justify-content-between">
+            <div>
+              <h4 class="header-title mt-0 mb-1">View Staff</h4>
+              <p class="sub-header">
+                View all staff members
+              </p> </div
+            ><div>
+              <router-link
+                to="/user-management/add-staff"
+                type="button"
+                class="btn btn-danger mr-4 mb-3 mb-sm-0"
+              >
+                <i class="uil-plus mr-1"></i> Add Staff
+              </router-link>
+            </div>
+            </div>
 
             <div class="">
               <table class="table mb-0">
