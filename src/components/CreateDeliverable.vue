@@ -1,13 +1,9 @@
 <template>
   <b-modal
-    :visible="show"
-    title="Deliverable name"
+    v-model="show"
+    :title="deliverable.deliverable_name"
     title-class="font-18"
     hide-footer
-    cancel-disabled
-    hide-header-close
-    no-close-on-backdrop
-    no-close-on-esc
   >
     <form @submit.prevent="action(form)">
       <b-form-group
@@ -30,7 +26,7 @@
 <script>
 export default {
   props: {
-    show: {
+    value: {
       type: Boolean,
       required: true
     },
@@ -38,10 +34,29 @@ export default {
       type: Function,
       required: true,
     },
+    deliverable: {
+      type: Object,
+      default: () =>{}
+    }
   },
   data() {
     return {
       form: {},
+    }
+  },
+  computed: {
+    show: {
+      get() {
+        return this.value
+      },
+      set(val) {
+        this.$emit('input', val)
+      }
+    }
+  },
+  watch: {
+    deliverable(newValue) {
+      this.form = newValue
     }
   },
 }

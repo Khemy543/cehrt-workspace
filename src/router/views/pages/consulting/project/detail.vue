@@ -3,6 +3,7 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import CreateProjectModal from '@components/CreateProjectModal.vue'
+import CreateDeliverable from '@components/CreateDeliverable'
 
 import { widgetData, projectActivity } from './data-projectdetail'
 
@@ -11,13 +12,14 @@ export default {
     title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, PageHeader, CreateProjectModal },
+  components: { Layout, PageHeader, CreateProjectModal, CreateDeliverable },
   data() {
     return {
       widgetData: widgetData,
       show: false,
       formtitle: 'Edit Project',
       projectActivity: projectActivity,
+      showCreateDeliverable: false,
       loading: true,
       project: {},
       title: 'Project Overview',
@@ -35,13 +37,8 @@ export default {
           active: true,
         },
       ],
-      projectDeliverables: []
-    }
-  },
-  computed: {
-    vProjectDeliverables() {
-      const deliverbales = this.project.project_type && this.project.project_type.deliverbales || [];
-      return deliverbales
+      projectDeliverables: [],
+      vDeliverable: {},
     }
   },
   created() {
@@ -49,6 +46,11 @@ export default {
     this.getProjectDeliverables()
   },
   methods: {
+    showDeliverable(deliverable) {
+      return !this.projectDeliverables.some(
+        (item) => item.project_type_deliverable.id === deliverable.id
+      )
+    },
     async getProjectDetials() {
       try {
         this.loading = true
@@ -66,21 +68,21 @@ export default {
           title: 'Error',
           autoHideDelay: 5000,
           appendToast: false,
-          variant: 'danger'
+          variant: 'danger',
         })
       }
     },
 
     async getProjectDeliverables() {
       try {
-        const response = await this.$http.get(`fetch/${this.$route.params.id}/deliverables`);
+        const response = await this.$http.get(
+          `fetch/${this.$route.params.id}/deliverables`
+        )
 
-        if(response) {
+        if (response) {
           this.projectDeliverables = response.data
         }
-      } catch (error) {
-        
-      }
+      } catch (error) {}
     },
     async editProject(form) {
       try {
@@ -98,7 +100,7 @@ export default {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
-            variant: 'success'
+            variant: 'success',
           })
         }
       } catch (error) {
@@ -118,7 +120,7 @@ export default {
           title: 'Error',
           autoHideDelay: 5000,
           appendToast: false,
-          variant: 'danger'
+          variant: 'danger',
         })
       }
     },
@@ -153,11 +155,56 @@ export default {
               title: 'Error',
               autoHideDelay: 5000,
               appendToast: false,
-              variant: 'danger'
+              variant: 'danger',
             })
           }
         }
       })
+    },
+
+    openCreateDeliverable(deliverable) {
+      this.vDeliverable = deliverable
+      this.showCreateDeliverable = true
+    },
+
+    async createDeliverable(form) {
+      try {
+        const response = await this.$http.post(
+          `/project/${this.$route.params.id}/create-deliverable`,
+          { ...form, project_type_deliverable_id: form.id }
+        )
+
+        if (response) {
+          this.projectDeliverables.push(response.data.deliverable)
+          this.$bvToast.toast('Project deliverable created successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
+
+          this.showCreateDeliverable = false
+        }
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
     },
   },
 }
@@ -651,8 +698,7 @@ export default {
 
               <ul class="list-unstyled activity-widget">
                 <li
-                  v-for="deliverable in project.project_type &&
-                    project.project_type.deliverables"
+                  v-for="deliverable in projectDeliverables"
                   :key="deliverable.id"
                   class="activity-list"
                 >
@@ -660,9 +706,15 @@ export default {
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
                         <router-link
-                          :to="`/project/${$route.params.id}/deliverable/${deliverable.id}`"
+                          :to="
+                            `/project/${$route.params.id}/deliverable/${deliverable.id}`
+                          "
                           class="text-dark"
-                          >{{ deliverable.deliverable_name }}</router-link
+                          >{{
+                            deliverable.project_type_deliverable &&
+                              deliverable.project_type_deliverable
+                                .deliverable_name
+                          }}</router-link
                         >
                       </h5>
                       <div class=" d-flex justify-content-between">
@@ -684,13 +736,45 @@ export default {
                         </div>
                       </div>
                     </div>
+                    <div class="d-flex">
+                      <button
+                        type="button"
+                        class="btn btn-soft-secondary btn-sm"
+                      >
+                        <i class="uil uil-edit"></i>
+                      </button>
 
-                    <button
-                      type="button"
-                      class="btn btn-soft-primary btn-sm"
-                    >
-                      <i class="uil uil-plus"></i>
-                    </button>
+                      <button
+                        type="button"
+                        class="btn btn-soft-danger ml-2 btn-sm"
+                      >
+                        <i class="uil uil-trash-alt"></i>
+                      </button>
+                    </div>
+                  </div>
+                </li>
+                <li
+                  v-for="deliver in project.project_type &&
+                    project.project_type.deliverables"
+                  :key="deliver.name"
+                >
+                  <div v-if="showDeliverable(deliver)" class="activity-list">
+                    <div class="media d-flex justify-content-between">
+                      <div class="media-body overflow-hidden">
+                        <h5 class="font-size-15 mt-2 mb-1">
+                          <div class="text-dark">{{
+                            deliver.deliverable_name
+                          }}</div>
+                        </h5>
+                      </div>
+                      <button
+                        type="button"
+                        class="btn btn-soft-primary btn-sm"
+                        @click="openCreateDeliverable(deliver)"
+                      >
+                        <i class="uil uil-plus"></i>
+                      </button>
+                    </div>
                   </div>
                 </li>
               </ul>
@@ -699,5 +783,12 @@ export default {
         </div>
       </div>
     </div>
+
+    <CreateDeliverable
+      :action="createDeliverable"
+      :value="showCreateDeliverable"
+      :deliverable="vDeliverable"
+      @input="showCreateDeliverable = $event"
+    />
   </Layout>
 </template>

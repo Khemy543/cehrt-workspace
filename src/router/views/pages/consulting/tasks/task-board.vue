@@ -4,7 +4,6 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import CreateTaskModal from '@components/CreateTaskModal.vue'
-import CreateDeliverable from '@components/CreateDeliverable'
 
 import Task from './board-task'
 import { tasks } from './data-taskboard'
@@ -20,7 +19,6 @@ export default {
     PageHeader,
     Task,
     CreateTaskModal,
-    CreateDeliverable,
   },
   data() {
     return {
@@ -91,18 +89,7 @@ export default {
       this.selectedWorkflow = workflow
     },
 
-    createTask() {},
-    async createDeliverable(form) {
-      try {
-        const response = await this.$http.post(
-          `/project/${this.$route.params.project_id}/create-deliverable`,
-          { ...form, project_type_deliverable_id: this.$route.params.deliverable_id }
-        )
-
-        if (response) {
-        }
-      } catch (error) {}
-    },
+    createTask() {}
   },
 }
 </script>
@@ -258,11 +245,6 @@ export default {
       :action="createTask"
       :value="show"
       @input="show = $event"
-    />
-
-    <CreateDeliverable
-      :action="createDeliverable"
-      :show="showCreateDeliverable"
     />
   </Layout>
 </template>
