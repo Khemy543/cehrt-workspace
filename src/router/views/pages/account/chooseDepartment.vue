@@ -3,6 +3,10 @@ import Layout from '@layouts/default'
 import appConfig from '@src/app.config'
 import { authMethods } from '@state/helpers'
 import DepartmentCard from '@components/department-card.vue'
+import admin from '@assets/images/department/admin.jpeg'
+import consulting from '@assets/images/department/consulting.jpeg'
+import finance from '@assets/images/department/finance.jpeg'
+
 export default {
   page: {
     title: 'Department',
@@ -42,7 +46,7 @@ export default {
         return {
           ...department,
           value: 12,
-          icon: 'lock',
+          icon: department.id === 4? admin : department.id === 24 ? consulting : finance,
           color: 'success'
         }
       })
