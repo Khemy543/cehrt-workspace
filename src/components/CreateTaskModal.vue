@@ -1,10 +1,5 @@
 <template>
-  <b-modal
-    v-model="show"
-    title="Create Task"
-    title-class="font-18"
-    hide-footer
-  >
+  <b-modal v-model="show" title="Create Task" title-class="font-18" hide-footer>
     <form @submit.prevent="action(form)">
       <b-form-group id="name" label="Task name" label-for="input-1">
         <b-form-input
@@ -17,12 +12,15 @@
       </b-form-group>
 
       <b-form-group id="assignees" label="Assign to" label-for="input-1">
-        <b-form-input
-          id="assignees"
-          v-model="form.assignees"
-          type="text"
-          required
-        ></b-form-input>
+        <b-form-select id="input-1" v-model="form.assignee" required>
+          <option value="">Select user</option>
+          <option
+            v-for="user in staff"
+            :key="user.id"
+            :value="user.id"
+            >{{ user.name }}</option
+          >
+        </b-form-select>
       </b-form-group>
 
       <b-form-group
@@ -41,11 +39,7 @@
         </b-form-select>
       </b-form-group>
 
-      <b-form-group
-        id="input-group-1"
-        label="Due date"
-        label-for="input-1"
-      >
+      <b-form-group id="input-group-1" label="Due date" label-for="input-1">
         <b-form-input
           id="input-1"
           v-model="form.end_date"
@@ -66,15 +60,17 @@ export default {
       required: true,
     },
     value: {
-        type: Boolean,
-        default: false
-    }
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
       form: {
-          priority: ""
+        priority: '',
+        assignee: ''
       },
+      staff: []
     }
   },
   computed: {
@@ -84,9 +80,23 @@ export default {
       },
       set(val) {
         this.$emit('input', val)
-      }
-    } 
-  }
+      },
+    },
+  },
+  created() {
+    this.getStaff()
+  },
+  methods: {
+    async getStaff() {
+      try {
+        const response = await this.$http.get(`/fetch/all-staff`)
+
+        if (response) {
+          this.staff = response.data
+        }
+      } catch (error) {}
+    },
+  },
 }
 </script>
 

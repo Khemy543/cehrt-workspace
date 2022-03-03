@@ -4,6 +4,7 @@
     :title="formTitle"
     title-class="font-18"
     hide-footer
+    size="lg"
   >
     <form @submit.prevent="action(form)">
       <b-form-group
@@ -51,21 +52,43 @@
         </b-form-select>
       </b-form-group>
 
-      <b-form-group
-        id="input-group-1"
-        label="Project Sector"
-        label-for="input-1"
-      >
-        <b-form-select v-model="form.project_sector_id" class="mb-2">
-          <option value="" disabled>Select project sector</option>
-          <option
-            v-for="sector in sectors"
-            :key="sector.id"
-            :value="sector.id"
-            >{{ sector.name }}</option
+      <div class="row">
+        <div class="col-md-6">
+          <b-form-group
+            id="input-group-1"
+            label="Project Sector"
+            label-for="input-1"
           >
-        </b-form-select>
-      </b-form-group>
+            <b-form-select v-model="form.project_sector_id" class="mb-2">
+              <option value="" disabled>Select project sector</option>
+              <option
+                v-for="sector in sectors"
+                :key="sector.id"
+                :value="sector.id"
+                >{{ sector.name }}</option
+              >
+            </b-form-select>
+          </b-form-group>
+        </div>
+        <div class="col-md-6">
+          <b-form-group
+            id="input-group-1"
+            label="Project Coordinator"
+            label-for="input-1"
+          >
+            <b-form-select v-model="form.coordinator_id" class="mb-2">
+              <option value="" disabled>Select project coordinator</option>
+              <option
+                v-for="user in staff"
+                :key="user.id"
+                :value="user.id"
+                >{{ user.name }}</option
+              >
+            </b-form-select>
+          </b-form-group>
+        </div>
+      </div>
+
       <div class="row">
         <div class="col-6">
           <b-form-group
@@ -114,18 +137,20 @@ export default {
     },
     value: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
       form: {
         project_type_id: '',
         project_sector_id: '',
+        coordinator_id: '',
         ...this.project,
       },
       projectTypes: [],
       sectors: [],
+      staff: []
     }
   },
   computed: {
@@ -135,8 +160,8 @@ export default {
       },
       set(val) {
         this.$emit('input', val)
-      }
-    }
+      },
+    },
   },
   watch: {
     project(newValue) {
@@ -144,6 +169,7 @@ export default {
         ...newValue,
         project_type_id: newValue.project_type.id || '',
         project_sector_id: newValue.project_sector.id || '',
+        coordinator_id: newValue.coordinator.id || '',
         start_date: newValue.raw_start_date,
         end_date: newValue.raw_end_date,
       }
@@ -152,6 +178,7 @@ export default {
   created() {
     this.getSectors()
     this.getProjectTypes()
+    this.getStaff();
   },
   methods: {
     async getSectors() {
@@ -172,6 +199,17 @@ export default {
         }
       } catch (error) {}
     },
+    async getStaff() {
+      try {
+        const response = await this.$http.get(`/fetch/all-staff`);
+
+        if(response) {
+          this.staff = response.data
+        }
+      } catch (error) {
+        
+      }
+    }
   },
 }
 </script>

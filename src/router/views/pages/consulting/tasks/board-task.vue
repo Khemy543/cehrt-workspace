@@ -8,6 +8,12 @@ export default {
       },
     },
   },
+
+  computed: {
+    initals() {
+      return this.task.assignee.name.match(/\b(\w)/g).join('').toUpperCase();
+    }
+  }
 }
 </script>
 <template>
@@ -37,36 +43,41 @@ export default {
       </b-dropdown>
 
       <h6 class="mt-0 mb-2 font-size-15">
-        <a href="javascript: void(0);" class="text-body">{{ task.title }}</a>
+        <a href="javascript: void(0);" class="text-body">{{ task.name }}</a>
       </h6>
 
       <span v-if="task.priority === 'High'" class="badge badge-soft-danger"
         >High</span
       >
 
-      <span v-else-if="task.priority === 'Normal'" class="badge badge-soft-info"
-        >Normal</span
+      <span v-else-if="task.priority === 'Medium'" class="badge badge-soft-info"
+        >{{ task.priority }}</span
       >
 
       <span v-else class="badge badge-soft-success">Low</span>
 
       <p class="mb-0 mt-4">
-        <img
+        <!-- <img
           :src="task.user"
           alt="user-img"
           class="avatar-xs rounded-circle mr-2"
-        />
+        /> -->
 
+        <span class="avatar-xs rounded-circle mr-2 bg-primary mb-2 p-2 text-white">
+          {{initals}}
+        </span>
+        <br />
+        <br/>
         <span class="text-nowrap align-middle font-size-13 mr-2">
           <i class="uil uil-comments-alt text-muted mr-1"></i
-          >{{ task.comments }}
+          >{{ task.comments || 0 }}
         </span>
 
         <span class="text-nowrap align-middle font-size-13">
           <i class="uil uil-check-square mr-1 text-muted"></i
-          >{{ task.subTasks }}
+          >{{ task.subTasks || 0 }}
         </span>
-        <small class="float-right text-muted">{{ task.dueDate }}</small>
+        <small class="float-right text-muted">{{ task.end_date }}</small>
       </p>
     </div>
     <!-- end card-body -->

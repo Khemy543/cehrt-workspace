@@ -6,7 +6,6 @@ import PageHeader from '@components/page-header'
 import CreateTaskModal from '@components/CreateTaskModal.vue'
 
 import Task from './board-task'
-import { tasks } from './data-taskboard'
 
 export default {
   page: {
@@ -22,10 +21,6 @@ export default {
   },
   data() {
     return {
-      todoTasks: [...tasks[0].items],
-      inProgressTasks: [...tasks[1].items],
-      reviewTasks: [...tasks[2].items],
-      doneTasks: [...tasks[3].items],
       title: 'Project Tasks Board',
       items: [
         {
@@ -52,6 +47,11 @@ export default {
       show: false,
       deliverableShow: false,
       deliverable: {},
+      staff: [],
+      todoTasks: [],
+      inProgressTasks: [],
+      doneTasks: [],
+      reviewTasks: []
     }
   },
   computed: {
@@ -62,10 +62,11 @@ export default {
     },
     showCreateDeliverable() {
       return !this.deliverable.deadline
-    },
+    }
   },
   created() {
     this.getworkFlows()
+    this.getTasks()
   },
   methods: {
     async getworkFlows() {
@@ -89,7 +90,73 @@ export default {
       this.selectedWorkflow = workflow
     },
 
-    createTask() {}
+    async createTask(form) {
+      try {
+        const {
+          project_id: projectId,
+          deliverable_id: deliverableId,
+        } = this.$route.params
+
+        const newForm = {
+          ...form,
+          project_id: projectId,
+        }
+
+        const response = await this.$http.post(
+          `/project/${deliverableId}/create-task`,
+          newForm
+        )
+
+        if (response) {
+          this.$bvToast.toast('Task created successful', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
+        }
+      } catch (error) {
+        if (error.response) {
+          let message = 'Something happened, Please try again later'
+          const { status, data } = error.response
+
+          if (status === 422) {
+            message = message = data.errors[Object.keys(data.errors)[0]]
+          }
+
+          this.$bvToast.toast(message, {
+            title: 'Error',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'danger',
+          })
+        }
+      }
+    },
+
+    async getTasks() {
+      try {
+        const response = await this.$http.get(
+          `/fetch/${this.$route.params.deliverable_id}/deliverable-tasks`
+        )
+
+        if (response) {
+          this.tasks = response.data;
+          this.todoTasks = response.data.filter((item) => item.status === 'pending') || [];
+          this.inProgressTasks = response.data.filter((item) => item.status === 'active') || [];
+          this.doneTasks = response.data.filter((item) => item.status === 'completed') || [];
+          this.reviewTasks = response.data.filter((item) => item.status === 'in-review') || [];
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
+    },
   },
 }
 </script>
@@ -122,7 +189,6 @@ export default {
                   <b-dropdown-item
                     v-for="workflow in workflows"
                     :key="workflow.id"
-                    class="dropdown-item"
                     href="javascript: void(0);"
                     variant="seconday"
                     @click="selectWorkflow(workflow)"
