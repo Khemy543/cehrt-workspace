@@ -11,7 +11,7 @@ export default {
 
   computed: {
     initals() {
-      return this.task.assignee.name.match(/\b(\w)/g).join('').toUpperCase();
+      return this.task.assignee.name ? this.task.assignee.name.match(/\b(\w)/g).join('').toUpperCase() : "GA";
     }
   }
 }
@@ -30,11 +30,17 @@ export default {
         <b-dropdown-item href="javascript: void(0);"
           ><i class="uil uil-edit-alt mr-2"></i>Edit</b-dropdown-item
         >
-        <b-dropdown-item href="javascript: void(0);"
-          ><i class="uil uil-user-plus mr-2"></i>Add People</b-dropdown-item
+        <b-dropdown-item v-if="task.assignee.id" href="javascript: void(0);"
+          ><i class="uil uil-sync mr-2"></i>Change Assignee</b-dropdown-item
         >
-        <b-dropdown-item href="javascript: void(0);" variant="warning"
-          ><i class="uil uil-exit mr-2"></i>Leave</b-dropdown-item
+        <b-dropdown-item v-else href="javascript: void(0);"
+          ><i class="uil uil-user-plus mr-2"></i>Assign To</b-dropdown-item
+        >
+        <b-dropdown-item v-if="task.reviewer.id" href="javascript: void(0);"
+          ><i class="uil uil-sync mr-2"></i>Change Reviewer</b-dropdown-item
+        >
+        <b-dropdown-item v-else href="javascript: void(0);"
+          ><i class="uil uil-exit mr-2"></i>Add Reviewer</b-dropdown-item
         >
         <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item href="javascript: void(0);" variant="danger">
@@ -63,8 +69,12 @@ export default {
           class="avatar-xs rounded-circle mr-2"
         /> -->
 
-        <span class="avatar-xs rounded-circle mr-2 bg-primary mb-2 p-2 text-white">
+        <span v-if="task.assignee.id" class="avatar-xs rounded-circle mr-2 bg-primary mb-2 p-2 text-white">
           {{initals}}
+        </span>
+
+        <span v-else >
+          Unassigned
         </span>
         <br />
         <br/>
@@ -77,7 +87,15 @@ export default {
           <i class="uil uil-check-square mr-1 text-muted"></i
           >{{ task.subTasks || 0 }}
         </span>
-        <small class="float-right text-muted">{{ task.end_date }}</small>
+        <small class="float-right text-muted">
+          <i class="uil uil-calendar-alt text-muted mr-1"></i
+          >{{ task.formatted_end_date }}
+          
+          <span v-if="task.is_due" class="text-nowrap align-middle font-size-15">
+          <i class="uil uil-windsock ml-1 text-danger"></i
+          >
+        </span></small>
+
       </p>
     </div>
     <!-- end card-body -->

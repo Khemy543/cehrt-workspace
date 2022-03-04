@@ -45,13 +45,12 @@ export default {
       workflows: [],
       selectedWorkflow: { id: null, name: 'No work flow Selected' },
       show: false,
-      deliverableShow: false,
       deliverable: {},
       staff: [],
       todoTasks: [],
       inProgressTasks: [],
       doneTasks: [],
-      reviewTasks: []
+      reviewTasks: [],
     }
   },
   computed: {
@@ -62,11 +61,12 @@ export default {
     },
     showCreateDeliverable() {
       return !this.deliverable.deadline
-    }
+    },
   },
   created() {
     this.getworkFlows()
-    this.getTasks()
+    this.getTasks();
+    this.getDeliverableDetails();
   },
   methods: {
     async getworkFlows() {
@@ -86,10 +86,23 @@ export default {
         })
       }
     },
-    selectWorkflow(workflow) {
-      this.selectedWorkflow = workflow
-    },
+    async getDeliverableDetails() {
+      try {
+        const response = await this.$http(`/fetch/${this.$route.params.deliverable_id}/deliverable`);
 
+        if(response) {
+          this.deliverable = response.data
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
+    },
     async createTask(form) {
       try {
         const {
@@ -108,6 +121,8 @@ export default {
         )
 
         if (response) {
+          this.todoTasks.unshift(response.data.task)
+          this.show = false
           this.$bvToast.toast('Task created successful', {
             title: 'Success',
             autoHideDelay: 5000,
@@ -141,11 +156,15 @@ export default {
         )
 
         if (response) {
-          this.tasks = response.data;
-          this.todoTasks = response.data.filter((item) => item.status === 'pending') || [];
-          this.inProgressTasks = response.data.filter((item) => item.status === 'active') || [];
-          this.doneTasks = response.data.filter((item) => item.status === 'completed') || [];
-          this.reviewTasks = response.data.filter((item) => item.status === 'in-review') || [];
+          this.tasks = response.data
+          this.todoTasks =
+            response.data.filter((item) => item.status === 'pending') || []
+          this.inProgressTasks =
+            response.data.filter((item) => item.status === 'active') || []
+          this.doneTasks =
+            response.data.filter((item) => item.status === 'completed') || []
+          this.reviewTasks =
+            response.data.filter((item) => item.status === 'in-review') || []
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -156,6 +175,53 @@ export default {
           toastClass: 'text-white',
         })
       }
+    },
+
+    createTaskWithDeliverable(workflow) {
+      this.$swal({
+        title: `Create tasks from ${workflow.name}?`,
+        text: 'This  action is irreversible',
+        showDenyButton: true,
+        confirmButtonText: 'Create',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#5369f8',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if(isConfirmed) {
+          try {
+            const response = await this.$http.post(
+              `/create/deliverable/${this.$route.params.deliverable_id}/tasks/${workflow.id}/from-workflow`
+            )
+  
+            if (response) {
+              this.todoTasks = [...this.todoTasks, ...response.data.tasks];
+              this.selectedWorkflow = workflow
+              this.$bvToast.toast('Tasks created successful', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success',
+              })
+            }
+          } catch (error) {
+            if (error.response) {
+              let message = 'Something happened, Please try again later'
+              const { status, data } = error.response
+  
+              if (status === 422) {
+                message = message = data.errors[Object.keys(data.errors)[0]]
+              }
+  
+              this.$bvToast.toast(message, {
+                title: 'Error',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'danger',
+              })
+            }
+          }
+        }
+      })
     },
   },
 }
@@ -191,7 +257,7 @@ export default {
                     :key="workflow.id"
                     href="javascript: void(0);"
                     variant="seconday"
-                    @click="selectWorkflow(workflow)"
+                    @click="createTaskWithDeliverable(workflow)"
                   >
                     {{ workflow.name }}
                   </b-dropdown-item>
