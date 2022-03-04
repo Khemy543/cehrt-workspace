@@ -12,8 +12,20 @@
       </b-form-group>
 
       <b-form-group id="assignees" label="Assign to" label-for="input-1">
-        <b-form-select id="input-1" v-model="form.assignee" required>
+        <b-form-select id="input-1" v-model="form.assignee_id" required>
           <option value="">Select user</option>
+          <option
+            v-for="user in staff"
+            :key="user.id"
+            :value="user.id"
+            >{{ user.name }}</option
+          >
+        </b-form-select>
+      </b-form-group>
+
+      <b-form-group id="reviewer" label="Reviewer" label-for="input-1">
+        <b-form-select id="input-1" v-model="form.reviewer_id" required>
+          <option value="">Select reviewer</option>
           <option
             v-for="user in staff"
             :key="user.id"
@@ -68,7 +80,8 @@ export default {
     return {
       form: {
         priority: '',
-        assignee: ''
+        assignee_id: '',
+        reviewer_id: ''
       },
       staff: []
     }

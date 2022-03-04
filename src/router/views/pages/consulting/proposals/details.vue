@@ -42,7 +42,7 @@
                         </div>
                       </div>
 
-                      <div class="col-md-3">
+                      <!-- <div class="col-md-3">
                         <div class="mt-4">
                           <p class="mb-2">
                             <i class="uil-calendar-slash text-danger"></i>
@@ -52,6 +52,9 @@
                             proposal.submission_date || 'N/A'
                           }}</h5>
                         </div>
+                      </div> -->
+                      <div class="col-md-3">
+
                       </div>
 
                       <div class="col-md-3">
@@ -94,12 +97,12 @@
           <!-- end card -->
         </div>
 
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body">
-              <h5>Proposal Reports</h5>
-              <div class="row mt-5">
-                <div v-for="n in reportTypes" :key="n.id" class="col-md-4">
+        <div class="col-12 mt-2">
+          <h5>Proposal Reports</h5>
+          <div class="row mt-4">
+            <div v-for="n in reportTypes" :key="n.id" class="col-md-4">
+              <div class="card">
+                <div class="card-body">
                   <div class="p-2 border rounded mb-3">
                     <div class="media">
                       <div class="avatar-sm font-weight-bold mr-3">
@@ -111,7 +114,7 @@
                       </div>
                       <div class="media-body">
                         <a href="#" class="d-inline-block mt-2">
-                          {{n.name}}.docx
+                          {{ n.name }}.docx
                         </a>
                       </div>
                       <div class="float-right mt-1">
@@ -120,6 +123,73 @@
                         </a>
                       </div>
                     </div>
+                  </div>
+                  <div>
+                    <ul class="list-inline">
+                      <li class="list-inline-item pr-1">
+                        <a
+                          :id="`date-tooltip-${proposal.id}`"
+                          href="javascript: void(0)"
+                          class="text-muted d-inline-block bg-transparent"
+                        >
+                          <b-tooltip
+                            :target="`date-tooltip-${proposal.id}`"
+                            triggers="hover"
+                            placement="top"
+                            >Due date</b-tooltip
+                          >
+                          <i class="uil uil-calender mr-1"></i>
+                          {{ proposal.end_date }}
+                        </a>
+                      </li>
+                      <li class="list-inline-item pr-1">
+                        <a
+                          :id="`task-tooltip-${proposal.id}`"
+                          href="javascript: void(0)"
+                          class="text-muted d-inline-block bg-transparent"
+                        >
+                          <b-tooltip
+                            :target="`task-tooltip-${proposal.id}`"
+                            triggers="hover"
+                            placement="top"
+                            >Tasks</b-tooltip
+                          >
+                          <i class="uil uil-bars mr-1"></i>
+                          {{ proposal.tasks || 0 }}
+                        </a>
+                      </li>
+                      <li class="list-inline-item">
+                        <a
+                          :id="`comment-tooltip-${proposal.id}`"
+                          href="javascript: void(0)"
+                          class="text-muted d-inline-block bg-transparent"
+                        >
+                          <b-tooltip
+                            :target="`comment-tooltip-${proposal.id}`"
+                            triggers="hover"
+                            placement="top"
+                            >Comments</b-tooltip
+                          >
+                          <i class="uil uil-comments-alt mr-1"></i>
+                          {{ proposal.comments || 0 }}
+                        </a>
+                      </li>
+                      <li class="list-inline-item pr-2">
+                        <a
+                          :id="`date-tooltip-${proposal.id}`"
+                          href="javascript: void(0)"
+                          class="text-muted d-inline-block bg-transparent"
+                        >
+                          <b-tooltip
+                            :target="`date-tooltip-${proposal.progress}`"
+                            triggers="hover"
+                            placement="top"
+                          ></b-tooltip>
+                          <i class="uil uil-check-square mr-1"></i>
+                          {{ proposal.progress || 0 }}%
+                        </a>
+                      </li>
+                    </ul>
                   </div>
                 </div>
               </div>
