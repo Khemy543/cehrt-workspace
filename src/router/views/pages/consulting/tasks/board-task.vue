@@ -13,6 +13,11 @@ export default {
     initals() {
       return this.task.assignee.name ? this.task.assignee.name.match(/\b(\w)/g).join('').toUpperCase() : "GA";
     }
+  },
+  methods: {
+    showEditModal() {
+      this.$emit('showEditModal', this.task)
+    }
   }
 }
 </script>
@@ -27,7 +32,7 @@ export default {
         <template v-slot:button-content>
           <i class="uil uil-ellipsis-v font-size-14"></i>
         </template>
-        <b-dropdown-item href="javascript: void(0);"
+        <b-dropdown-item href="javascript: void(0);" @click="showEditModal"
           ><i class="uil uil-edit-alt mr-2"></i>Edit</b-dropdown-item
         >
         <b-dropdown-item v-if="task.assignee.id" href="javascript: void(0);"
