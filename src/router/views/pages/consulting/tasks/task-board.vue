@@ -51,6 +51,8 @@ export default {
       inProgressTasks: [],
       doneTasks: [],
       reviewTasks: [],
+      selectedTask: null,
+      formTitle: 'Create Task',
     }
   },
   computed: {
@@ -65,8 +67,8 @@ export default {
   },
   created() {
     this.getworkFlows()
-    this.getTasks();
-    this.getDeliverableDetails();
+    this.getTasks()
+    this.getDeliverableDetails()
   },
   methods: {
     async getworkFlows() {
@@ -88,9 +90,11 @@ export default {
     },
     async getDeliverableDetails() {
       try {
-        const response = await this.$http(`/fetch/${this.$route.params.deliverable_id}/deliverable`);
+        const response = await this.$http(
+          `/fetch/${this.$route.params.deliverable_id}/deliverable`
+        )
 
-        if(response) {
+        if (response) {
           this.deliverable = response.data
         }
       } catch (error) {
@@ -158,13 +162,35 @@ export default {
         if (response) {
           this.tasks = response.data
           this.todoTasks =
-            response.data.filter((item) => item.status === 'pending') || []
+            [...this.tasks
+              .filter((item) => item.status === 'pending')
+              .map((item) => {
+                return {
+                  ...item,
+                  groupId: 1
+                }
+              })] || []
           this.inProgressTasks =
-            response.data.filter((item) => item.status === 'active') || []
+            [...this.tasks.filter((item) => item.status === 'active').map((item) => {
+              return {
+                ...item,
+                groupId: 2
+              }
+            })] || []
           this.doneTasks =
-            response.data.filter((item) => item.status === 'completed') || []
+            [...this.tasks.filter((item) => item.status === 'completed').map((item) => {
+              return {
+                ...item,
+                groupId: 3
+              }
+            })] || []
           this.reviewTasks =
-            response.data.filter((item) => item.status === 'in-review') || []
+            [...this.tasks.filter((item) => item.status === 'in-review').map((item) => {
+              return {
+                ...item,
+                groupId: 4
+              }
+            })] || []
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -187,14 +213,14 @@ export default {
         confirmButtonColor: '#5369f8',
         denyButtonColor: '#4b4b5a',
       }).then(async ({ isConfirmed, isDenied }) => {
-        if(isConfirmed) {
+        if (isConfirmed) {
           try {
             const response = await this.$http.post(
               `/create/deliverable/${this.$route.params.deliverable_id}/tasks/${workflow.id}/from-workflow`
             )
-  
+
             if (response) {
-              this.todoTasks = [...this.todoTasks, ...response.data.tasks];
+              this.todoTasks = [...this.todoTasks, ...response.data.tasks]
               this.selectedWorkflow = workflow
               this.$bvToast.toast('Tasks created successful', {
                 title: 'Success',
@@ -207,11 +233,11 @@ export default {
             if (error.response) {
               let message = 'Something happened, Please try again later'
               const { status, data } = error.response
-  
+
               if (status === 422) {
                 message = message = data.errors[Object.keys(data.errors)[0]]
               }
-  
+
               this.$bvToast.toast(message, {
                 title: 'Error',
                 autoHideDelay: 5000,
@@ -222,6 +248,20 @@ export default {
           }
         }
       })
+    },
+    handleChange(val) {
+      console.log(val)
+    },
+    showEditModal(task) {
+      this.formTitle = 'Edit Task'
+      this.selectedTask = task
+      this.show = true
+    },
+
+    showCreateModal() {
+      this.formTitle = 'Create Task'
+      this.selectedTask = null
+      this.show = true
     },
   },
 }
@@ -235,7 +275,15 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="row align-items-center">
-              <div class="col">
+              <div v-if="deliverable.workflow" class="col">
+                <span class="font-size-10">
+                  Selected Workflow:
+                  <b class="font-size-16">{{
+                    deliverable.workflow.name
+                  }}</b></span
+                >
+              </div>
+              <div v-else class="col">
                 <label class="font-weight-bold d-inline mr-2">
                   <feather
                     type="activity"
@@ -267,7 +315,7 @@ export default {
                 <button
                   id="btn-new-event"
                   class="btn btn-primary"
-                  @click="show = true"
+                  @click="showCreateModal"
                 >
                   <i class="uil-plus mr-1"></i>Add New
                 </button>
@@ -280,7 +328,7 @@ export default {
       </div>
       <!-- end col-12 -->
     </div>
-
+    {{ todoTasks }}
     <div v-if="!loading && tasks.length > 0" class="row">
       <div class="col-12">
         <div class="board">
@@ -291,10 +339,10 @@ export default {
             </h5>
 
             <div id="task-list-one" class="task-list-items">
-              <draggable v-model="todoTasks" v-bind="dragOptions">
+              <draggable v-model="todoTasks" group="task">
                 <transition-group type="transition" :name="'flip-list'">
                   <div v-for="task in todoTasks" :key="task.id">
-                    <Task :task="task" />
+                    <Task :task="task" @showEditModal="showEditModal" />
                   </div>
                 </transition-group>
               </draggable>
@@ -310,7 +358,7 @@ export default {
             </h5>
 
             <div id="task-list-one" class="task-list-items">
-              <draggable v-model="inProgressTasks" v-bind="dragOptions">
+              <draggable v-model="inProgressTasks" group="task">
                 <transition-group type="transition" :name="'flip-list'">
                   <div v-for="task in inProgressTasks" :key="task.id">
                     <Task :task="task" />
@@ -329,7 +377,7 @@ export default {
             </h5>
 
             <div id="task-list-one" class="task-list-items">
-              <draggable v-model="reviewTasks" v-bind="dragOptions">
+              <draggable v-model="reviewTasks" group="task">
                 <transition-group type="transition" :name="'flip-list'">
                   <div v-for="task in reviewTasks" :key="task.id">
                     <Task :task="task" />
@@ -348,7 +396,7 @@ export default {
             </h5>
 
             <div id="task-list-one" class="task-list-items">
-              <draggable v-model="doneTasks" v-bind="dragOptions">
+              <draggable v-model="doneTasks" group="task">
                 <transition-group type="transition" :name="'flip-list'">
                   <div v-for="task in doneTasks" :key="task.id">
                     <Task :task="task" />
@@ -374,7 +422,9 @@ export default {
     </div>
 
     <CreateTaskModal
+      :task="selectedTask"
       :action="createTask"
+      :form-title="formTitle"
       :value="show"
       @input="show = $event"
     />
