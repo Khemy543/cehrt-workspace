@@ -4,7 +4,6 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 
 import TaskDetail from './task-detail'
-import { todayTasks, upcomingTasks, otherTasks } from './data-tasklist'
 
 export default {
   page: {
@@ -14,29 +13,80 @@ export default {
   components: { Layout, PageHeader, TaskDetail },
   data() {
     return {
-      selectedTask: todayTasks[0],
       title: 'Tasks List',
       items: [
         {
-          text: 'Shreyu',
+          text: 'Cerht',
           href: '/',
         },
         {
-          text: 'Apps',
+          text: 'Projects',
           href: '/',
         },
         {
-          text: 'Tasks',
+          text: 'Deliverables',
           href: '/',
         },
         {
-          text: 'List',
+          text: 'Task',
           active: true,
         },
       ],
-      todayTasks: [...todayTasks],
-      upcomingTask: [...upcomingTasks],
-      otherTask: [...otherTasks],
+      task: null,
+      loading: false,
+      subtasks: []
+    }
+  },
+  created() {
+    const { hasSubTask } = this.$route.query
+    this.getTask()
+    if(hasSubTask) {
+      this.getSubTasks()
+    }
+  },
+  methods: {
+    async getTask() {
+      try {
+        const isSubtask = this.$route.query.subtask;
+        const url = isSubtask ? `/fetch/${this.$route.params.id}/sub-task` : `/fetch/${this.$route.params.id}/task`;
+        this.loading = true
+        const response = await this.$http.get(url);
+
+        if (response) {
+          this.task = response.data
+          this.loading = false
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
+    },
+
+    async getSubTasks() {
+      try {
+        const response = await this.$http.get(`/fetch/${this.$route.params.id}/task/sub-tasks`)
+
+        if (response) {
+          this.subtasks = response.data;
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
+    },
+
+    updateTask(task) {
+      this.task = task
     }
   },
 }
@@ -45,375 +95,81 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-
-    <div class="row">
-      <div class="col-xl-8">
+    <div v-if="loading" class=" d-flex justify-content-center">
+      <b-spinner type="grow" variant="primary"></b-spinner>
+    </div>
+    <div v-else class="row">
+      <!-- task details -->
+      <div class="col-xl-6">
+        <TaskDetail :task="task" :subtasks="subtasks" @updateTask="updateTask"/>
+      </div>
+      <div class="col-xl-6">
         <div class="row">
           <div class="col">
             <div class="card">
               <div class="card-body">
                 <!-- cta -->
-                <div class="row">
-                  <div class="col-sm-3">
-                    <a href="javascript: void(0);" class="btn btn-primary">
-                      <i class="uil uil-plus mr-1"></i>Add New
-                    </a>
-                  </div>
-                  <div class="col-sm-9">
-                    <div class="float-sm-right mt-3 mt-sm-0">
-                      <div
-                        class="task-search d-inline-block mb-3 mb-sm-0 mr-sm-3"
-                      >
-                        <form>
-                          <div class="input-group">
-                            <input
-                              type="text"
-                              class="form-control search-input"
-                              placeholder="Search..."
-                            />
-                            <span class="uil uil-search icon-search"></span>
-                            <div class="input-group-append">
-                              <button
-                                class="btn btn-soft-primary"
-                                type="button"
-                              >
-                                <i class="uil uil-file-search-alt"></i>
-                              </button>
-                            </div>
-                          </div>
-                        </form>
-                      </div>
-
-                      <b-dropdown id="sort-act" class="d-inline-block" right>
-                        <template v-slot:button-content>
-                          <i class="uil uil-sort-amount-down"></i>
-                        </template>
-                        <b-dropdown-item>Due Date</b-dropdown-item>
-                        <b-dropdown-item>Added Date</b-dropdown-item>
-                        <b-dropdown-item>Assignee</b-dropdown-item>
-                      </b-dropdown>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="row mt-4">
+                <div class="row mt-3">
                   <div class="col">
-                    <a
-                      v-b-toggle.todayTasks
-                      class="text-dark"
-                      href="javascript: void(0);"
-                      aria-controls="todayTasks"
+                    <h5 class="mb-2 font-size-16">Comments</h5>
+
+                    <div
+                      v-for="comment of task.comments"
+                      :key="`comment-${comment.id}`"
+                      class="media mt-3 p-1 border-bottom pb-2"
                     >
-                      <h5 class="mb-0">
-                        <i class="uil uil-angle-down font-size-18"></i>Today
-                        <span class="text-muted font-size-14"
-                          >({{ todayTasks.length }})</span
-                        >
-                      </h5>
-                    </a>
-                    <b-collapse id="todayTasks" visible>
-                      <div class="card mb-0 shadow-none">
-                        <div class="card-body pt-0">
-                          <div
-                            v-for="(task, index) of todayTasks"
-                            :key="index"
-                            class="row justify-content-sm-between border-bottom mt-2 pt-2"
-                          >
-                            <div class="col-lg-6 mb-2 mb-lg-0">
-                              <div class="custom-control custom-checkbox">
-                                <input
-                                  :id="`task-${index}`"
-                                  type="checkbox"
-                                  class="custom-control-input"
-                                />
-                                <label
-                                  class="custom-control-label"
-                                  :for="`task-${index}`"
-                                  >{{ task.title }}</label
-                                >
-                              </div>
-                              <!-- end checkbox -->
-                            </div>
-                            <!-- end col -->
-                            <div class="col-lg-6">
-                              <div class="d-sm-flex justify-content-between">
-                                <div>
-                                  <img
-                                    v-b-tooltip.hover
-                                    :title="`Assigned to ${task.assigned_to}`"
-                                    :src="`${task.assignee_avatar}`"
-                                    alt="image"
-                                    class="avatar-xs rounded-circle"
-                                  />
-                                </div>
-                                <div class="mt-3 mt-sm-0">
-                                  <ul class="list-inline font-13 text-sm-right">
-                                    <li class="list-inline-item pr-1">
-                                      <i
-                                        class="uil uil-schedule font-16 mr-1"
-                                      ></i>
-                                      {{ task.due_date }}
-                                    </li>
-                                    <li class="list-inline-item pr-1">
-                                      <i
-                                        class="uil uil-align-alt font-16 mr-1"
-                                      ></i>
-                                      {{ task.checklists.length }}
-                                    </li>
-                                    <li class="list-inline-item pr-2">
-                                      <i
-                                        class="uil uil-comment-message font-16 mr-1"
-                                      ></i>
-                                      {{ task.comments.length }}
-                                    </li>
-                                    <li class="list-inline-item">
-                                      <span
-                                        class="badge p-1"
-                                        :class="{
-                                          'badge-soft-danger':
-                                            `${task.priority}` === 'High',
-                                          'badge-soft-info':
-                                            `${task.priority}` === 'Medium',
-                                          'badge-soft-success':
-                                            `${task.priority}` === 'Low',
-                                        }"
-                                        >{{ task.priority }}</span
-                                      >
-                                    </li>
-                                  </ul>
-                                </div>
-                              </div>
-                              <!-- end .d-flex-->
-                            </div>
-                            <!-- end col -->
-                          </div>
-                          <!-- end card-body-->
-                        </div>
-                        <!-- end card -->
+                      <img
+                        :src="comment.author_avatar"
+                        class="mr-2 rounded-circle"
+                        height="36"
+                        alt=""
+                      />
+                      <div class="media-body">
+                        <h5 class="mt-0 mb-0 font-size-14">
+                          <span class="float-right text-muted font-size-12">{{
+                            comment.posted_on
+                          }}</span>
+                          {{ comment.author }}
+                        </h5>
+                        <p class="mt-1 mb-0 text-muted">
+                          {{ comment.text }}
+                        </p>
                       </div>
-                      <!-- end .collapse-->
-
-                      <!-- upcoming tasks -->
-                    </b-collapse>
-
-                    <div class="mt-4">
-                      <a
-                        v-b-toggle.upcomingTask
-                        class="text-dark"
-                        href="javascript: void(0);"
-                        aria-controls="upcomingTask"
-                      >
-                        <h5 class="mb-0">
-                          <i class="uil uil-angle-down font-size-18"></i
-                          >Upcoming
-                          <span class="text-muted font-size-14"
-                            >({{ upcomingTask.length }})</span
-                          >
-                        </h5>
-                      </a>
-                      <b-collapse id="upcomingTask" visible>
-                        <div class="card mb-0 shadow-none">
-                          <div class="card-body pt-0">
-                            <div
-                              v-for="(task, index) of upcomingTask"
-                              :key="index"
-                              class="row justify-content-sm-between border-bottom mt-2 pt-2"
-                            >
-                              <div class="col-lg-6 mb-2 mb-lg-0">
-                                <div class="custom-control custom-checkbox">
-                                  <input
-                                    :id="`task-upcoming-${index}`"
-                                    type="checkbox"
-                                    class="custom-control-input"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    :for="`task-upcoming-${index}`"
-                                    >{{ task.title }}</label
-                                  >
-                                </div>
-                                <!-- end checkbox -->
-                              </div>
-                              <!-- end col -->
-                              <div class="col-lg-6">
-                                <div class="d-sm-flex justify-content-between">
-                                  <div>
-                                    <img
-                                      v-b-tooltip.hover
-                                      :title="`Assigned to ${task.assigned_to}`"
-                                      :src="`${task.assignee_avatar}`"
-                                      alt="image"
-                                      class="avatar-xs rounded-circle"
-                                    />
-                                  </div>
-                                  <div class="mt-3 mt-sm-0">
-                                    <ul
-                                      class="list-inline font-13 text-sm-right"
-                                    >
-                                      <li class="list-inline-item pr-1">
-                                        <i
-                                          class="uil uil-schedule font-16 mr-1"
-                                        ></i>
-                                        {{ task.due_date }}
-                                      </li>
-                                      <li class="list-inline-item pr-1">
-                                        <i
-                                          class="uil uil-align-alt font-16 mr-1"
-                                        ></i>
-                                        {{ task.checklists.length }}
-                                      </li>
-                                      <li class="list-inline-item pr-2">
-                                        <i
-                                          class="uil uil-comment-message font-16 mr-1"
-                                        ></i>
-                                        {{ task.comments.length }}
-                                      </li>
-                                      <li class="list-inline-item">
-                                        <span
-                                          class="badge p-1"
-                                          :class="{
-                                            'badge-soft-danger':
-                                              `${task.priority}` === 'High',
-                                            'badge-soft-info':
-                                              `${task.priority}` === 'Medium',
-                                            'badge-soft-success':
-                                              `${task.priority}` === 'Low',
-                                          }"
-                                          >{{ task.priority }}</span
-                                        >
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                                <!-- end .d-flex-->
-                              </div>
-                              <!-- end col -->
-                            </div>
-                            <!-- end card-body-->
-                          </div>
-                          <!-- end card -->
-                        </div>
-                        <!-- end .collapse-->
-
-                        <!-- upcoming tasks -->
-                      </b-collapse>
                     </div>
-
-                    <div class="mt-4">
-                      <a
-                        v-b-toggle.otherTask
-                        class="text-dark"
-                        href="javascript: void(0);"
-                        aria-controls="otherTask"
-                      >
-                        <h5 class="mb-0">
-                          <i class="uil uil-angle-down font-size-18"></i>Other
-                          <span class="text-muted font-size-14"
-                            >({{ otherTask.length }})</span
-                          >
-                        </h5>
-                      </a>
-                      <b-collapse id="otherTask" visible>
-                        <div class="card mb-0 shadow-none">
-                          <div class="card-body pt-0">
-                            <div
-                              v-for="(task, index) of otherTask"
-                              :key="index"
-                              class="row justify-content-sm-between border-bottom mt-2 pt-2"
-                            >
-                              <div class="col-lg-6 mb-2 mb-lg-0">
-                                <div class="custom-control custom-checkbox">
-                                  <input
-                                    :id="`task-other-${index}`"
-                                    type="checkbox"
-                                    class="custom-control-input"
-                                  />
-                                  <label
-                                    class="custom-control-label"
-                                    :for="`task-other-${index}`"
-                                    >{{ task.title }}</label
-                                  >
-                                </div>
-                                <!-- end checkbox -->
-                              </div>
-                              <!-- end col -->
-                              <div class="col-lg-6">
-                                <div class="d-sm-flex justify-content-between">
-                                  <div>
-                                    <img
-                                      v-b-tooltip.hover
-                                      :title="`Assigned to ${task.assigned_to}`"
-                                      :src="`${task.assignee_avatar}`"
-                                      alt="image"
-                                      class="avatar-xs rounded-circle"
-                                    />
-                                  </div>
-                                  <div class="mt-3 mt-sm-0">
-                                    <ul
-                                      class="list-inline font-13 text-sm-right"
-                                    >
-                                      <li class="list-inline-item pr-1">
-                                        <i
-                                          class="uil uil-schedule font-16 mr-1"
-                                        ></i>
-                                        {{ task.due_date }}
-                                      </li>
-                                      <li class="list-inline-item pr-1">
-                                        <i
-                                          class="uil uil-align-alt font-16 mr-1"
-                                        ></i>
-                                        {{ task.checklists.length }}
-                                      </li>
-                                      <li class="list-inline-item pr-2">
-                                        <i
-                                          class="uil uil-comment-message font-16 mr-1"
-                                        ></i>
-                                        {{ task.comments.length }}
-                                      </li>
-                                      <li class="list-inline-item">
-                                        <span
-                                          class="badge p-1"
-                                          :class="{
-                                            'badge-soft-danger':
-                                              `${task.priority}` === 'High',
-                                            'badge-soft-info':
-                                              `${task.priority}` === 'Medium',
-                                            'badge-soft-success':
-                                              `${task.priority}` === 'Low',
-                                          }"
-                                          >{{ task.priority }}</span
-                                        >
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                                <!-- end .d-flex-->
-                              </div>
-                              <!-- end col -->
-                            </div>
-                            <!-- end card-body-->
-                          </div>
-                          <!-- end card -->
-                        </div>
-                        <!-- end .collapse-->
-
-                        <!-- upcoming tasks -->
-                      </b-collapse>
-                    </div>
+                    <!-- end comment -->
                   </div>
-                  <!-- end row -->
+                  <!-- end col -->
                 </div>
-                <div class="row mb-3 mt-5">
-                  <div class="col-12">
-                    <div class="text-center">
-                      <a href="javascript:void(0);" class="btn btn-white mb-3">
-                        <feather
-                          type="loader"
-                          class="icon-dual icon-xs mr-2 align-middle"
-                        ></feather
-                        >Load more
-                      </a>
+                <div class="row mt-2">
+                  <div class="col">
+                    <div class="border rounded">
+                      <form action="#" class="comment-area-box">
+                        <textarea
+                          rows="3"
+                          class="form-control border-0 resize-none"
+                          placeholder="Your comment..."
+                        ></textarea>
+                        <div class="p-2 bg-light">
+                          <div class="float-right">
+                            <button
+                              type="submit"
+                              class="btn btn-sm btn-success"
+                            >
+                              <i class="uil uil-message mr-1"></i>Submit
+                            </button>
+                          </div>
+                          <div>
+                            <a href="#" class="btn btn-sm px-1 btn-light">
+                              <i class="uil uil-cloud-upload"></i>
+                            </a>
+                            <a href="#" class="btn btn-sm px-1 btn-light">
+                              <i class="uil uil-at"></i>
+                            </a>
+                          </div>
+                        </div>
+                      </form>
                     </div>
+                    <!-- end .border-->
                   </div>
                   <!-- end col-->
                 </div>
@@ -422,10 +178,6 @@ export default {
             </div>
           </div>
         </div>
-      </div>
-      <!-- task details -->
-      <div class="col-xl-4">
-        <TaskDetail :task="selectedTask" />
       </div>
       <!-- end col -->
     </div>

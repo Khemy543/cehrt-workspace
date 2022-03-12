@@ -110,9 +110,7 @@ export default {
 
             if (response) {
               const index = this.staff.findIndex((item) => item.id === user.id)
-              console.log(this.staff[index])
               this.staff[index] = { ...user, is_active: 0 }
-              console.log(this.staff[index])
               this.$bvToast.toast('User account deactivated', {
                 title: 'Success',
                 autoHideDelay: 5000,

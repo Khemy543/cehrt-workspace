@@ -301,6 +301,14 @@ const projectAppsRoutes = [
     component: () =>
       lazyLoadView(import('@views/pages/consulting/tasks/task-list')),
   },
+  {
+    path: '/task/:id/details',
+    name: 'Task Details',
+    invisible: true,
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/tasks/task-list')),
+  },
 ]
 
 /* const taskAppsRoutes = [

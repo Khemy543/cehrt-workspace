@@ -2,10 +2,10 @@
 import { layoutComputed, authMethods } from '@state/helpers'
 import Topbar from '@components/topbar'
 import SideBar from '@components/side-bar'
-import Footer from '@components/footer'
+/* import Footer from '@components/footer' */
 
 export default {
-  components: { Topbar, SideBar, Footer },
+  components: { Topbar, SideBar },
   data() {
     return {
       isMenuCondensed: false,
@@ -151,7 +151,7 @@ export default {
           <slot />
         </div>
       </div>
-      <Footer />
+      <!-- <Footer /> -->
     </div>
   </div>
 </template>
