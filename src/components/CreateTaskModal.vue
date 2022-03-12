@@ -11,7 +11,7 @@
         ></b-form-input>
       </b-form-group>
       <b-form-group id="assignees" label="Assign to" label-for="input-1">
-        <b-form-select id="input-1" v-model="form.assignee_id" required>
+        <b-form-select id="input-1" v-model="form.assignee_id">
           <option value="">Select user</option>
           <option v-for="user in staff" :key="user.id" :value="user.id">{{
             user.name
@@ -20,7 +20,7 @@
       </b-form-group>
 
       <b-form-group id="reviewer" label="Reviewer" label-for="input-1">
-        <b-form-select id="input-1" v-model="form.reviewer_id" required>
+        <b-form-select id="input-1" v-model="form.reviewer_id">
           <option value="">Select reviewer</option>
           <option v-for="user in staff" :key="user.id" :value="user.id">{{
             user.name

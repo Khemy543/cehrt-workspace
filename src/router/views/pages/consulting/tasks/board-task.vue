@@ -17,6 +17,9 @@ export default {
   methods: {
     showEditModal() {
       this.$emit('showEditModal', this.task)
+    },
+    goTotask() {
+      return this.$router.push(`/task/${this.task.id}/details?hasSubTask=${this.task.hasSubTask}&subtask=false`)
     }
   }
 }
@@ -35,7 +38,7 @@ export default {
         <b-dropdown-item href="javascript: void(0);" @click="showEditModal"
           ><i class="uil uil-edit-alt mr-2"></i>Edit</b-dropdown-item
         >
-        <b-dropdown-item v-if="task.assignee.id" href="javascript: void(0);"
+        <!-- <b-dropdown-item v-if="task.assignee.id" href="javascript: void(0);"
           ><i class="uil uil-sync mr-2"></i>Change Assignee</b-dropdown-item
         >
         <b-dropdown-item v-else href="javascript: void(0);"
@@ -46,13 +49,13 @@ export default {
         >
         <b-dropdown-item v-else href="javascript: void(0);"
           ><i class="uil uil-exit mr-2"></i>Add Reviewer</b-dropdown-item
-        >
+        > -->
         <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item href="javascript: void(0);" variant="danger">
           <i class="uil uil-trash mr-2"></i>Delete
         </b-dropdown-item>
       </b-dropdown>
-
+      <div @click="goTotask">
       <h6 class="mt-0 mb-2 font-size-15">
         <a href="javascript: void(0);" class="text-body">{{ task.name }}</a>
       </h6>
@@ -102,6 +105,7 @@ export default {
         </span></small>
 
       </p>
+      </div>
     </div>
     <!-- end card-body -->
   </div>
