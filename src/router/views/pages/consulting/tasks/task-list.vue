@@ -34,23 +34,28 @@ export default {
       ],
       task: null,
       loading: false,
-      subtasks: []
+      subtasks: [],
+      comments: [],
+      comment: '',
     }
   },
   created() {
-    const { hasSubTask } = this.$route.query
+    const hasSubTask = this.$route.query.hasSubTask === 'true'
     this.getTask()
-    if(hasSubTask) {
+    this.getTaksComment()
+    if (hasSubTask) {
       this.getSubTasks()
     }
   },
   methods: {
     async getTask() {
       try {
-        const isSubtask = this.$route.query.subtask;
-        const url = isSubtask ? `/fetch/${this.$route.params.id}/sub-task` : `/fetch/${this.$route.params.id}/task`;
+        const isSubtask = this.$route.query.subtask === 'true'
+        const url = isSubtask
+          ? `/fetch/${this.$route.params.id}/sub-task`
+          : `/fetch/${this.$route.params.id}/task`
         this.loading = true
-        const response = await this.$http.get(url);
+        const response = await this.$http.get(url)
 
         if (response) {
           this.task = response.data
@@ -69,10 +74,34 @@ export default {
 
     async getSubTasks() {
       try {
-        const response = await this.$http.get(`/fetch/${this.$route.params.id}/task/sub-tasks`)
+        const response = await this.$http.get(
+          `/fetch/${this.$route.params.id}/task/sub-tasks`
+        )
 
         if (response) {
-          this.subtasks = response.data;
+          this.subtasks = response.data
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
+    },
+
+    async getTaksComment() {
+      try {
+        const isSubtask = this.$route.query.subtask === 'true'
+        const url = isSubtask
+          ? `/fetch/subtask/${this.$route.params.id}/comment`
+          : `/fetch/task/${this.$route.params.id}/comment`
+        const response = await this.$http.get(url)
+
+        if (response) {
+          this.comments = response.data
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -87,7 +116,51 @@ export default {
 
     updateTask(task) {
       this.task = task
-    }
+    },
+    addSubtask(task) {
+      this.subtasks.push(task)
+    },
+    deleteSubTask(task) {
+      this.subtasks = this.subtasks.filter(item => item.id !== task.id)
+    },
+    async addComment() {
+      try {
+        const isSubtask = this.$route.query.subtask === 'true'
+        const url = isSubtask
+          ? `/add/subtask/${this.$route.params.id}/comment`
+          : `/add/task/${this.$route.params.id}/comment`
+        const response = await this.$http.post(url, {
+          comment: this.comment,
+        })
+
+        if (response) {
+          this.comment = ''
+          this.comments.push(response.data.comment)
+        }
+      } catch (error) {
+        if (error.response) {
+          let message = 'Something happened, Please try again later'
+          const { status, data } = error.response
+
+          if (status === 422) {
+            message = message = data.errors[Object.keys(data.errors)[0]]
+          }
+
+          this.$bvToast.toast(message, {
+            title: 'Error',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'danger',
+          })
+        }
+      }
+    },
+    getInitials(name) {
+      return name
+        .match(/\b(\w)/g)
+        .join('')
+        .toUpperCase()
+    },
   },
 }
 </script>
@@ -101,7 +174,13 @@ export default {
     <div v-else class="row">
       <!-- task details -->
       <div class="col-xl-6">
-        <TaskDetail :task="task" :subtasks="subtasks" @updateTask="updateTask"/>
+        <TaskDetail
+          :task="task"
+          :subtasks="subtasks"
+          @updateTask="updateTask"
+          @addSubtask="addSubtask"
+          @deleteSubTask="deleteSubTask"
+        />
       </div>
       <div class="col-xl-6">
         <div class="row">
@@ -114,25 +193,24 @@ export default {
                     <h5 class="mb-2 font-size-16">Comments</h5>
 
                     <div
-                      v-for="comment of task.comments"
-                      :key="`comment-${comment.id}`"
+                      v-for="comm of comments"
+                      :key="`comment-${comm.id}`"
                       class="media mt-3 p-1 border-bottom pb-2"
                     >
-                      <img
-                        :src="comment.author_avatar"
-                        class="mr-2 rounded-circle"
-                        height="36"
-                        alt=""
-                      />
+                      <div
+                        class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex"
+                      >
+                        {{ getInitials(comm.user) }}
+                      </div>
                       <div class="media-body">
                         <h5 class="mt-0 mb-0 font-size-14">
                           <span class="float-right text-muted font-size-12">{{
-                            comment.posted_on
+                            comm.created_at
                           }}</span>
-                          {{ comment.author }}
+                          {{ comm.user }}
                         </h5>
                         <p class="mt-1 mb-0 text-muted">
-                          {{ comment.text }}
+                          {{ comm.comment }}
                         </p>
                       </div>
                     </div>
@@ -143,8 +221,13 @@ export default {
                 <div class="row mt-2">
                   <div class="col">
                     <div class="border rounded">
-                      <form action="#" class="comment-area-box">
+                      <form
+                        action="#"
+                        class="comment-area-box"
+                        @submit.prevent="addComment"
+                      >
                         <textarea
+                          v-model="comment"
                           rows="3"
                           class="form-control border-0 resize-none"
                           placeholder="Your comment..."

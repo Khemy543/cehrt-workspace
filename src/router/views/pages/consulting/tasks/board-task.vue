@@ -20,6 +20,40 @@ export default {
     },
     goTotask() {
       return this.$router.push(`/task/${this.task.id}/details?hasSubTask=${this.task.hasSubTask}&subtask=false`)
+    },
+    deleteTask() {
+      this.$swal({
+        title: 'Do you want to delete task?',
+        showDenyButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if(isConfirmed) {
+          try {
+            const response = await this.$http.delete(`/delete/${this.task.id}/task`);
+
+            if(response) {
+              this.$bvToast.toast('Task deleted successful', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success',
+              })
+              this.$emit('deleteTask', this.task)
+            }
+          } catch (error) {
+            this.$bvToast.toast('Something happened, Please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+              toastClass: 'text-white',
+            })
+          }
+        }
+      })
     }
   }
 }
@@ -51,7 +85,7 @@ export default {
           ><i class="uil uil-exit mr-2"></i>Add Reviewer</b-dropdown-item
         > -->
         <b-dropdown-divider></b-dropdown-divider>
-        <b-dropdown-item href="javascript: void(0);" variant="danger">
+        <b-dropdown-item variant="danger" @click="deleteTask">
           <i class="uil uil-trash mr-2"></i>Delete
         </b-dropdown-item>
       </b-dropdown>
