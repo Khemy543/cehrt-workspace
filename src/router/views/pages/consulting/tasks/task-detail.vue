@@ -21,10 +21,33 @@ export default {
       editorOptions: {
         theme: 'bubble',
       },
+      form: {},
       todayTasks: [...todayTasks],
       show: false,
       selectedTask: null,
       formTitle: 'Create SubTask',
+      taskStatuses: [
+        {
+          id: 1,
+          name: 'Pending',
+          api: 'pending',
+        },
+        {
+          id: 2,
+          name: 'On going',
+          api: 'active',
+        },
+        {
+          id: 3,
+          name: 'Completed',
+          api: 'completed',
+        },
+        {
+          id: 4,
+          name: 'In Review',
+          api: 'in-review',
+        },
+      ],
     }
   },
   computed: {
@@ -37,8 +60,19 @@ export default {
         : 'GA'
     },
     isSubTask() {
-      return this.$route.query.hasSubTask
+      return this.$route.query.subtask === 'true'
     },
+    selectedStatus() {
+      return this.taskStatuses.find((item) => item.api === this.task.status)
+    },
+    hasSubTask() {
+      return this.$route.query.hasSubTask === 'true'
+    },
+  },
+  mounted() {
+    this.form = {
+      ...this.task,
+    }
   },
   methods: {
     async createSubTask(form) {
@@ -54,7 +88,15 @@ export default {
             appendToast: false,
             variant: 'success',
           })
-          this.$router.push(`/task/${this.$route.params.id}/sub-tasks`)
+          if (this.hasSubTask) {
+            this.$emit('addSubtask', response.data.subTask)
+            this.show = false
+            return
+          }
+
+          return this.$router.push(
+            `/task/${this.$route.params.id}/details?subtask=false&hasSubTask=true`
+          )
         }
       } catch (error) {
         if (error.response) {
@@ -76,21 +118,23 @@ export default {
     },
     async editTask(form) {
       try {
-        const url = !this.isSubTask
+        const url = this.isSubTask
           ? `/update/${form.id}/sub-task`
           : `/update/${form.id}/task`
         const response = await this.$http.put(url, form)
 
         if (response) {
-
-          this.$emit('updateTask', response.data.task ? response.data.task : response.data.subTask)
+          this.$emit(
+            'updateTask',
+            response.data.task ? response.data.task : response.data.subTask
+          )
           this.$bvToast.toast('Task updated successful', {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
             variant: 'success',
-          });
-          this.show = false;
+          })
+          this.show = false
         }
       } catch (error) {
         if (error.response) {
@@ -129,6 +173,122 @@ export default {
       this.selectedTask = null
       this.show = true
     },
+
+    async changeWorkFlow(status) {
+      try {
+        const response = await this.$http.patch(
+          `/update/${this.$route.params.id}/task-status`,
+          {
+            status: status.api,
+          }
+        )
+
+        if (response) {
+          this.$emit('updateTask', {
+            ...this.task,
+            status: status.api,
+          })
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
+    },
+
+    deleteTask() {
+      this.$swal({
+        title: 'Do you want to delete task?',
+        showDenyButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const url = this.isSubTask
+              ? `/delete/${this.$route.params.id}/sub-task`
+              : `/delete/${this.$route.params.id}/task`
+            const response = await this.$http.delete(url)
+
+            if (response) {
+              this.$bvToast.toast('Task deleted successful', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success',
+              })
+
+              this.$router.push('/')
+            }
+          } catch (error) {
+            this.$bvToast.toast('Something happened, Please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+              toastClass: 'text-white',
+            })
+          }
+        }
+      })
+    },
+
+    deleteSubTask(task) {
+      this.$swal({
+        title: 'Do you want to delete subtask?',
+        showDenyButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.delete(
+              `/delete/${task.id}/sub-task`
+            )
+
+            if (response) {
+              this.$emit('deleteSubTask', task)
+              this.$bvToast.toast('Subtask deleted successful', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success',
+              })
+            }
+          } catch (error) {
+            this.$bvToast.toast('Something happened, Please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+              toastClass: 'text-white',
+            })
+          }
+        }
+      })
+    },
+
+    async changeTaskDescription() {
+      try {
+        const url = this.isSubTask
+          ? `/update/${this.$route.params.id}/sub-task`
+          : `/update/${this.$route.params.id}/task`
+        const response = await this.$http.put(url, {
+          ...this.form,
+        })
+
+        if (response) {
+        }
+      } catch (error) {}
+    },
   },
 }
 </script>
@@ -150,28 +310,39 @@ export default {
             <b-dropdown-item @click="showEditTask">
               <i class="uil uil-edit mr-1"></i>Edit
             </b-dropdown-item>
-            <b-dropdown-item v-if="isSubTask" @click="openCreateSubTask">
+            <b-dropdown-item v-if="!isSubTask" @click="openCreateSubTask">
               <i class="uil uil-plus mr-1"></i>Add SubTask
             </b-dropdown-item>
             <!-- item -->
             <b-dropdown-divider></b-dropdown-divider>
             <!-- item-->
-            <b-dropdown-item href="javascript:void(0);" variant="danger">
+            <b-dropdown-item variant="danger" @click="deleteTask">
               <i class="uil uil-trash-alt mr-1"></i>Delete
             </b-dropdown-item>
             <!-- end dropdown menu-->
           </b-dropdown>
           <!-- end dropdown-->
 
-          <div class="custom-control custom-checkbox float-left">
-            <input
-              id="completedCheck"
-              type="checkbox"
-              class="custom-control-input"
-            />
-            <label class="custom-control-label" for="completedCheck"
-              >Mark as completed</label
+          <div>
+            <b-dropdown
+              class="d-inline"
+              variant="link"
+              toggle-class="font-weight-bold p-0 align-middle"
             >
+              <template v-slot:button-content>
+                {{ selectedStatus.name }}
+                <i class="uil uil-angle-down font-size-16 align-middle"></i>
+              </template>
+              <b-dropdown-item
+                v-for="status in taskStatuses"
+                :key="status.id"
+                href="javascript: void(0);"
+                variant="seconday"
+                @click="changeWorkFlow(status)"
+              >
+                {{ status.name }}
+              </b-dropdown-item>
+            </b-dropdown>
           </div>
           <!-- end custom-checkbox-->
         </div>
@@ -181,13 +352,13 @@ export default {
         <div class="col">
           <h4 class="mt-3">{{ task.name }}</h4>
           <div class="row">
-            <div class="col-6">
+            <div class="col-5">
               <!-- assignee -->
               <p class="mt-2 mb-1 text-muted">Assigned To</p>
               <div v-if="task.assignee.name" class="media">
                 <div
                   v-if="task.assignee.id"
-                  class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex"
+                  class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center"
                 >
                   {{ initals }}
                 </div>
@@ -202,7 +373,7 @@ export default {
             </div>
             <!-- end col -->
 
-            <div class="col-6">
+            <div class="col-5">
               <!-- start due date -->
               <p class="mt-2 mb-1 text-muted">Due Date</p>
               <div class="media">
@@ -215,6 +386,26 @@ export default {
               </div>
               <!-- end due date -->
             </div>
+
+            <div class="col-2">
+              <!-- start due date -->
+              <p class="mt-2 mb-1 text-muted">Priority</p>
+              <div class="media">
+                <span
+                  class="badge"
+                  :class="
+                    task.priority === 'high'
+                      ? 'badge-soft-danger'
+                      : task.priority === 'medium'
+                      ? 'badge-soft-warning'
+                      : 'badge-soft-success'
+                  "
+                >
+                  {{ task.priority }}
+                </span>
+              </div>
+              <!-- end due date -->
+            </div>
             <!-- end col -->
           </div>
           <!-- end row -->
@@ -224,8 +415,9 @@ export default {
             <div class="col">
               <div id="taskDesk">
                 <vue-editor
-                  v-model="task.description"
+                  v-model="form.description"
                   :editor-options="editorOptions"
+                  @blur="changeTaskDescription"
                 ></vue-editor>
               </div>
             </div>
@@ -286,15 +478,14 @@ export default {
                     class="activity-list"
                   >
                     <div class="media d-flex justify-content-between">
-                      <div class="media-body overflow-hidden">
+                      <router-link
+                        :to="`/task/${subtask.id}/details?subtask=true`"
+                        class="media-body overflow-hidden"
+                      >
                         <h5 class="font-size-15 mt-2 mb-1">
-                          <router-link
-                            :to="`/task/${subtask.id}/details?subtask=true`"
-                            class="text-dark"
-                            >{{ subtask.name }}</router-link
-                          >
+                          <div class="text-dark">{{ subtask.name }}</div>
                         </h5>
-                        <div class=" d-flex justify-content-between">
+                        <div class=" d-flex">
                           <div>
                             <a
                               :id="`task-tooltip-${subtask.id}`"
@@ -311,17 +502,97 @@ export default {
                               {{ subtask.formatted_end_date }}
                             </a>
                           </div>
+                          <div class=" ml-3">
+                            <a
+                              :id="`task-tooltip-status-${subtask.id}`"
+                              href="javascript: void(0)"
+                              class="text-muted d-inline-block bg-transparent"
+                            >
+                              <b-tooltip
+                                :target="`task-tooltip-status-${subtask.id}`"
+                                triggers="hover"
+                                placement="top"
+                                >Status</b-tooltip
+                              >
+                              <i class="uil uil-windsock mr-1"></i>
+                             <span style="text-transform:capitalize">{{ subtask.status }}</span> 
+                            </a>
+                          </div>
+                          <div class=" ml-3">
+                            <a
+                              :id="`task-tooltip-priority-${subtask.id}`"
+                              href="javascript: void(0)"
+                              class="text-muted d-inline-block bg-transparent"
+                            >
+                              <b-tooltip
+                                :target="`task-tooltip-priority-${subtask.id}`"
+                                triggers="hover"
+                                placement="top"
+                                >Priority</b-tooltip
+                              >
+                              <span
+                                class="badge"
+                                :class="
+                                  subtask.priority === 'high'
+                                    ? 'badge-soft-danger'
+                                    : subtask.priority === 'medium'
+                                    ? 'badge-soft-warning'
+                                    : 'badge-soft-success'
+                                "
+                              >
+                                {{ subtask.priority }}
+                              </span>
+                            </a>
+                          </div>
                         </div>
-                      </div>
-                      <div class="d-flex">
-                        <router-link
-                          :to="`/task/${subtask.id}/details?subtask=true&hasSubTask=false`"
-                          type="button"
-                          class="btn btn-soft-primary btn-sm"
+                      </router-link>
+                      <div>
+                        <b-dropdown
+                          class="float-right"
+                          variant="link"
+                          toggle-class="p-0"
+                          right
                         >
-                          <i class="uil uil-eye"></i>
-                        </router-link>
+                          <template v-slot:button-content>
+                            <i class="uil uil-ellipsis-v text-muted"></i>
+                          </template>
+                          <!-- item-->
+                          <b-dropdown-item
+                            :to="
+                              `/task/${subtask.id}/details?subtask=true&hasSubTask=false`
+                            "
+                          >
+                            View
+                          </b-dropdown-item>
+                          <!-- item -->
+                          <b-dropdown-divider></b-dropdown-divider>
+                          <!-- item-->
+                          <b-dropdown-item
+                            variant="danger"
+                            @click="deleteSubTask(subtask)"
+                          >
+                            <i class="uil uil-trash-alt mr-1"></i>Delete
+                          </b-dropdown-item>
+                          <!-- end dropdown menu-->
+                        </b-dropdown>
+                        <!-- end dropdown-->
                       </div>
+                      <!-- <div class="d-flex">
+                        <router-link
+                          :to="
+                            `/task/${subtask.id}/details?subtask=true&hasSubTask=false`
+                          "
+                        >
+                          <span class="avatar-title rounded text-primary">
+                            <i class="uil uil-eye font-size-18"></i>
+                          </span>
+                        </router-link>
+                        <div class=" ml-2">
+                          <span class="avatar-title rounded text-danger">
+                            <i class="uil uil-trash font-size-18"></i>
+                          </span>
+                        </div>
+                      </div> -->
                     </div>
                   </li>
                 </ul>

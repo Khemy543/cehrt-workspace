@@ -173,8 +173,7 @@ export default {
 										>Welcome to Your Calendar</h5
 									>
 									<p class="text-muted mb-2">
-										The calendar shows the events synced from all your linked
-										calendars. Click on event to see or edit the details. You
+										Click on event to see or edit the details. You
 										can create new event by clicking on "Create New event"
 										button or any cell available in calendar below.
 									</p>
@@ -185,9 +184,6 @@ export default {
 										@click="showmodal = true"
 									>
 										<i class="uil-plus-circle"></i> Create New Event
-									</button>
-									<button class="btn btn-white mt-2">
-										<i class="uil-sync"></i> Link Calendars
 									</button>
 								</div>
 							</div>
