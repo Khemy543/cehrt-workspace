@@ -68,6 +68,9 @@ export default {
     hasSubTask() {
       return this.$route.query.hasSubTask === 'true'
     },
+    taskPriority() {
+      return this.task.priority.toLowerCase();
+    }
   },
   mounted() {
     this.form = {
@@ -394,9 +397,9 @@ export default {
                 <span
                   class="badge"
                   :class="
-                    task.priority === 'high'
+                    taskPriority === 'high'
                       ? 'badge-soft-danger'
-                      : task.priority === 'medium'
+                      : taskPriority === 'medium'
                       ? 'badge-soft-warning'
                       : 'badge-soft-success'
                   "

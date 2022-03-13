@@ -12,6 +12,9 @@ export default {
   computed: {
     initals() {
       return this.task.assignee.name ? this.task.assignee.name.match(/\b(\w)/g).join('').toUpperCase() : "GA";
+    },
+    priority() {
+      return this.task.priority.toLowerCase()
     }
   },
   methods: {
@@ -72,18 +75,6 @@ export default {
         <b-dropdown-item href="javascript: void(0);" @click="showEditModal"
           ><i class="uil uil-edit-alt mr-2"></i>Edit</b-dropdown-item
         >
-        <!-- <b-dropdown-item v-if="task.assignee.id" href="javascript: void(0);"
-          ><i class="uil uil-sync mr-2"></i>Change Assignee</b-dropdown-item
-        >
-        <b-dropdown-item v-else href="javascript: void(0);"
-          ><i class="uil uil-user-plus mr-2"></i>Assign To</b-dropdown-item
-        >
-        <b-dropdown-item v-if="task.reviewer.id" href="javascript: void(0);"
-          ><i class="uil uil-sync mr-2"></i>Change Reviewer</b-dropdown-item
-        >
-        <b-dropdown-item v-else href="javascript: void(0);"
-          ><i class="uil uil-exit mr-2"></i>Add Reviewer</b-dropdown-item
-        > -->
         <b-dropdown-divider></b-dropdown-divider>
         <b-dropdown-item variant="danger" @click="deleteTask">
           <i class="uil uil-trash mr-2"></i>Delete
@@ -94,12 +85,12 @@ export default {
         <a href="javascript: void(0);" class="text-body">{{ task.name }}</a>
       </h6>
 
-      <span v-if="task.priority === 'High'" class="badge badge-soft-danger"
+      <span v-if="priority === 'high'" class="badge badge-soft-danger"
         >High</span
       >
 
-      <span v-else-if="task.priority === 'Medium'" class="badge badge-soft-info"
-        >{{ task.priority }}</span
+      <span v-else-if="priority === 'medium'" class="badge badge-soft-info"
+        >Medium</span
       >
 
       <span v-else class="badge badge-soft-success">Low</span>

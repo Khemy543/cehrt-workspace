@@ -165,7 +165,7 @@ export default {
 
 
     <div v-if="!loading && projectData.length <= 0" class=" w-100 d-flex justify-content-center">
-      <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:50%" />
+      <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
     </div>
 
     <CreateProjectModal
