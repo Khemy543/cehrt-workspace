@@ -216,11 +216,11 @@ const dashboardRoutes = [
 // apps
 const calendarAppsRoutes = [
   {
-    path: '/apps/calendar',
+    path: '/calendar',
     name: 'Calendar',
     icon: 'calendar',
-    department: 'Consultancy',
-    component: () => lazyLoadView(import('@views/pages/apps/calendar')),
+    department: 'all',
+    component: () => lazyLoadView(import('@views/pages/calendar/index.vue')),
     meta: { authRequired: true },
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
@@ -311,6 +311,20 @@ const projectAppsRoutes = [
   },
 ]
 
+const adminProjectRoutes = [
+  {
+    path: '/admin/project-management',
+    name: 'Manage Project',
+    icon: 'briefcase',
+    department: 'Administration',
+    meta: { authRequired: true },
+    // create a container component
+    component: () =>
+      lazyLoadView(import('@views/pages/administrator/project/index')),
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+  },
+]
+
 /* const taskAppsRoutes = [
   {
     path: '/apps/task',
@@ -352,6 +366,17 @@ const profileRoute = [
   },
 ]
 
+const recycleRoutes = [
+  {
+    path: '/recycle',
+    name: 'Project Recycle',
+    meta: { authRequired: true },
+    icon: 'refresh-ccw',
+    department: 'Consultancy',
+    component: () => lazyLoadView(import('@views/pages/consulting/recycle/index.vue')),
+  }
+]
+
 const appsRoutes = [
   ...userManagementRoutes,
   /* ...departmentRoutes, */
@@ -359,6 +384,8 @@ const appsRoutes = [
   /* ...emailAppsRoutes, */
   ...proposalRoutes,
   ...projectAppsRoutes,
+  ...adminProjectRoutes,
+  ...recycleRoutes
 ]
 
 // pages
@@ -401,8 +428,9 @@ const appsRoutes = [
     ],
   },
 ] */
+/*
 // ui
-/* const uiRoutes = [
+const uiRoutes = [
   {
     path: '/ui',
     name: 'UI Elements',
@@ -411,7 +439,7 @@ const appsRoutes = [
     department: 'all',
     meta: { authRequired: true },
     // create a container component
-    component: () => lazyLoadView(import('@views/pages/ui/icons/unicons')),
+    component: () => lazyLoadView(import('@views/pages/ui/icons/feather')),
     children: [
       {
         path: 'bootstrap',
@@ -547,8 +575,8 @@ const authProtectedRoutes = [
   ...appsRoutes,
   ...workFlowRoutes,
   /* ...pagesRoutes, */
-  /* ...uiRoutes,
-  ...formsRoutes,
+  // ...uiRoutes,
+  /* ...formsRoutes,
   ...chartsRoutes,
   ...tablesRoutes, */
 ]

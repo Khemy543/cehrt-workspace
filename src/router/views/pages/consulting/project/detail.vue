@@ -4,21 +4,18 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import CreateProjectModal from '@components/CreateProjectModal.vue'
 import CreateDeliverable from '@components/CreateDeliverable'
-
-import { widgetData, projectActivity } from './data-projectdetail'
+import ProjectDeletionModal from '../../../../../components/ProjectDeletionModal.vue'
 
 export default {
   page: {
     title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, PageHeader, CreateProjectModal, CreateDeliverable },
+  components: { Layout, PageHeader, CreateProjectModal, CreateDeliverable, ProjectDeletionModal },
   data() {
     return {
-      widgetData: widgetData,
       show: false,
       formtitle: 'Edit Project',
-      projectActivity: projectActivity,
       showCreateDeliverable: false,
       loading: true,
       project: {},
@@ -39,6 +36,7 @@ export default {
       ],
       projectDeliverables: [],
       vDeliverable: {},
+      showProjectDeletionModal: false
     }
   },
   created() {
@@ -127,9 +125,9 @@ export default {
 
     deleteProject() {
       this.$swal({
-        title: 'Do you want to delete this project?',
+        title: 'Send project deletion request?',
         showDenyButton: true,
-        confirmButtonText: 'Delete',
+        confirmButtonText: 'Send',
         denyButtonText: `Cancel`,
         confirmButtonColor: '#ff5c75',
         denyButtonColor: '#4b4b5a',
@@ -264,7 +262,7 @@ export default {
                     <button
                       type="button"
                       class="btn btn-soft-danger btn-sm"
-                      @click="deleteProject"
+                      @click="showProjectDeletionModal = true"
                     >
                       <i class="uil uil-trash-alt mr-1"></i>Delete
                     </button>
@@ -789,6 +787,12 @@ export default {
       :value="showCreateDeliverable"
       :deliverable="vDeliverable"
       @input="showCreateDeliverable = $event"
+    />
+
+    <ProjectDeletionModal 
+      :close="() => showProjectDeletionModal = false"
+      :value="showProjectDeletionModal"
+      @input="showProjectDeletionModal = $event"
     />
   </Layout>
 </template>

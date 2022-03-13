@@ -76,7 +76,7 @@
             label="Project Coordinator"
             label-for="input-1"
           >
-            <b-form-select v-model="form.coordinator_id" class="mb-2">
+            <b-form-select v-model="form.coordinator_id" class="mb-2" required>
               <option value="" disabled>Select project coordinator</option>
               <option
                 v-for="user in staff"
