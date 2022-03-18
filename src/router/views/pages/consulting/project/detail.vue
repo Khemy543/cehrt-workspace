@@ -363,6 +363,14 @@ export default {
                   <div class="col-lg-3 col-md-6">
                     <div class="mt-4">
                       <p class="mb-2">
+                        <i class="uil-user text-danger"></i> Coordinator
+                      </p>
+                      <h5 class="font-size-16">{{ project.coordinator.name || 'N/A' }}</h5>
+                    </div>
+                  </div>
+                  <div class="col-lg-3 col-md-6">
+                    <div class="mt-4">
+                      <p class="mb-2">
                         <i class="uil-calender text-danger"></i> Start Date
                       </p>
                       <h5 class="font-size-16">{{ project.start_date }}</h5>

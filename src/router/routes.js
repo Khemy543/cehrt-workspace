@@ -176,6 +176,7 @@ const workFlowRoutes = [
 const proposalRoutes = [
   {
     path: '/proposals/view-proposals',
+    header: 'Activities',
     name: 'Proposals',
     icon: 'bookmark',
     department: 'Consultancy',
@@ -325,38 +326,6 @@ const adminProjectRoutes = [
   },
 ]
 
-/* const taskAppsRoutes = [
-  {
-    path: '/apps/task',
-    name: 'Task',
-    icon: 'bookmark',
-    meta: { authRequired: true },
-    // create a container component
-    component: {
-      render(c) {
-        return c('router-view')
-      },
-    },
-    props: (route) => ({ user: store.state.auth.currentUser || {} }),
-    children: [
-      {
-        path: 'list',
-        name: 'Task List',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/apps/tasks/task-list')),
-      },
-      {
-        path: 'task-board',
-        name: 'Kanban Board',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/apps/tasks/task-board')),
-      },
-    ],
-  },
-]
- */
 const profileRoute = [
   {
     path: '/profile',
@@ -377,10 +346,22 @@ const recycleRoutes = [
   }
 ]
 
+const leaveRequestRoutes = [
+  {
+    path: '/leave-request',
+    name: 'Leave Request',
+    meta: { authRequired: true },
+    icon: 'refresh-ccw',
+    department: 'all',
+    component: () => lazyLoadView(import('@views/pages/leave-request/index.vue')),
+  }
+]
+
 const appsRoutes = [
   ...userManagementRoutes,
   /* ...departmentRoutes, */
   ...calendarAppsRoutes,
+  ...leaveRequestRoutes,
   /* ...emailAppsRoutes, */
   ...proposalRoutes,
   ...projectAppsRoutes,
