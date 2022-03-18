@@ -240,7 +240,7 @@ export default {
     createTaskWithDeliverable(workflow) {
       this.$swal({
         title: `Create tasks from ${workflow.name}?`,
-        text: 'This  action is irreversible',
+        text: 'This action will delete all current tasks',
         showDenyButton: true,
         confirmButtonText: 'Create',
         denyButtonText: `Cancel`,
@@ -254,7 +254,9 @@ export default {
             )
 
             if (response) {
-              this.todoTasks = [...this.todoTasks, ...response.data.tasks]
+              this.todoTasks = response.data.tasks;
+
+              console.log(this.todoTasks)
               this.selectedWorkflow = workflow
               this.$bvToast.toast('Tasks created successful', {
                 title: 'Success',
@@ -346,15 +348,15 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="row align-items-center">
-              <div v-if="deliverable.workflow" class="col">
+              <!-- <div v-if="deliverable.workflow" class="col">
                 <span class="font-size-10">
                   Selected Workflow:
                   <b class="font-size-16">{{
                     deliverable.workflow.name
                   }}</b></span
                 >
-              </div>
-              <div v-else class="col">
+              </div> -->
+              <div class="col">
                 <label class="font-weight-bold d-inline mr-2">
                   <feather
                     type="activity"
@@ -368,7 +370,7 @@ export default {
                   toggle-class="font-weight-bold p-0 align-middle"
                 >
                   <template v-slot:button-content>
-                    {{ selectedWorkflow.name }}
+                    {{ (deliverable.workflow && deliverable.workflow.name) || selectedWorkflow.name }}
                     <i class="uil uil-angle-down font-size-16 align-middle"></i>
                   </template>
                   <b-dropdown-item

@@ -5,31 +5,29 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import bootstrapPlugin from '@fullcalendar/bootstrap'
 import listPlugin from '@fullcalendar/list'
+import { required } from 'vuelidate/lib/validators'
 import { dateFormate } from '@src/utils/format-date.js'
+
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 
 export default {
   page: {
-    title: 'Calendar',
+    title: 'Leave Request',
     meta: [{ name: 'description', content: appConfig.description }],
   },
   components: { FullCalendar, Layout, PageHeader },
   data() {
     return {
-      title: 'Calendar',
+      title: 'Leave Request',
       items: [
         {
-          text: 'Shreyu',
+          text: 'Chert',
           href: '/',
         },
         {
-          text: 'Apps',
-          href: '/',
-        },
-        {
-          text: 'Calendar',
+          text: 'Leave Request',
           active: true,
         },
       ],
@@ -46,93 +44,101 @@ export default {
       createModal: false,
       showmodal: false,
       eventModal: false,
-      categories: [],
+      categories: [
+        {
+          id: 1,
+          type: 'Annual',
+        },
+        {
+          id: 2,
+          type: 'Sick',
+        },
+        {
+          id: 3,
+          type: 'Maternity',
+        },
+        {
+          id: 4,
+          type: 'Compassionate',
+        },
+        {
+          id: 5,
+          type: 'Others',
+        },
+      ],
       submitted: false,
       submit: false,
       newEventData: {},
       edit: {},
-      editableEvent: {},
       deleteId: {},
       event: {
-        name: '',
+        type: '',
         start_date: '',
         end_date: '',
-      }
+        reason: '',
+      },
+      editevent: {
+        editTitle: '',
+      },
     }
   },
+  validations: {
+    event: {
+      title: { required },
+      category: { required },
+    },
+  },
   created() {
-    this.getDashboardData()
-    this.getEvents()
+    this.getAllProved();
+    this.getLeaveRequests();
   },
   methods: {
-    async getEvents() {
+    async getLeaveRequests() {
       try {
-        const response = await this.$http.get(`fetch/events`)
+        const response = await this.$http.get(`/fetch/leave/requests`);
 
         if (response) {
-          const vEvents = response.data.map((item) => {
+          const requestedLeaves = response.data.map((item) => {
             return {
-              id: `event-${item.id}`,
-              title: item.name,
-              start: item.start_date,
-              end: item.end_date,
+              id: item.id,
+              title: `${item.user} (${item.type} Leave)`,
               editable: true,
-              className: 'bg-danger text-white',
+              start: dateFormate(item.start_date),
+              end: dateFormate(item.end_date),
+              reason: item.reason,
+              className: item.type === 'Sick' ? `bg-soft-danger text-white` : item.type === 'Annual' ? 'bg-soft-primary text-white' : item.type === 'Maternity' ? 'bg-soft-success text-white' : item.type === 'Compassionate' ? 'bg-soft-warning text-white' : 'bg-soft-secondary text-white'
             }
           })
-          this.calendarEvents = [...this.calendarEvents, ...vEvents];
+          this.calendarEvents = [...this.calendarEvents, ...requestedLeaves]
         }
       } catch (error) {
-        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
           appendToast: false,
           variant: 'danger',
+          toastClass: 'text-white',
         })
       }
     },
-    async getDashboardData() {
+
+    async getAllProved() {
       try {
-        const response = await this.$http.get(`/fetch/personal/dashboard-data`)
+        const response = await this.$http.get(`/fetch/all/approved/leave/requests`);
 
         if (response) {
-          const { subtasks, tasks } = response.data
+          const approvedLeaves = response.data.map((item) => {
+            return {
+              id: item.id,
+              title: `${item.user} (${item.type})`,
+              start: dateFormate(item.start_date),
+              end: dateFormate(item.end_date),
+              reason: item.reason,
+              className: item.type === 'Sick' ? `bg-danger text-white` : item.type === 'Annual' ? 'bg-primary text-white' : item.type === 'Maternity' ? 'bg-success text-white' : item.type === 'Compassionate' ? 'bg-warning text-white' : 'bg-secondary text-white'
+            }
+          })
 
-          const vSubtasks =
-            subtasks &&
-            subtasks.map((item) => {
-              return {
-                id: `subtask-${item.id}`,
-                title: `${item.name} ( ${item.status})`,
-                end: item.end_date,
-                editable: false,
-                url: `/task/${item.id}/details?hasSubTask=false&subtask=true`,
-                start:
-                  item.start_date ||
-                  (item.created_at && item.created_at.split('T')[0]),
-                className: 'bg-primary-text-white',
-              } || []
-
-            })
-
-          const vTasks =
-            tasks &&
-            tasks.map((item) => {
-              return {
-                id: `task-${item.id}`,
-                title: `${item.name} ( ${item.status} )`,
-                end: item.end_date,
-                editable: false,
-                url: `/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
-                start:
-                  item.start_date ||
-                  (item.created_at && item.created_at.split('T')[0]),
-                className: 'bg-primary-text-white',
-              }
-            })
-
-          this.calendarEvents = [...this.calendarEvents, ...vSubtasks, ...vTasks]
+          this.calendarEvents = [...this.calendarEvents, ...approvedLeaves]
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -140,37 +146,32 @@ export default {
           autoHideDelay: 5000,
           appendToast: false,
           variant: 'danger',
+          toastClass: 'text-white',
         })
       }
     },
-
-    /**
-     * Modal form submit
-     */
     async handleSubmit() {
       try {
-        const response = await this.$http.post(`event/create`, this.event)
+        const response = await this.$http.post(`/request/for-leave`, { ...this.event, type: this.event.type })
         if (response) {
           const {
-            name,
+            id,
+            type,
+            user,
             start_date: startDate,
             end_date: endDate,
-            id,
-          } = response.data.event
-          this.calendarEvents = this.calendarEvents.concat({
-            id: `event-${id}`,
-            title: name,
-            start: startDate,
-            end: endDate,
-            editable: true,
-            className: 'bg-danger text-white',
-          })
-          this.$bvToast.toast('Event created successfully', {
-            title: 'Success',
-            autoHideDelay: 5000,
-            appendToast: false,
-            variant: 'success',
-          })
+            reason
+          } = response.data.leave
+          this.calendarEvents = this.calendarEvents.concat(
+            {
+              id,
+              title: `${user} (${type})`,
+              start: dateFormate(startDate),
+              end: dateFormate(endDate),
+              reason,
+              className: type === 'Sick' ? `bg-soft-danger text-white` : type === 'Annual' ? 'bg-soft-primary text-white' : type === 'Maternity' ? 'bg-soft-success text-white' : type === 'Compassionate' ? 'bg-soft-warning text-white' : 'bg-soft-secondary text-white'
+            }
+          )
         }
       } catch (error) {
         if (error.response) {
@@ -208,7 +209,7 @@ export default {
      */
     async editSubmit() {
       try {
-        const response = await this.$http.put(`/update/${this.editableEvent.id}/event`, this.editableEvent);
+        const response = await this.$http.put(`/update/${this.editevent.id}/leave/request`, this.editevent);
 
         if (response) {
           const { name, start_date: startDate, end_date: endDate } = response.data.event;
@@ -253,7 +254,7 @@ export default {
      */
     deleteEvent() {
       this.$swal({
-        title: 'Do you want to delete event?',
+        title: 'Do you want to delete leave request?',
         showDenyButton: true,
         confirmButtonText: 'Delete',
         denyButtonText: `Cancel`,
@@ -262,15 +263,15 @@ export default {
       }).then(async ({ isConfirmed, isDenied }) => {
         if (isConfirmed) {
           try {
-            const deleteId = this.edit.id.split('-')[1]
-            const response = await this.$http.delete(`/delete/${deleteId}/event`);
+            const deleteId = this.edit.id
+            const response = await this.$http.delete(`/delete/${deleteId}/leave/request`);
 
             if (response) {
               this.calendarEvents = this.calendarEvents.filter(
                 (x) => '' + x.id !== '' + this.edit.id
               )
               this.eventModal = false;
-              this.$bvToast.toast('Event deleted successfully', {
+              this.$bvToast.toast('Request deleted successfully', {
                 title: 'Success',
                 autoHideDelay: 5000,
                 appendToast: false,
@@ -302,11 +303,12 @@ export default {
     editEvent(info) {
       if (info.event.startEditable) {
         this.edit = info.event
-        this.editableEvent = {
-          id: this.edit.id.split('-')[1],
-          name: this.edit.title,
+        const index = this.calendarEvents.findIndex(item => item.id === Number(this.edit.id))
+        this.editevent = {
+          type: this.edit.title.split('(')[1].split(' ')[0],
           start_date: dateFormate(this.edit.start),
-          end_date: dateFormate(this.edit.end)
+          end_date: dateFormate(this.edit.end),
+          reason: this.calendarEvents[index].reason
         }
         this.eventModal = true
       }
@@ -338,7 +340,6 @@ export default {
               </div>
               <div class="col-xl-10 col-lg-9">
                 <div class="mt-4 mt-lg-0">
-                  <h5 class="mt-0 mb-1 font-weight-bold">Welcome to Your Calendar</h5>
                   <p class="text-muted mb-2">
                     Click on event to see or edit the details. You can create
                     new event by clicking on "Create New event" button or any
@@ -350,7 +351,7 @@ export default {
                     class="btn btn-primary mt-2 mr-1"
                     @click="showmodal = true"
                   >
-                    <i class="uil-plus-circle"></i> Create New Event
+                    <i class="uil-plus-circle"></i> Create Leave Request
                   </button>
                 </div>
               </div>
@@ -387,6 +388,7 @@ export default {
                   next: 'Next',
                 }"
                 :bootstrap-font-awesome="false"
+                :editable="true"
                 :droppable="true"
                 :plugins="calendarPlugins"
                 :events="calendarEvents"
@@ -405,15 +407,16 @@ export default {
         <div class="row">
           <div class="col-12">
             <div class="form-group">
-              <label for="name">Event Name</label>
-              <input
-                id="name"
-                v-model="event.name"
-                type="text"
-                class="form-control"
-                placeholder="Enter name"
-                required
-              />
+              <b-form-group id="marital_status" label="Leave Type" label-for="marital_status">
+                <b-form-select id="marital_status" v-model="event.type" type="text" required>
+                  <option value>Select leave type</option>
+                  <option
+                    v-for="type in categories"
+                    :key="type.id"
+                    :value="type.type"
+                  >{{ type.type }}</option>
+                </b-form-select>
+              </b-form-group>
             </div>
           </div>
           <div class="col-12">
@@ -445,6 +448,16 @@ export default {
               </div>
             </div>
           </div>
+          <div class="col-12">
+            <b-form-group label="Reason">
+              <b-form-textarea
+                id="input-1"
+                v-model="event.reason"
+                placeholder="Enter reason for leave request"
+                rows="4"
+              ></b-form-textarea>
+            </b-form-group>
+          </div>
         </div>
 
         <div class="text-right">
@@ -456,19 +469,20 @@ export default {
 
     <!-- Edit Modal -->
     <b-modal v-model="eventModal" title="Edit Event" title-class="text-black font-18" hide-footer>
-      <form @submit.prevent="editSubmit">
+      <form @submit.prevent="editEvent">
         <div class="row">
           <div class="col-12">
             <div class="form-group">
-              <label for="name">Event Name</label>
-              <input
-                id="name"
-                v-model="editableEvent.name"
-                type="text"
-                class="form-control"
-                placeholder="Enter name"
-                required
-              />
+              <b-form-group id="marital_status" label="Leave Type" label-for="marital_status">
+                <b-form-select id="marital_status" v-model="editevent.type" type="text" required>
+                  <option value>Select leave type</option>
+                  <option
+                    v-for="type in categories"
+                    :key="type.id"
+                    :value="type.type"
+                  >{{ type.type }}</option>
+                </b-form-select>
+              </b-form-group>
             </div>
           </div>
           <div class="col-12">
@@ -478,7 +492,7 @@ export default {
                   <label for="name">Start Date</label>
                   <input
                     id="name"
-                    v-model="editableEvent.start_date"
+                    v-model="editevent.start_date"
                     type="date"
                     class="form-control"
                     placeholder="Enter start date"
@@ -491,7 +505,7 @@ export default {
                   <label for="name">End Date</label>
                   <input
                     id="name"
-                    v-model="editableEvent.end_date"
+                    v-model="editevent.end_date"
                     type="date"
                     class="form-control"
                     placeholder="Enter end date"
@@ -500,9 +514,20 @@ export default {
               </div>
             </div>
           </div>
+          <div class="col-12">
+            <b-form-group label="Reason">
+              <b-form-textarea
+                id="input-1"
+                v-model="editevent.reason"
+                placeholder="Enter reason for leave request"
+                rows="4"
+              ></b-form-textarea>
+            </b-form-group>
+          </div>
         </div>
+
         <div class="d-flex justify-content-between">
-          <b-button type="button" variant="danger" @click="deleteEvent">Delete Event</b-button>
+          <b-button type="button" variant="danger" @click="deleteEvent">Delete Request</b-button>
           <button type="submit" class="btn btn-success">Save</button>
         </div>
       </form>

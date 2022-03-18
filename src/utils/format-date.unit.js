@@ -1,4 +1,4 @@
-import formatDate from './format-date'
+import {formatDate} from './format-date'
 
 describe('@utils/format-date', () => {
   it('correctly compares dates years apart', () => {
