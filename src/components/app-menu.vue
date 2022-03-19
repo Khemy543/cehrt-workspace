@@ -32,50 +32,6 @@
           >{{ item.badge.text }}</span
         >
       </router-link>
-
-      <!-- <ul v-if="hasItems(item)" class="nav-second-level">
-        <li
-          v-for="subitem in item.children"
-          :key="`sub-item-${subitem.name}`"
-          :class="{ 'side-nav-item': hasItems(subitem) }"
-        >
-          <a
-            v-if="hasItems(subitem)"
-            href="javascript:void(0);"
-            class="side-nav-link-a-ref"
-          >
-            {{ subitem.name }}
-            <span class="menu-arrow"></span>
-          </a>
-
-          <router-link
-            v-if="!hasItems(subitem)"
-            tag="a"
-            :to="`${item.path}/${subitem.path}`"
-            class="side-nav-link-ref"
-            :class="subitem.invisible ? 'd-none' : ''"
-            >{{ subitem.name }}</router-link
-          >
-
-          <ul
-            v-if="hasItems(subitem)"
-            class="nav-third-level"
-            aria-expanded="false"
-          >
-            <li
-              v-for="subSubitem in subitem.children"
-              :key="`sub-sub-item-${subSubitem.name}`"
-            >
-              <router-link
-                tag="a"
-                :to="`${item.path}/${subitem.path}/${subSubitem.path}`"
-                class="side-nav-link-ref"
-                >{{ subSubitem.name }}</router-link
-              >
-            </li>
-          </ul>
-        </li>
-      </ul> -->
     </li>
   </ul>
 
@@ -100,6 +56,10 @@ export default {
     department: {
       type:Object,
       default: () => {}
+    },
+    isSupervisor: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -108,7 +68,7 @@ export default {
     }
   },
   computed: {
-    ...authComputed,
+    ...authComputed
   },
   mounted: function() {
     // eslint-disable-next-line no-unused-vars

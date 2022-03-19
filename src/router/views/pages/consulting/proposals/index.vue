@@ -6,7 +6,7 @@ import CreateProposalModal from '@components/CreateProposalModal.vue'
 
 export default {
   page: {
-    title: 'View Departments',
+    title: 'Proposals',
     meta: [{ name: 'description', content: appConfig.description }],
   },
   components: {
@@ -54,7 +54,15 @@ export default {
           this.proposals = response.data
           this.loading = false
         }
-      } catch (error) {}
+      } catch (error) { 
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
     },
 
     openCreateProposal() {
@@ -97,7 +105,7 @@ export default {
     },
 
     async updateProposal(form) {
-      const fakeForm = { ...form};
+      const fakeForm = { ...form };
       delete fakeForm['submission_date']
       try {
         const response = await this.$http.put(
@@ -192,19 +200,17 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div v-if="loading" class=" d-flex justify-content-center">
+    <div v-if="loading" class="d-flex justify-content-center">
       <b-spinner type="grow" variant="primary"></b-spinner>
     </div>
     <div v-else class="row">
       <div class="col-lg-12">
         <div class="card">
           <div class="card-body">
-            <div class=" d-flex justify-content-between">
+            <div class="d-flex justify-content-between">
               <div>
                 <h4 class="header-title mt-0 mb-1">View Proposals</h4>
-                <p class="sub-header">
-                  view, add and edit details of all proposals
-                </p>
+                <p class="sub-header">view, add and edit details of all proposals</p>
               </div>
               <div>
                 <button
@@ -217,7 +223,7 @@ export default {
               </div>
             </div>
 
-            <div class="table-responsive">
+            <div v-if="proposals.length > 0" class="table-responsive">
               <table class="table mb-0">
                 <thead class="thead-light">
                   <tr>
@@ -238,14 +244,16 @@ export default {
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ vproposal.title }}</td>
                     <td>{{ vproposal.client }}</td>
-                    <td>{{
-                      vproposal.project_type && vproposal.project_type.name
-                    }}</td>
+                    <td>
+                      {{
+                        vproposal.project_type && vproposal.project_type.name
+                      }}
+                    </td>
                     <td>{{ vproposal.funding_option }}</td>
                     <td>
                       <b-dropdown
                         variant="link"
-                        class=" position-absolute"
+                        class="position-absolute"
                         toggle-class="p-0 text-muted arrow-none"
                       >
                         <template v-slot:button-content>
@@ -254,9 +262,9 @@ export default {
                         <b-dropdown-item
                           :to="`/proposals/details/${vproposal.id}`"
                           variant="secondary"
-                          ><i class="uil uil-exit mr-2"></i
-                          >View</b-dropdown-item
                         >
+                          <i class="uil uil-exit mr-2"></i>View
+                        </b-dropdown-item>
                         <b-dropdown-divider></b-dropdown-divider>
                         <b-dropdown-item
                           href="javascript: void(0);"
@@ -277,6 +285,10 @@ export default {
                   </tr>
                 </tbody>
               </table>
+            </div>
+
+            <div v-else class="w-100 d-flex justify-content-center">
+              <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
             </div>
           </div>
         </div>

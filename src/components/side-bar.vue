@@ -34,6 +34,9 @@ export default {
 	},
 	computed: {
 		...authComputed,
+		isSupervisor() {
+			return this.user.isSupervisor || false;
+		}
 	}
 }
 </script>
@@ -109,11 +112,11 @@ export default {
 				:settings="settings"
 			>
 				<div id="sidebar-menu">
-					<Appmenu :department="department" />
+					<Appmenu :department="department" :is-superviosr="isSupervisor"/>
 				</div>
 			</VuePerfectScrollbar>
 			<div v-else id="sidebar-menu">
-				<Appmenu :department="department" />
+				<Appmenu :department="department" :is-superviosr="isSupervisor"/>
 			</div>
 		</div>
 		<!-- Sidebar -left -->

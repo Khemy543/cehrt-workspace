@@ -12,22 +12,27 @@ export default {
     },
     projectStatus() {
       return this.project.status || 'Pending'
+    },
+    isProjectPage() {
+      return this.$route.name === 'Project';
     }
   }
 }
 </script>
 
 <template>
-  <router-link :to="`details/${project.id}`" class="col-xl-4 col-lg-6">
+  <router-link :to="isProjectPage ? `details/${project.id}` : '#'" class="col-xl-4 col-lg-6">
     <div class="card border">
       <div class="card-body">
-        <div
-            class="badge badge-success float-right"
-            :class="{
-              'badge-warning': `${projectStatus}` === 'Pending',
-            }"
-            >{{ projectStatus }}</div
-          >
+        <slot name="status">
+          <div
+              class="badge badge-success float-right"
+              :class="{
+                'badge-warning': `${projectStatus}` === 'Pending',
+              }"
+              >{{ projectStatus }}</div
+            >
+          </slot>
         <p
           class="text-uppercase font-size-12 mb-2 text-primary"
           >{{ project.client }}</p
