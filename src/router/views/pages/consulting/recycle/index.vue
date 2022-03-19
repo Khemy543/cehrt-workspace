@@ -1,40 +1,33 @@
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div v-if="loading" class=" d-flex justify-content-center">
+    <div v-if="loading" class="d-flex justify-content-center">
       <b-spinner type="grow" variant="primary"></b-spinner>
     </div>
     <div v-else class="row">
-      <ProjectCard
-        v-for="project in projectData"
-        :key="project.id"
-        :project="project"
-      />
+      <ProjectCard v-for="project in projectData" :key="project.id" :project="project">
+        <template v-slot:status>
+          <button
+            type="button"
+            class="btn btn-soft-primary btn-sm float-right"
+            @click="restoreProject(project)"
+          >restore</button>
+        </template>
+      </ProjectCard>
     </div>
 
     <div v-if="links.next" class="row mb-3 mt-2">
       <div class="col-12">
         <div class="text-center">
           <div class="btn btn-white" @click="getProjects(links.next)">
-            <feather
-              type="loader"
-              class="icon-dual icon-xs mr-2 align-middle"
-            ></feather
-            >Load more
+            <feather type="loader" class="icon-dual icon-xs mr-2 align-middle"></feather>Load more
           </div>
         </div>
       </div>
     </div>
 
-    <div
-      v-if="!loading && projectData.length <= 0"
-      class=" w-100 d-flex justify-content-center"
-    >
-      <img
-        :src="require('@assets/svgs/empty.svg')"
-        alt="no projects"
-        style="width:30%"
-      />
+    <div v-if="!loading && projectData.length <= 0" class="w-100 d-flex justify-content-center">
+      <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
     </div>
   </Layout>
 </template>
@@ -96,6 +89,40 @@ export default {
         })
       }
     },
+
+    restoreProject(project) {
+      this.$swal({
+        title: 'Restore project?',
+        showDenyButton: true,
+        confirmButtonText: 'Restore',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.patch(`/restore/trashed/${project.id}/project`);
+
+            if (response) {
+              this.projectData = this.projectData.filter((item) => item.id !== project.id);
+              this.$bvToast.toast('Something happened, Please try again later', {
+                title: 'Error',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'danger',
+              })
+            }
+          } catch (error) {
+            this.$bvToast.toast('Something happened, Please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+      })
+    }
   },
 }
 </script>

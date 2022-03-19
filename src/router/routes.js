@@ -1,4 +1,4 @@
-import store from '@state/store'
+import store from '@state/store';
 
 // auth related routes
 const authRoutes = [
@@ -117,7 +117,6 @@ const userManagementRoutes = [
     name: 'Staff',
     path: '/user-management/staff/:id/view-staff',
     meta: { authRequired: true },
-    invisible: true,
     props: true,
     component: () =>
       lazyLoadView(
@@ -189,7 +188,7 @@ const proposalRoutes = [
   {
     name: 'Proposals details',
     path: '/proposals/details/:id',
-    invisible: true,
+
     meta: { authRequired: true },
     component: () =>
       lazyLoadView(import('@views/pages/consulting/proposals/details.vue')),
@@ -281,7 +280,7 @@ const projectAppsRoutes = [
   {
     path: '/project/details/:id',
     name: 'Detail',
-    invisible: true,
+
     meta: { authRequired: true },
     component: () =>
       lazyLoadView(import('@views/pages/consulting/project/detail')),
@@ -289,7 +288,7 @@ const projectAppsRoutes = [
   {
     path: '/project/:project_id/deliverable/:deliverable_id',
     name: 'Task List',
-    invisible: true,
+
     meta: { authRequired: true },
     component: () =>
       lazyLoadView(import('@views/pages/consulting/tasks/task-board')),
@@ -297,7 +296,7 @@ const projectAppsRoutes = [
   {
     path: '/project/task-board',
     name: 'Kanban Board',
-    invisible: true,
+
     meta: { authRequired: true },
     component: () =>
       lazyLoadView(import('@views/pages/consulting/tasks/task-list')),
@@ -305,7 +304,7 @@ const projectAppsRoutes = [
   {
     path: '/task/:id/details',
     name: 'Task Details',
-    invisible: true,
+
     meta: { authRequired: true },
     component: () =>
       lazyLoadView(import('@views/pages/consulting/tasks/task-list')),
@@ -342,8 +341,9 @@ const recycleRoutes = [
     meta: { authRequired: true },
     icon: 'refresh-ccw',
     department: 'Consultancy',
-    component: () => lazyLoadView(import('@views/pages/consulting/recycle/index.vue')),
-  }
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/recycle/index.vue')),
+  },
 ]
 
 const leaveRequestRoutes = [
@@ -353,20 +353,36 @@ const leaveRequestRoutes = [
     meta: { authRequired: true },
     icon: 'refresh-ccw',
     department: 'all',
-    component: () => lazyLoadView(import('@views/pages/leave-request/index.vue')),
-  }
+    component: () =>
+      lazyLoadView(import('@views/pages/leave-request/index.vue')),
+  },
+  {
+    path: '/requested-leave',
+    name: 'Requested Leave',
+    meta: { authRequired: true },
+    icon: 'refresh-ccw',
+    department: 'all',
+    isSupervisor: true,
+    component: () =>
+      lazyLoadView(import('@views/pages/leave-request/requested-leave.vue')),
+  },
+  {
+    path: '/request/:id/details',
+    name: 'Leave',
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/leave-request/view-details.vue')),
+  },
 ]
 
 const appsRoutes = [
   ...userManagementRoutes,
-  /* ...departmentRoutes, */
   ...calendarAppsRoutes,
   ...leaveRequestRoutes,
-  /* ...emailAppsRoutes, */
   ...proposalRoutes,
   ...projectAppsRoutes,
   ...adminProjectRoutes,
-  ...recycleRoutes
+  ...recycleRoutes,
 ]
 
 // pages

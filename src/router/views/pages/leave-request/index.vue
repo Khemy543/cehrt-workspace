@@ -98,7 +98,7 @@ export default {
         const response = await this.$http.get(`/fetch/leave/requests`);
 
         if (response) {
-          const requestedLeaves = response.data.map((item) => {
+          const requestedLeaves = response.data.filter(request => request.status === 'pending').map((item) => {
             return {
               id: item.id,
               title: `${item.user} (${item.type} Leave)`,
@@ -106,7 +106,7 @@ export default {
               start: dateFormate(item.start_date),
               end: dateFormate(item.end_date),
               reason: item.reason,
-              className: item.type === 'Sick' ? `bg-soft-danger text-white` : item.type === 'Annual' ? 'bg-soft-primary text-white' : item.type === 'Maternity' ? 'bg-soft-success text-white' : item.type === 'Compassionate' ? 'bg-soft-warning text-white' : 'bg-soft-secondary text-white'
+              className: item.type === 'Sick' ? `bg-soft-danger text-danger` : item.type === 'Annual' ? 'bg-soft-primary text-primary' : item.type === 'Maternity' ? 'bg-soft-success text-success' : item.type === 'Compassionate' ? 'bg-soft-warning text-warning' : 'bg-soft-secondary text-secondary'
             }
           })
           this.calendarEvents = [...this.calendarEvents, ...requestedLeaves]
@@ -168,10 +168,17 @@ export default {
               title: `${user} (${type})`,
               start: dateFormate(startDate),
               end: dateFormate(endDate),
+              editable: true,
               reason,
-              className: type === 'Sick' ? `bg-soft-danger text-white` : type === 'Annual' ? 'bg-soft-primary text-white' : type === 'Maternity' ? 'bg-soft-success text-white' : type === 'Compassionate' ? 'bg-soft-warning text-white' : 'bg-soft-secondary text-white'
+              className: type === 'Sick' ? `bg-soft-danger text-danger` : type === 'Annual' ? 'bg-soft-primary text-primary' : type === 'Maternity' ? 'bg-soft-success text-success' : type === 'Compassionate' ? 'bg-soft-warning text-warning' : 'bg-soft-secondary text-secondary'
             }
           )
+          this.$bvToast.toast('Request created successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
         }
       } catch (error) {
         if (error.response) {
@@ -218,7 +225,7 @@ export default {
           this.edit.setProp('end', endDate)
           this.eventModal = false;
 
-          this.$bvToast.toast('Event updated successfully', {
+          this.$bvToast.toast('Request updated successfully', {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
