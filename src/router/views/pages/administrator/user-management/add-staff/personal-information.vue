@@ -18,7 +18,13 @@ export default {
       nhia: '',
       spouseName: '',
       spouseEmployer: '',
-      spousePhone:''
+      spousePhone:'',
+      nameOfNextOfKin: '',
+      relationshipOfNextOfKin: '',
+      addressOfNextOfKin: '',
+      postalAddressOfKin: '',
+      telNextOfKin: '',
+      emailNextOfKin: ''
     }
   },
   validations: {
@@ -67,6 +73,24 @@ export default {
     spouseEmployer: {
       required: false
     },
+    nameOfNextOfKin: {
+      required
+    },
+    relationshipOfNextOfKin: {
+      required
+    },
+    addressOfNextOfKin: {
+      required
+    },
+    postalAddressOfKin: {
+      required
+    },
+    telNextOfKin: {
+      required
+    },
+    emailNextOfKin: {
+      required
+    },
     form: [
       'firstName',
       'lastName',
@@ -82,7 +106,13 @@ export default {
       'maritalStatus',
       'spouseName',
       'spousePhone',
-      'spouseEmployer'
+      'spouseEmployer',
+      'nameOfNextOfKin',
+      'relationshipOfNextOfKin',
+      'addressOfNextOfKin',
+      'postalAddressOfKin',
+      'telNextOfKin',
+      'emailNextOfKin'
     ],
   },
   methods: {
@@ -386,6 +416,121 @@ export default {
               v-if="$v.spouseEmployer.$error && !$v.spouseEmployer.required"
               class="help-block invalid-feedback"
               >spouse employer is required</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class=" row">
+      <div class="col-md-6">
+        <div class="form-group mb-3" :class="{ 'has-error': $v.nameOfNextOfKin.$error }">
+          <label class="col-md-12 col-form-label">Name of next of kin</label>
+          <div class="col-md-12">
+            <input
+              v-model.trim="nameOfNextOfKin"
+              class="form-control"
+              :class="{ 'is-invalid': $v.nameOfNextOfKin.$error }"
+              placeholder="Name of next of kin"
+            />
+            <span
+              v-if="$v.nameOfNextOfKin.$error && !$v.nameOfNextOfKin.required"
+              class="help-block invalid-feedback"
+              >Name is required</span
+            >
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+       <div class="form-group mb-3" :class="{ 'has-error': $v.relationshipOfNextOfKin.$error }">
+          <label class="col-md-12 col-form-label">Relationship</label>
+          <div class="col-md-12">
+            <input
+              v-model.trim="relationshipOfNextOfKin"
+              class="form-control"
+              :class="{ 'is-invalid': $v.relationshipOfNextOfKin.$error }"
+              placeholder="Relationship with next of kin"
+            />
+            <span
+              v-if="$v.relationshipOfNextOfKin.$error && !$v.relationshipOfNextOfKin.required"
+              class="help-block invalid-feedback"
+              >relationship is required</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class=" row">
+      <div class="col-md-6">
+        <div class="form-group mb-3" :class="{ 'has-error': $v.telNextOfKin.$error }">
+          <label class="col-md-12 col-form-label">Telephone of next of kin</label>
+          <div class="col-md-12">
+            <input
+              v-model.trim="telNextOfKin"
+              class="form-control"
+              :class="{ 'is-invalid': $v.telNextOfKin.$error }"
+              placeholder="Telephone of next of kin"
+            />
+            <span
+              v-if="$v.telNextOfKin.$error && !$v.telNextOfKin.required"
+              class="help-block invalid-feedback"
+              >Telephone of next of kin</span
+            >
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+       <div class="form-group mb-3" :class="{ 'has-error': $v.emailNextOfKin.$error }">
+          <label class="col-md-12 col-form-label">Email of next of kin</label>
+          <div class="col-md-12">
+            <input
+              v-model.trim="emailNextOfKin"
+              class="form-control"
+              :class="{ 'is-invalid': $v.emailNextOfKin.$error }"
+              placeholder="Email of next of kin"
+            />
+            <span
+              v-if="$v.emailNextOfKin.$error && !$v.emailNextOfKin.required"
+              class="help-block invalid-feedback"
+              >Email of next of kin</span
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class=" row">
+      <div class="col-md-6">
+        <div class="form-group mb-3" :class="{ 'has-error': $v.addressOfNextOfKin.$error }">
+          <label class="col-md-12 col-form-label">Address of next of kin</label>
+          <div class="col-md-12">
+            <input
+              v-model.trim="addressOfNextOfKin"
+              class="form-control"
+              :class="{ 'is-invalid': $v.addressOfNextOfKin.$error }"
+              placeholder="Address of next of kin"
+            />
+            <span
+              v-if="$v.nhia.$addressOfNextOfKin && !$v.addressOfNextOfKin.required"
+              class="help-block invalid-feedback"
+              >Address is required</span
+            >
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+       <div class="form-group mb-3" :class="{ 'has-error': $v.postalAddressOfKin.$error }">
+          <label class="col-md-12 col-form-label">Postal address of next of kin</label>
+          <div class="col-md-12">
+            <input
+              v-model.trim="postalAddressOfKin"
+              class="form-control"
+              :class="{ 'is-invalid': $v.postalAddressOfKin.$error }"
+              placeholder="Address of next of kin"
+            />
+            <span
+              v-if="$v.nhia.$postalAddressOfKin && !$v.postalAddressOfKin.required"
+              class="help-block invalid-feedback"
+              >Postal address is required</span
             >
           </div>
         </div>

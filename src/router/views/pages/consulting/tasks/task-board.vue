@@ -125,7 +125,16 @@ export default {
         )
 
         if (response) {
-          this.todoTasks.unshift(response.data.task)
+          // this.tasks.unshift(response.data.task);
+          this.tasks = [response.data.task, ...this.tasks];
+          this.todoTasks =
+            this.tasks.filter((item) => item.status === 'pending' || item.status === null) || []
+          this.inProgressTasks =
+            this.tasks.filter((item) => item.status === 'active') || []
+          this.doneTasks =
+            this.tasks.filter((item) => item.status === 'completed') || []
+          this.reviewTasks =
+            this.tasks.filter((item) => item.status === 'in-review') || []
           this.show = false
           this.$bvToast.toast('Task created successful', {
             title: 'Success',
@@ -254,9 +263,17 @@ export default {
             )
 
             if (response) {
-              this.todoTasks = response.data.tasks;
+              this.tasks = response.data.tasks;
 
-              console.log(this.todoTasks)
+              console.log(this.tasks)
+              this.todoTasks =
+                this.tasks.filter((item) => item.status === 'pending' || item.status === null) || []
+              this.inProgressTasks =
+                this.tasks.filter((item) => item.status === 'active') || []
+              this.doneTasks =
+                this.tasks.filter((item) => item.status === 'completed') || []
+              this.reviewTasks =
+                this.tasks.filter((item) => item.status === 'in-review') || []
               this.selectedWorkflow = workflow
               this.$bvToast.toast('Tasks created successful', {
                 title: 'Success',
@@ -355,14 +372,10 @@ export default {
                     deliverable.workflow.name
                   }}</b></span
                 >
-              </div> -->
+              </div>-->
               <div class="col">
                 <label class="font-weight-bold d-inline mr-2">
-                  <feather
-                    type="activity"
-                    class="icon-dual icon-xs mr-2 align-middle"
-                  ></feather
-                  >Work Flows:
+                  <feather type="activity" class="icon-dual icon-xs mr-2 align-middle"></feather>Work Flows:
                 </label>
                 <b-dropdown
                   class="d-inline"
@@ -371,7 +384,9 @@ export default {
                 >
                   <template v-slot:button-content>
                     {{ (deliverable.workflow && deliverable.workflow.name) || selectedWorkflow.name }}
-                    <i class="uil uil-angle-down font-size-16 align-middle"></i>
+                    <i
+                      class="uil uil-angle-down font-size-16 align-middle"
+                    ></i>
                   </template>
                   <b-dropdown-item
                     v-for="workflow in workflows"
@@ -379,18 +394,12 @@ export default {
                     href="javascript: void(0);"
                     variant="seconday"
                     @click="createTaskWithDeliverable(workflow)"
-                  >
-                    {{ workflow.name }}
-                  </b-dropdown-item>
+                  >{{ workflow.name }}</b-dropdown-item>
                 </b-dropdown>
               </div>
               <div class="col text-right">
-                <button
-                  id="btn-new-event"
-                  class="btn btn-primary"
-                  @click="showCreateModal"
-                >
-                  <i class="uil-plus mr-1"></i>Add New
+                <button id="btn-new-event" class="btn btn-primary" @click="showCreateModal">
+                  <i class="uil-plus mr-1"></i>Add New Task
                 </button>
               </div>
             </div>
@@ -401,7 +410,7 @@ export default {
       </div>
       <!-- end col-12 -->
     </div>
-    <div v-if="loading" class=" d-flex justify-content-center">
+    <div v-if="loading" class="d-flex justify-content-center">
       <b-spinner type="grow" variant="primary"></b-spinner>
     </div>
     <div v-else-if="!loading && tasks.length > 0" class="row">
@@ -409,8 +418,9 @@ export default {
         <div class="board">
           <!-- todo tasks -->
           <div class="tasks border">
-            <h5 class="mt-0 task-header header-title"
-              >Todo <span class="font-size-13">({{ todoTasks.length }})</span>
+            <h5 class="mt-0 task-header header-title">
+              Todo
+              <span class="font-size-13">({{ todoTasks.length }})</span>
             </h5>
 
             <div id="task-list-one" class="task-list-items">
@@ -422,11 +432,7 @@ export default {
               >
                 <transition-group type="transition" :name="'flip-list'">
                   <div v-for="task in todoTasks" :key="task.id">
-                    <Task
-                      :task="task"
-                      @showEditModal="showEditModal"
-                      @deleteTask="deleteTask"
-                    />
+                    <Task :task="task" @showEditModal="showEditModal" @deleteTask="deleteTask" />
                   </div>
                 </transition-group>
               </draggable>
@@ -436,8 +442,8 @@ export default {
 
           <!-- in progress tasks -->
           <div class="tasks border">
-            <h5 class="mt-0 task-header header-title"
-              >In Progress
+            <h5 class="mt-0 task-header header-title">
+              In Progress
               <span class="font-size-13">({{ inProgressTasks.length }})</span>
             </h5>
 
@@ -450,11 +456,7 @@ export default {
               >
                 <transition-group type="transition" :name="'flip-list'">
                   <div v-for="task in inProgressTasks" :key="task.id">
-                    <Task
-                      :task="task"
-                      @showEditModal="showEditModal"
-                      @deleteTask="deleteTask"
-                    />
+                    <Task :task="task" @showEditModal="showEditModal" @deleteTask="deleteTask" />
                   </div>
                 </transition-group>
               </draggable>
@@ -464,8 +466,8 @@ export default {
 
           <!-- review tasks -->
           <div class="tasks border">
-            <h5 class="mt-0 task-header header-title"
-              >Review
+            <h5 class="mt-0 task-header header-title">
+              Review
               <span class="font-size-13">({{ reviewTasks.length }})</span>
             </h5>
 
@@ -478,11 +480,7 @@ export default {
               >
                 <transition-group type="transition" :name="'flip-list'">
                   <div v-for="task in reviewTasks" :key="task.id">
-                    <Task
-                      :task="task"
-                      @showEditModal="showEditModal"
-                      @deleteTask="deleteTask"
-                    />
+                    <Task :task="task" @showEditModal="showEditModal" @deleteTask="deleteTask" />
                   </div>
                 </transition-group>
               </draggable>
@@ -492,8 +490,8 @@ export default {
 
           <!-- done tasks -->
           <div class="tasks border">
-            <h5 class="mt-0 task-header header-title"
-              >Done
+            <h5 class="mt-0 task-header header-title">
+              Done
               <span class="font-size-13">({{ doneTasks.length }})</span>
             </h5>
 
@@ -506,11 +504,7 @@ export default {
               >
                 <transition-group type="transition" :name="'flip-list'">
                   <div v-for="task in doneTasks" :key="task.id">
-                    <Task
-                      :task="task"
-                      @showEditModal="showEditModal"
-                      @deleteTask="deleteTask"
-                    />
+                    <Task :task="task" @showEditModal="showEditModal" @deleteTask="deleteTask" />
                   </div>
                 </transition-group>
               </draggable>
@@ -521,15 +515,8 @@ export default {
       </div>
     </div>
 
-    <div
-      v-else-if="!loading && tasks.length <= 0"
-      class="w-100 d-flex justify-content-center"
-    >
-      <img
-        :src="require('@assets/svgs/empty.svg')"
-        alt="no tasks"
-        style="width:35%"
-      />
+    <div v-else-if="!loading && tasks.length <= 0" class="w-100 d-flex justify-content-center">
+      <img :src="require('@assets/svgs/empty.svg')" alt="no tasks" style="width:35%" />
     </div>
 
     <CreateTaskModal

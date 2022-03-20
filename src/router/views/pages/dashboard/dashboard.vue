@@ -223,6 +223,11 @@ export default {
       selectedDate: [new Date().setDate(new Date().getDate() - 7), new Date()],
     }
   },
+
+  methods: {
+    editEvent() {},
+    dateClicked() {}
+  }
 }
 </script>
 

@@ -28,14 +28,16 @@ export default {
 		return {
 			settings: {
 				minScrollbarLength: 60,
-			},
-			initials: this.$store? this.$store.state.auth.userInitials : '' || ''
+			}
 		}
 	},
 	computed: {
 		...authComputed,
 		isSupervisor() {
 			return this.user.isSupervisor || false;
+		},
+		initials() {
+			return this.$store? this.$store.state.auth.userInitials : '' || '';
 		}
 	}
 }

@@ -54,7 +54,7 @@ export default {
                 if (response) {
                     const item = response.data
                     this.event = item;
-
+                    // this.$refs['fullCalendar'].fullCalendar('gotoDate', item.start_date)
                     const event = {
                         id: item.id,
                         title: `${item.user} (${item.type} Leave)`,
@@ -191,7 +191,6 @@ export default {
                                 :events="calendarEvents"
                                 :weekends="calendarWeekends"
                                 :theme-system="themeSystem"
-                                initial-date="2014-02-01"
                             />
                         </div>
                     </div>

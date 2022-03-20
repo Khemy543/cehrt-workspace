@@ -101,10 +101,12 @@ export default {
       }).then(async ({ isConfirmed, isDenied }) => {
         if (isConfirmed) {
           try {
-            const response = await this.$http.patch(`/restore/trashed/${project.id}/project`);
+            const response = await this.$http.patch(`/restore/trashed/project`,{
+              project_id: project.id
+            });
 
             if (response) {
-              this.projectData = this.projectData.filter((item) => item.id !== project.id);
+              this.projectData = this.projectData.filter(item => item.id !== project.id);
               this.$bvToast.toast('Something happened, Please try again later', {
                 title: 'Error',
                 autoHideDelay: 5000,
@@ -113,6 +115,7 @@ export default {
               })
             }
           } catch (error) {
+            console.log(error)
             this.$bvToast.toast('Something happened, Please try again later', {
               title: 'Error',
               autoHideDelay: 5000,

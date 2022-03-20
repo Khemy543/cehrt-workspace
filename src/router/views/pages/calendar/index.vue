@@ -63,8 +63,45 @@ export default {
   created() {
     this.getDashboardData()
     this.getEvents()
+    this.getLeaveRequests()
   },
   methods: {
+    async getLeaveRequests() {
+      try {
+        const response = await this.$http.get(`/fetch/all/leave/requests`);
+
+        if (response) {
+          const requestedLeaves = response.data.filter(request => request.status !== 'rejected').map((item) => {
+            const colors = {
+              'Sick': 'danger',
+              'Annual': 'primary',
+              'Maternity': 'success',
+              'Compassionate': 'warning',
+              'Others': 'secondary'
+            }
+            const color = item.status === 'pending' ? `text-${colors[item.type]} bg-soft` : 'text-white bg';
+            return {
+              id: item.id,
+              title: `${item.user} (${item.type} Leave) ${item.status}`,
+              editable: true,
+              start: dateFormate(item.start_date),
+              end: dateFormate(item.end_date),
+              reason: item.reason,
+              className: item.type === 'Sick' ? `${color}-danger` : item.type === 'Annual' ? `${color}-primary` : item.type === 'Maternity' ? `${color}-success` : item.type === 'Compassionate' ? `${color}-warning` : `${color}-secondary`
+            }
+          })
+          this.calendarEvents = [...this.calendarEvents, ...requestedLeaves]
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
+    },
     async getEvents() {
       try {
         const response = await this.$http.get(`fetch/events`)
