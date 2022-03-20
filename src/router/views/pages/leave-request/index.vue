@@ -409,7 +409,7 @@ export default {
         </div>
       </div>
     </div>
-    <b-modal v-model="showmodal" title="Add New Event" title-class="text-black font-18" hide-footer>
+    <b-modal v-model="showmodal" title="Leave request" title-class="text-black font-18" hide-footer>
       <form @submit.prevent="handleSubmit">
         <div class="row">
           <div class="col-12">
@@ -475,7 +475,7 @@ export default {
     </b-modal>
 
     <!-- Edit Modal -->
-    <b-modal v-model="eventModal" title="Edit Event" title-class="text-black font-18" hide-footer>
+    <b-modal v-model="eventModal" title="Edit Leave request" title-class="text-black font-18" hide-footer>
       <form @submit.prevent="editEvent">
         <div class="row">
           <div class="col-12">

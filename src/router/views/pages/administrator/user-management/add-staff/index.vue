@@ -90,6 +90,12 @@ export default {
         alternatePhone,
         departments,
         staffId,
+        nameOfNextOfKin,
+        relationshipOfNextOfKin,
+        addressOfNextOfKin,
+        postalAddressOfKin,
+        telNextOfKin,
+        emailNextOfKin
       } = this.finalModel
       try {
         const response = await this.$http.post('/admin/add/staff', {
@@ -109,16 +115,22 @@ export default {
           supervisor_id: Number(supervisor),
           ...(maritalStatus === 'married'
             ? {
-                spouse_name: spouseName,
-                spouse_employer: spouseEmployer,
-                spouse_work_phone: spousePhone,
-              }
+              spouse_name: spouseName,
+              spouse_employer: spouseEmployer,
+              spouse_work_phone: spousePhone,
+            }
             : {}),
           alternative_phone_number: alternatePhone,
           department_ids: this.getIds(departments),
           staff_id: staffId,
           work_location: workLocation,
           work_phone_number: workPhone,
+          next_of_king_name: nameOfNextOfKin,
+          next_of_king_relation: relationshipOfNextOfKin,
+          next_of_king_house_address: addressOfNextOfKin,
+          next_of_king_email: emailNextOfKin,
+          next_of_king_phone_number: telNextOfKin,
+          next_of_king_postal_address: postalAddressOfKin
         })
 
         if (response) {
@@ -127,7 +139,7 @@ export default {
             message: 'Staff created successfully',
             type: 'success',
           })
-          this.$router.push('/user-management/staff')
+          // this.$router.push('/user-management/staff')
         }
       } catch (error) {
         let message = 'Something happend, Please try again later'
@@ -157,28 +169,18 @@ export default {
         <div class="card">
           <div class="card-body">
             <p class="mt-0 mb-1">Enter Staff Information</p>
-            <form-wizard
-              color="#5369f8"
-              error-color="#ff5c75"
-              @on-complete="addStaff"
-            >
+            <form-wizard color="#5369f8" error-color="#ff5c75" @on-complete="addStaff">
               <tab-content
                 title="Personal Information"
                 :before-change="() => validateStep('PersonalIformation')"
               >
-                <PersonalIformation
-                  ref="PersonalIformation"
-                  @on-validate="mergePartialModels"
-                />
+                <PersonalIformation ref="PersonalIformation" @on-validate="mergePartialModels" />
               </tab-content>
               <tab-content
                 title="Work Information"
                 :before-change="() => validateStep('workInformation')"
               >
-                <WorkInformation
-                  ref="workInformation"
-                  @on-validate="mergePartialModels"
-                />
+                <WorkInformation ref="workInformation" @on-validate="mergePartialModels" />
               </tab-content>
               <tab-content title="Finish">
                 <div class="row">
@@ -189,9 +191,7 @@ export default {
                       </h2>
                       <h3 class="mt-0">Add New Staff !</h3>
 
-                      <p class="w-75 mb-2 mx-auto">
-                        Click on the finish button to add staff.
-                      </p>
+                      <p class="w-75 mb-2 mx-auto">Click on the finish button to add staff.</p>
 
                       <!-- <div class="mb-3">
                         <div class="custom-control custom-checkbox">
@@ -204,7 +204,7 @@ export default {
                             >I agree with the Terms and Conditions</label
                           >
                         </div>
-                      </div> -->
+                      </div>-->
                     </div>
                   </div>
                   <!-- end col -->

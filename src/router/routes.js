@@ -103,6 +103,7 @@ const userManagementRoutes = [
   {
     path: '/user-management/staff',
     name: 'User Management',
+    header: 'Activities',
     icon: 'user-plus',
     department: 'Administration',
     meta: { authRequired: true },
@@ -351,7 +352,7 @@ const leaveRequestRoutes = [
     path: '/leave-request',
     name: 'Leave Request',
     meta: { authRequired: true },
-    icon: 'refresh-ccw',
+    icon: 'send',
     department: 'all',
     component: () =>
       lazyLoadView(import('@views/pages/leave-request/index.vue')),
@@ -360,7 +361,7 @@ const leaveRequestRoutes = [
     path: '/requested-leave',
     name: 'Requested Leave',
     meta: { authRequired: true },
-    icon: 'refresh-ccw',
+    icon: 'user-minus',
     department: 'all',
     isSupervisor: true,
     component: () =>
@@ -376,9 +377,9 @@ const leaveRequestRoutes = [
 ]
 
 const appsRoutes = [
-  ...userManagementRoutes,
   ...calendarAppsRoutes,
   ...leaveRequestRoutes,
+  ...userManagementRoutes,
   ...proposalRoutes,
   ...projectAppsRoutes,
   ...adminProjectRoutes,

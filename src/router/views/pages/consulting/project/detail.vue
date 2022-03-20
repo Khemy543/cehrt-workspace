@@ -36,14 +36,75 @@ export default {
       ],
       projectDeliverables: [],
       vDeliverable: {},
-      showProjectDeletionModal: false
+      showProjectDeletionModal: false,
+      comment: "",
+      comments: []
+    }
+  },
+  computed: {
+    initials() {
+      return 'AB'
     }
   },
   created() {
     this.getProjectDetials()
     this.getProjectDeliverables()
+    this.getComments();
   },
   methods: {
+    getInitials(name) {
+      return name
+        .match(/\b(\w)/g)
+        .join('')
+        .toUpperCase()
+    },
+    async getComments() {
+      try {
+        const response = await this.$http.get(`/fetch/project/${this.$route.params.id}/comments`);
+
+        if (response) {
+          this.comments = response.data;
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
+    async sendComment() {
+      try {
+        const response = await this.$http.post(`/add/project/${this.$route.params.id}/comment`, {
+          comment: this.comment
+        });
+
+        if (response) {
+          this.comments.push(response.data.comment);
+          this.comment = ""
+        }
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
     showDeliverable(deliverable) {
       return !this.projectDeliverables.some(
         (item) => item.project_type_deliverable.id === deliverable.id
@@ -80,7 +141,7 @@ export default {
         if (response) {
           this.projectDeliverables = response.data
         }
-      } catch (error) {}
+      } catch (error) { }
     },
     async editProject(form) {
       try {
@@ -218,17 +279,15 @@ export default {
       :project="project"
       @input="show = $event"
     />
-    <div v-if="loading" class=" d-flex justify-content-center">
+    <div v-if="loading" class="d-flex justify-content-center">
       <b-spinner type="grow" variant="primary"></b-spinner>
     </div>
     <div v-else>
-      <div class=" row">
+      <div class="row">
         <div class="col">
           <div class="card">
             <div class="card-body p-0">
-              <div
-                class="card-title border-bottom p-3 mb-0 w-100 d-flex justify-content-between"
-              >
+              <div class="card-title border-bottom p-3 mb-0 w-100 d-flex justify-content-between">
                 <div class="row page-title" style="padding:0">
                   <div class="col-sm-12 col-xl-12">
                     <h4 class="mt-0">
@@ -239,22 +298,17 @@ export default {
                           project.status === 'pending'
                             ? ' badge-danger'
                             : project.status === 'ongoing'
-                            ? 'badge-warning'
-                            : 'badge-success'
+                              ? 'badge-warning'
+                              : 'badge-success'
                         "
-                        >{{ project.status }}</div
-                      >
+                      >{{ project.status }}</div>
                     </h4>
                   </div>
                 </div>
 
                 <div class="col-sm-4 col-xl-6 text-sm-right">
                   <div class="btn-group ml-2 d-none d-sm-inline-block">
-                    <button
-                      type="button"
-                      class="btn btn-soft-primary btn-sm"
-                      @click="show = true"
-                    >
+                    <button type="button" class="btn btn-soft-primary btn-sm" @click="show = true">
                       <i class="uil uil-edit mr-1"></i>Edit
                     </button>
                   </div>
@@ -275,10 +329,7 @@ export default {
                 <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
-                    <feather
-                      type="grid"
-                      class="align-self-center icon-dual icon-lg mr-4"
-                    ></feather>
+                    <feather type="grid" class="align-self-center icon-dual icon-lg mr-4"></feather>
                     <div class="media-body">
                       <h4 class="mt-0 mb-0">{{ project.tasks }}</h4>
                       <span class="text-muted">Total Task</span>
@@ -289,14 +340,13 @@ export default {
                 <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
-                    <feather
-                      type="check-square"
-                      class="align-self-center icon-dual icon-lg mr-4"
-                    ></feather>
+                    <feather type="check-square" class="align-self-center icon-dual icon-lg mr-4"></feather>
                     <div class="media-body">
-                      <h4 class="mt-0 mb-0">{{
-                        project.no_of_completed_tasks
-                      }}</h4>
+                      <h4 class="mt-0 mb-0">
+                        {{
+                          project.no_of_completed_tasks
+                        }}
+                      </h4>
                       <span class="text-muted">Total Tasks Completed</span>
                     </div>
                   </div>
@@ -305,14 +355,13 @@ export default {
                 <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
-                    <feather
-                      type="clock"
-                      class="align-self-center icon-dual icon-lg mr-4"
-                    ></feather>
+                    <feather type="clock" class="align-self-center icon-dual icon-lg mr-4"></feather>
                     <div class="media-body">
-                      <h4 class="mt-0 mb-0">{{
-                        project.no_of_pending_tasks
-                      }}</h4>
+                      <h4 class="mt-0 mb-0">
+                        {{
+                          project.no_of_pending_tasks
+                        }}
+                      </h4>
                       <span class="text-muted">Total Pending Task</span>
                     </div>
                   </div>
@@ -321,10 +370,7 @@ export default {
                 <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
-                    <feather
-                      type="users"
-                      class="align-self-center icon-dual icon-lg mr-4"
-                    ></feather>
+                    <feather type="users" class="align-self-center icon-dual icon-lg mr-4"></feather>
                     <div class="media-body">
                       <h4 class="mt-0 mb-0">{{ project.assignees }}</h4>
                       <span class="text-muted">Total Assignees</span>
@@ -344,20 +390,16 @@ export default {
               <h6 class="mt-0 header-title">About Project</h6>
 
               <div class="text-muted mt-3">
-                <p>
-                  {{ project.description }}
-                </p>
-                <div
-                  class="badge badge-soft-primary font-size-13 font-weight-normal ml-1"
-                  >{{
+                <p>{{ project.description }}</p>
+                <div class="badge badge-soft-primary font-size-13 font-weight-normal ml-1">
+                  {{
                     project.project_sector && project.project_sector.name
-                  }}</div
-                >
+                  }}
+                </div>
 
                 <div
                   class="badge badge-soft-success font-size-13 font-weight-normal ml-1"
-                  >{{ project.project_type && project.project_type.name }}</div
-                >
+                >{{ project.project_type && project.project_type.name }}</div>
 
                 <div class="row">
                   <div class="col-lg-3 col-md-6">
@@ -438,127 +480,40 @@ export default {
             <div class="card-body">
               <b-tabs pills class="navtab-bg">
                 <b-tab title="Discussion" active>
-                  <h5 class="mb-4 pb-1 header-title">Comments (6)</h5>
-                  <div class="media mb-4 font-size-14">
+                  <h5 class="mb-4 pb-1 header-title">Comments ({{ comments.length }})</h5>
+                  <div v-for="com in comments" :key="com.id" class="media mb-4 font-size-14">
                     <div class="mr-3">
                       <a href="#">
-                        <img
-                          class="media-object rounded-circle avatar-sm"
-                          alt
-                          src="@assets/images/users/avatar-2.jpg"
-                        />
+                        <div
+                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center"
+                        >{{ getInitials(com.user) }}</div>
                       </a>
                     </div>
                     <div class="media-body">
-                      <h5 class="mt-0 font-size-15">John Cooks</h5>
+                      <h5 class="mt-0 font-size-15">{{ com.user }}</h5>
                       <p class="text-muted mb-1">
-                        <a href class="text-danger">@Rick Perry</a>
-                        Their separate existence is a myth.
+                       {{com.comment}}
                       </p>
-                      <a href class="text-primary">Reply</a>
                     </div>
                   </div>
-                  <div class="media mb-4 font-size-14">
-                    <div class="mr-3">
-                      <a href="#">
-                        <img
-                          class="media-object rounded-circle avatar-sm"
-                          alt
-                          src="@assets/images/users/avatar-3.jpg"
-                        />
-                      </a>
-                    </div>
-                    <div class="media-body">
-                      <h5 class="mt-0 font-size-15">Jayden Dowie</h5>
-                      <p class="text-muted mb-1">
-                        <a href class="text-danger">@Rick Perry</a>
-                        It will be as simple as occidental in fact be Occidental
-                        will seem like simplified.
-                      </p>
-                      <a href class="text-primary">Reply</a>
 
-                      <div class="media mt-3 font-size-14">
-                        <div class="d-flex mr-3">
-                          <a href="#">
-                            <div
-                              class="avatar-sm font-weight-bold d-inline-block m-1"
-                            >
-                              <span
-                                class="avatar-title rounded-circle bg-soft-primary text-primary"
-                                >R</span
-                              >
-                            </div>
-                          </a>
-                        </div>
-                        <div class="media-body">
-                          <h5 class="mt-0 font-size-15">Ray Roberts</h5>
-                          <p class="text-muted mb-0">
-                            <a href class="text-danger">@Rick Perry</a>
-                            Cras sit amet nibh libero.
-                          </p>
-                          <a href class="text-primary">Reply</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="media mb-4 font-size-14">
-                    <div class="mr-3">
-                      <a href="#">
-                        <img
-                          class="media-object rounded-circle avatar-sm"
-                          alt
-                          src="@assets/images/users/avatar-2.jpg"
-                        />
-                      </a>
-                    </div>
-                    <div class="media-body">
-                      <h5 class="mt-0 font-size-15">John Cooks</h5>
-                      <p class="text-muted">
-                        <a href class="text-danger">@Rick Perry</a>
-                        Itaque earum rerum hic
-                      </p>
-                      <div class="p-2 border rounded mb-2">
-                        <div class="media">
-                          <div class="avatar-sm font-weight-bold mr-3">
-                            <span
-                              class="avatar-title rounded bg-soft-primary text-primary"
-                            >
-                              <i class="uil-file-plus-alt font-size-18"></i>
-                            </span>
-                          </div>
-                          <div class="media-body">
-                            <a href="#" class="d-inline-block mt-2">
-                              Landing 1.psd
-                            </a>
-                          </div>
-                          <div class="float-right mt-1">
-                            <a href="#" class="p-2">
-                              <i class="uil-download-alt font-size-18"></i>
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                      <a href class="text-primary">Reply</a>
-                    </div>
-                  </div>
-                  <div class="media">
+                  <form class="media" @submit.prevent="sendComment">
                     <div class="d-flex mr-3">
                       <a href="#">
-                        <img
-                          class="media-object rounded-circle avatar-sm"
-                          alt
-                          src="@assets/images/users/avatar-1.jpg"
-                        />
+                        <div
+                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center"
+                        >{{ initials }}</div>
                       </a>
                     </div>
                     <div class="media-body">
                       <input
+                        v-model="comment"
                         type="text"
                         class="form-control input-sm"
                         placeholder="Some text value..."
                       />
                     </div>
-                  </div>
+                  </form>
                 </b-tab>
                 <b-tab title="Files/Resources">
                   <h5 class="mb-3 header-title">Attached Files</h5>
@@ -566,16 +521,12 @@ export default {
                     <div class="p-2 border rounded mb-3">
                       <div class="media">
                         <div class="avatar-sm font-weight-bold mr-3">
-                          <span
-                            class="avatar-title rounded bg-soft-primary text-primary"
-                          >
+                          <span class="avatar-title rounded bg-soft-primary text-primary">
                             <i class="uil-file-plus-alt font-size-18"></i>
                           </span>
                         </div>
                         <div class="media-body">
-                          <a href="#" class="d-inline-block mt-2">
-                            Landing 1.psd
-                          </a>
+                          <a href="#" class="d-inline-block mt-2">Landing 1.psd</a>
                         </div>
                         <div class="float-right mt-1">
                           <a href="#" class="p-2">
@@ -587,16 +538,12 @@ export default {
                     <div class="p-2 border rounded mb-3">
                       <div class="media">
                         <div class="avatar-sm font-weight-bold mr-3">
-                          <span
-                            class="avatar-title rounded bg-soft-primary text-primary"
-                          >
+                          <span class="avatar-title rounded bg-soft-primary text-primary">
                             <i class="uil-file-plus-alt font-size-18"></i>
                           </span>
                         </div>
                         <div class="media-body">
-                          <a href="#" class="d-inline-block mt-2">
-                            Landing 2.psd
-                          </a>
+                          <a href="#" class="d-inline-block mt-2">Landing 2.psd</a>
                         </div>
                         <div class="float-right mt-1">
                           <a href="#" class="p-2">
@@ -609,25 +556,13 @@ export default {
                     <div class="p-2 border rounded mb-3">
                       <div>
                         <a href="#" class="d-inline-block m-1">
-                          <img
-                            src="@assets/images/small/img-2.jpg"
-                            alt
-                            class="avatar-lg rounded"
-                          />
+                          <img src="@assets/images/small/img-2.jpg" alt class="avatar-lg rounded" />
                         </a>
                         <a href="#" class="d-inline-block m-1">
-                          <img
-                            src="@assets/images/small/img-3.jpg"
-                            alt
-                            class="avatar-lg rounded"
-                          />
+                          <img src="@assets/images/small/img-3.jpg" alt class="avatar-lg rounded" />
                         </a>
                         <a href="#" class="d-inline-block m-1">
-                          <img
-                            src="@assets/images/small/img-4.jpg"
-                            alt
-                            class="avatar-lg rounded"
-                          />
+                          <img src="@assets/images/small/img-4.jpg" alt class="avatar-lg rounded" />
                         </a>
                       </div>
                     </div>
@@ -635,9 +570,7 @@ export default {
                     <div class="p-2 border rounded mb-3">
                       <div class="media">
                         <div class="avatar-sm font-weight-bold mr-3">
-                          <span
-                            class="avatar-title rounded bg-soft-primary text-primary"
-                          >
+                          <span class="avatar-title rounded bg-soft-primary text-primary">
                             <i class="uil-file-plus-alt font-size-18"></i>
                           </span>
                         </div>
@@ -654,18 +587,10 @@ export default {
                     <div class="p-2 border rounded mb-3">
                       <div>
                         <a href="#" class="d-inline-block m-1">
-                          <img
-                            src="@assets/images/small/img-7.jpg"
-                            alt
-                            class="avatar-lg rounded"
-                          />
+                          <img src="@assets/images/small/img-7.jpg" alt class="avatar-lg rounded" />
                         </a>
                         <a href="#" class="d-inline-block m-1">
-                          <img
-                            src="@assets/images/small/img-6.jpg"
-                            alt
-                            class="avatar-lg rounded"
-                          />
+                          <img src="@assets/images/small/img-6.jpg" alt class="avatar-lg rounded" />
                         </a>
                       </div>
                     </div>
@@ -673,16 +598,12 @@ export default {
                     <div class="p-2 border rounded mb-3">
                       <div class="media">
                         <div class="avatar-sm font-weight-bold mr-3">
-                          <span
-                            class="avatar-title rounded bg-soft-primary text-primary"
-                          >
+                          <span class="avatar-title rounded bg-soft-primary text-primary">
                             <i class="uil-file-plus-alt font-size-18"></i>
                           </span>
                         </div>
                         <div class="media-body">
-                          <a href="#" class="d-inline-block mt-2"
-                            >Clients.psd</a
-                          >
+                          <a href="#" class="d-inline-block mt-2">Clients.psd</a>
                         </div>
                         <div class="float-right mt-1">
                           <a href="#" class="p-2">
@@ -716,14 +637,15 @@ export default {
                             `/project/${$route.params.id}/deliverable/${deliverable.id}`
                           "
                           class="text-dark"
-                          >{{
+                        >
+                          {{
                             deliverable.project_type_deliverable &&
                               deliverable.project_type_deliverable
                                 .deliverable_name
-                          }}</router-link
-                        >
+                          }}
+                        </router-link>
                       </h5>
-                      <div class=" d-flex justify-content-between">
+                      <div class="d-flex justify-content-between">
                         <div>
                           <a
                             :id="`task-tooltip-${deliverable.id}`"
@@ -734,8 +656,7 @@ export default {
                               :target="`task-tooltip-${deliverable.id}`"
                               triggers="hover"
                               placement="top"
-                              >Tasks</b-tooltip
-                            >
+                            >Tasks</b-tooltip>
                             <i class="uil uil-bars mr-1"></i>
                             {{ deliverable.task || 0 }} task(s)
                           </a>
@@ -743,17 +664,11 @@ export default {
                       </div>
                     </div>
                     <div class="d-flex">
-                      <button
-                        type="button"
-                        class="btn btn-soft-secondary btn-sm"
-                      >
+                      <button type="button" class="btn btn-soft-secondary btn-sm">
                         <i class="uil uil-edit"></i>
                       </button>
 
-                      <button
-                        type="button"
-                        class="btn btn-soft-danger ml-2 btn-sm"
-                      >
+                      <button type="button" class="btn btn-soft-danger ml-2 btn-sm">
                         <i class="uil uil-trash-alt"></i>
                       </button>
                     </div>
@@ -761,16 +676,18 @@ export default {
                 </li>
                 <li
                   v-for="deliver in project.project_type &&
-                    project.project_type.deliverables"
+                  project.project_type.deliverables"
                   :key="deliver.name"
                 >
                   <div v-if="showDeliverable(deliver)" class="activity-list">
                     <div class="media d-flex justify-content-between">
                       <div class="media-body overflow-hidden">
                         <h5 class="font-size-15 mt-2 mb-1">
-                          <div class="text-dark">{{
-                            deliver.deliverable_name
-                          }}</div>
+                          <div class="text-dark">
+                            {{
+                              deliver.deliverable_name
+                            }}
+                          </div>
                         </h5>
                       </div>
                       <button
@@ -797,7 +714,7 @@ export default {
       @input="showCreateDeliverable = $event"
     />
 
-    <ProjectDeletionModal 
+    <ProjectDeletionModal
       :close="() => showProjectDeletionModal = false"
       :value="showProjectDeletionModal"
       @input="showProjectDeletionModal = $event"
