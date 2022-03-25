@@ -3,7 +3,7 @@ export default {
   props: {
     user: {
       type: Object,
-      default: () => {}
+      default: () => { }
     },
     initials: {
       type: String,
@@ -20,22 +20,16 @@ export default {
 					src="@assets/images/users/avatar-7.jpg"
 					alt
 					class="avatar-lg rounded-circle"
-				/> -->
-        <div class=" w-100 d-flex justify-content-center">
+        />-->
+        <div class="w-100 d-flex justify-content-center">
           <div
             style="width:60px; height:60px; border-radius:100px;"
             class="mr-2 d-flex align-items-center justify-content-center bg-primary text-white font-weight-bold"
-          >
-            {{ initials }}
-          </div>
+          >{{ initials }}</div>
         </div>
         <h5 class="mt-2 mb-0">{{ user.firstname }} {{ user.lastname }} {{ user.other_names }}</h5>
-        <h6 class="text-muted font-weight-normal mt-2 mb-0"
-          >Staff Identification Number</h6
-        >
-        <h6 class="font-weight-normal mt-1 mb-4"
-          >{{ user.staff_id }}</h6
-        >
+        <h6 class="text-muted font-weight-normal mt-2 mb-0">Staff Identification Number</h6>
+        <h6 class="font-weight-normal mt-1 mb-4">{{ user.staff_id }}</h6>
       </div>
 
       <!-- profile  -->
@@ -52,19 +46,21 @@ export default {
                 <th scope="row">Phone</th>
                 <td>{{ user.phone_number }}</td>
               </tr>
-			  <tr v-if="user.alternate_phone">
+              <tr v-if="user.alternate_phone">
                 <th scope="row">Work Phone</th>
                 <td>{{ user.phone_number }}</td>
               </tr>
-			  <tr>
+              <tr>
                 <th scope="row">Work Phone</th>
                 <td>{{ user.phone_number }}</td>
               </tr>
               <tr>
                 <th scope="row">Address</th>
-                <td>
-                  {{ user.address }}
-                </td>
+                <td>{{ user.address }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Rate</th>
+                <td>{{ user.rate_currency }} {{ Number(user.rate).toFixed(2) }}</td>
               </tr>
             </tbody>
           </table>
@@ -72,7 +68,11 @@ export default {
       </div>
       <div class="mt-3 pt-2 border-top">
         <h4 class="mb-3 font-size-15">Department</h4>
-        <label v-for="department in user.departments" :key="department.id" class="badge badge-soft-primary">{{ department.name }}</label>
+        <label
+          v-for="department in user.departments"
+          :key="department.id"
+          class="badge badge-soft-primary mr-2"
+        >{{ department.name }}</label>
       </div>
     </div>
   </div>
