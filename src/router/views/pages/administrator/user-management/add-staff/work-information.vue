@@ -13,17 +13,54 @@ export default {
       workLocation: '',
       workPhone: '',
       startDate: '',
-      departments: null,
+      departments: [],
       departmentsOptions: [],
       staffOptions: [],
+      roles: [],
       staffId: null,
       rate: "",
-      rateCurrency: ''
+      rateCurrency: '',
+      consultingRoleId: '',
+      adminRoleId: '',
+      financeRoleId: ''
+    }
+  },
+  computed: {
+    adiminId() {
+      const roles = this.departmentsOptions.find(item => item.name === 'Administration');
+      return roles && roles.id || null;
+    },
+    consultingId() {
+      const roles = this.departmentsOptions.find(item => item.name === 'Consultancy');
+      return roles && roles.id || null;
+    },
+    financeId() {
+      const roles = this.departmentsOptions.find(item => item.name === 'Finance');
+      return roles && roles.id || null;
+    },
+    adminRoles() {
+      return this.roles.filter(role => role.department_id === this.adiminId);
+    },
+    consultingRoles() {
+      return this.roles.filter(role => role.department_id === this.consultingId);
+    },
+    financeRoles() {
+      return this.roles.filter(role => role.department_id === this.financeId)
+    },
+    showFinaceRole() {
+      return this.departments.some(item => item.id === this.financeId);
+    },
+    showAdminRole() {
+      return this.departments.some(item => item.id === this.adiminId);
+    },
+    showConsultingRole() {
+      return this.departments.some(item => item.id === this.consultingId)
     }
   },
   created() {
     this.fetchDepartments();
     this.fetchSuperviosrs()
+    this.fetchRoles();
   },
   validations: {
     title: {
@@ -53,8 +90,17 @@ export default {
     rateCurrency: {
       required: false
     },
+    consultingRoleId: {
+      required: false
+    },
+    adminRoleId: {
+      required: false
+    },
+    financeRoleId: {
+      required: false
+    },
 
-    form: ['title', 'supervisor', 'workLocation', 'workPhone', 'startDate', 'departments', 'staffId', 'rate', 'rateCurrency'],
+    form: ['title', 'supervisor', 'workLocation', 'workPhone', 'startDate', 'departments', 'staffId', 'rate', 'rateCurrency', 'consultingRoleId', 'adminRoleId', 'financeRoleId'],
   },
   methods: {
     async fetchDepartments() {
@@ -79,6 +125,17 @@ export default {
 
       }
     },
+    async fetchRoles() {
+      try {
+        const response = await this.$http.get('/admin/department/positions');
+
+        if (response) {
+          this.roles = response.data;
+        }
+      } catch (error) {
+
+      }
+    },
     validate() {
       this.$v.form.$touch()
       var isValid = !this.$v.form.$invalid
@@ -94,7 +151,7 @@ export default {
     <div class="row">
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.title.$error }">
-          <label class="col-md-3 col-form-label">Title</label>
+          <label class="col-md-12 col-form-label">Title</label>
           <div class="col-md-12">
             <multiselect
               v-model="title"
@@ -109,7 +166,7 @@ export default {
       </div>
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.departments.$error }">
-          <label class="col-md-3 col-form-label">Deparatments</label>
+          <label class="col-md-12 col-form-label">Deparatments</label>
           <div class="col-md-12">
             <multiselect
               v-model="departments"
@@ -126,11 +183,58 @@ export default {
         </div>
       </div>
     </div>
+    <div class="row">
+      <div  v-if="showConsultingRole" class="col-md-6">
+        <div class="form-group mb-3">
+          <label class="col-md-12 col-form-label">Consulting Role</label>
+          <div class="col-md-12">
+            <select v-model.trim="consultingRoleId" class="form-control">
+              <option disabled value>Select Consulting Role</option>
+              <option
+                v-for="option in consultingRoles"
+                :key="option.id"
+                :value="option.id"
+              >{{ option.name }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
 
+      <div v-if="showAdminRole" class="col-md-6">
+        <div class="form-group mb-3">
+          <label class="col-md-12 col-form-label">Adminstration Role</label>
+          <div class="col-md-12">
+            <select v-model.trim="adminRoleId" class="form-control">
+              <option disabled value>Select Adminstration Role</option>
+              <option
+                v-for="option in adminRoles"
+                :key="option.id"
+                :value="option.id"
+              >{{ option.name }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div  v-if="showFinaceRole" class="col-md-6">
+        <div class="form-group mb-3">
+          <label class="col-md-12 col-form-label">Finance Role</label>
+          <div class="col-md-12">
+            <select v-model.trim="financeRoleId" class="form-control">
+              <option disabled value>Select Finance Role</option>
+              <option
+                v-for="option in financeRoles"
+                :key="option.id"
+                :value="option.id"
+              >{{ option.name }}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="row">
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.supervisor.$error }">
-          <label class="col-md-3 col-form-label">Supervisor</label>
+          <label class="col-md-12 col-form-label">Supervisor</label>
           <div class="col-md-12">
             <select
               v-model.trim="supervisor"
@@ -227,7 +331,7 @@ export default {
         </div>
       </div>
     </div>
-    <div class="row">
+    <div  v-if="showConsultingRole" class="row">
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.rate.$error }">
           <label class="col-md-12 col-form-label">Staff Rate</label>

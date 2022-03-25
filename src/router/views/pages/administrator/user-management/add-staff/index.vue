@@ -58,6 +58,17 @@ export default {
     getIds(departments) {
       return departments.map((items) => items.id)
     },
+    getRoleIds(roles) {
+      const newRoles = [];
+
+      roles.forEach(role => {
+        if(role) {
+          newRoles.push(role)
+        }
+      });
+      
+      return newRoles;
+    },
     makeToast({ title, message, type }) {
       this.$bvToast.toast(message, {
         title,
@@ -95,7 +106,12 @@ export default {
         addressOfNextOfKin,
         postalAddressOfKin,
         telNextOfKin,
-        emailNextOfKin
+        emailNextOfKin,
+        rate,
+        rateCurrency,
+        consultingRoleId,
+        adminRoleId,
+        financeRoleId
       } = this.finalModel
       try {
         const response = await this.$http.post('/admin/add/staff', {
@@ -130,7 +146,10 @@ export default {
           next_of_king_house_address: addressOfNextOfKin,
           next_of_king_email: emailNextOfKin,
           next_of_king_phone_number: telNextOfKin,
-          next_of_king_postal_address: postalAddressOfKin
+          next_of_king_postal_address: postalAddressOfKin,
+          rate: rate,
+          rate_currency: rateCurrency,
+          position_ids: this.getRoleIds([consultingRoleId, adminRoleId, financeRoleId])
         })
 
         if (response) {
@@ -139,7 +158,8 @@ export default {
             message: 'Staff created successfully',
             type: 'success',
           })
-          // this.$router.push('/user-management/staff')
+        
+        this.$router.push('/user-management/staff')
         }
       } catch (error) {
         let message = 'Something happend, Please try again later'

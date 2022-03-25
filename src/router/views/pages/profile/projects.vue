@@ -19,7 +19,7 @@ export default {
 			<div
 				v-for="project in projects"
 				:key="project.id"
-				class="col-xl-4 col-lg-6"
+				class="col-md-6"
 			>
 				<div class="card border">
 					<div class="card-body">
