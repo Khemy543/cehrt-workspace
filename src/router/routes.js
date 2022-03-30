@@ -287,6 +287,14 @@ const projectAppsRoutes = [
       lazyLoadView(import('@views/pages/consulting/project/detail')),
   },
   {
+    path: '/project/:id/project-plan',
+    name: 'Project Plan',
+
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/project/project-plan')),
+  },
+  {
     path: '/project/:project_id/deliverable/:deliverable_id',
     name: 'Task List',
 

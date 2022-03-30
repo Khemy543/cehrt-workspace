@@ -307,7 +307,7 @@ export default {
                 </div>
 
                 <div class="col-sm-4 col-xl-6 text-sm-right">
-                  <router-link to="" class="btn-group ml-2 d-none d-sm-inline-block">
+                  <router-link :to="`/project/${project.id}/project-plan`" class="btn-group ml-2 d-none d-sm-inline-block">
                     <button type="button" class="btn btn-soft-info btn-sm">
                       <i class="uil uil-edit mr-1"></i>View Project Plan
                     </button>
