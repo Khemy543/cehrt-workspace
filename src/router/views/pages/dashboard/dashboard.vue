@@ -163,29 +163,29 @@ export default {
       ],
       statChart: [
         {
-          mainTitle: 'today revenue',
+          mainTitle: 'Total Task Assigned',
           value: 2100,
           subValue: '10.21%',
           chartColor: '#5369f8',
         },
         {
-          mainTitle: 'product sold',
+          mainTitle: 'completed Task',
           value: 1065,
           subValue: '5.05%',
           chartColor: '#f77e53',
         },
         {
-          mainTitle: 'New customers',
+          mainTitle: 'Pending Task',
           value: 11,
           subValue: '25.16%',
           chartColor: '#43d39e',
         },
-        {
+       /*  {
           mainTitle: 'new visitors',
           value: 750,
           subValue: '5.05%',
           chartColor: '#ffbe0b',
-        },
+        }, */
       ],
       chatMessages: [
         {
@@ -247,7 +247,7 @@ export default {
               name="date"
             ></flat-pickr>
           </div>
-          <div class="btn-group">
+          <!-- <div class="btn-group">
             <b-dropdown variant="primary" right>
               <template v-slot:button-content>
                 <i class="uil uil-file-alt mr-1"></i>Download
@@ -278,7 +278,7 @@ export default {
                 <span>Re-Generate</span>
               </b-dropdown-item>
             </b-dropdown>
-          </div>
+          </div> -->
         </form>
       </div>
     </div>
@@ -287,7 +287,7 @@ export default {
       <div
         v-for="stat of statChart"
         :key="stat.mainTitle"
-        class="col-md-6 col-xl-3"
+        class="col-md-6 col-xl-4"
       >
         <StatChart
           :main-title="stat.mainTitle"
@@ -364,6 +364,8 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="app-calendar">
+              <div style="height: 60vh; overflow:scroll;" >
+
               <FullCalendar
                 ref="fullCalendar"
                 default-view="dayGridMonth"
@@ -391,6 +393,7 @@ export default {
                 @dateClick="dateClicked"
                 @eventClick="editEvent"
               />
+              </div>
             </div>
           </div>
         </div>
@@ -414,27 +417,74 @@ export default {
       <div class="col-xl-12">
         <div class="card">
           <div class="card-body">
-            <a
+            <!-- <a
               href="javascript: void(0);"
               class="btn btn-primary btn-sm float-right"
             >
               <i class="uil uil-export ml-1"></i> Export
-            </a>
-            <h5 class="card-title mt-0 mb-0 header-title">Recent Orders</h5>
+            </a> -->
+            <h5 class="card-title mt-0 mb-0 header-title">Projects</h5>
             <div class="table-responsive mt-4 mb-0">
               <b-table-simple class="table table-hover table-nowrap mb-0">
                 <b-thead class="thead-white">
                   <b-tr>
                     <b-th>#</b-th>
-                    <b-th>Product</b-th>
-                    <b-th>Customer</b-th>
-                    <b-th>Price</b-th>
+                    <b-th>Product Name</b-th>
+                    <b-th>Client</b-th>
+                    <b-th>Project Type</b-th>
                     <b-th>Status</b-th>
                   </b-tr>
                 </b-thead>
                 <b-tbody>
-                  <b-tr v-for="order in ordersData" :key="order.name">
-                    <b-td>{{ order.id }}</b-td>
+                  <b-tr v-for="(order, index) in ordersData" :key="order.name">
+                    <b-td>{{ index + 1 }}</b-td>
+                    <b-td>{{ order.product }}</b-td>
+                    <b-td>{{ order.name }}</b-td>
+                    <b-td>{{ order.price }}</b-td>
+                    <b-td>
+                      <span
+                        class="badge"
+                        :class="{
+                          'badge-soft-warning': `${order.status}` === 'Pending',
+                          'badge-soft-success':
+                            `${order.status}` === 'Delivered',
+                          'badge-soft-danger': `${order.status}` === 'Declined',
+                        }"
+                        >{{ order.status }}</span
+                      >
+                    </b-td>
+                  </b-tr>
+                </b-tbody>
+              </b-table-simple>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-xl-12">
+        <div class="card">
+          <div class="card-body">
+            <!-- <a
+              href="javascript: void(0);"
+              class="btn btn-primary btn-sm float-right"
+            >
+              <i class="uil uil-export ml-1"></i> Export
+            </a> -->
+            <h5 class="card-title mt-0 mb-0 header-title">Proposals</h5>
+            <div class="table-responsive mt-4 mb-0">
+              <b-table-simple class="table table-hover table-nowrap mb-0">
+                <b-thead class="thead-white">
+                  <b-tr>
+                    <b-th>#</b-th>
+                    <b-th>Product Name</b-th>
+                    <b-th>Client</b-th>
+                    <b-th>Project Type</b-th>
+                    <b-th>Status</b-th>
+                  </b-tr>
+                </b-thead>
+                <b-tbody>
+                  <b-tr v-for="(order, index) in ordersData" :key="order.name">
+                    <b-td>{{ index + 1 }}</b-td>
                     <b-td>{{ order.product }}</b-td>
                     <b-td>{{ order.name }}</b-td>
                     <b-td>{{ order.price }}</b-td>
