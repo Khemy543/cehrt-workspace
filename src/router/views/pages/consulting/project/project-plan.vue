@@ -34,6 +34,11 @@ export default {
     computed: {
         projectDeliverable() {
             return this.project.deliverable || []
+        },
+        department() {
+            return this.$store
+                ? this.$store.state.auth.userDepartment
+                : {} || {}
         }
     },
     created() {
@@ -60,9 +65,35 @@ export default {
         },
 
         getAmount(days, rate, currency) {
-            console.log(days, rate, currency)
+            console.log(days, rate)
             return (Number(days) * Number(rate)).toFixed(2)
-        }
+        },
+
+        getConsultingRole(roles) {
+            return roles && roles.find(item => item.department_id === this.department.id) || {};
+        },
+        async saveDetails(task) {
+            const tempTask = { ...task, amount: task.rate * task.allocated_days }
+
+            try {
+                const response = await this.$http.put(`/update/${task.id}/task`, tempTask);
+
+                if (response) {
+
+                }
+            } catch (error) {
+                this.$bvToast.toast('Something happened, Please try again later', {
+                    title: 'Error',
+                    autoHideDelay: 5000,
+                    appendToast: false,
+                    variant: 'danger',
+                })
+            }
+        },
+/* 
+        getToal() {
+            return 
+        } */
     }
 }
 </script>
@@ -116,26 +147,45 @@ export default {
                                                     v-for="(task, index) in deliverable.tasks"
                                                     :key="task.id"
                                                 >
-                                                    <th scope="row">{{ index + 1}}</th>
+                                                    <th scope="row">{{ index + 1 }}</th>
                                                     <td>{{ task.name }}</td>
                                                     <td>{{ task.assignee || 'N/A' }}</td>
                                                     <td>
                                                         <div style="width:100px;">
                                                             <b-form-input
                                                                 v-model="task.allocated_days"
-                                                                :disabled="!task.rate"
                                                                 type="number"
                                                                 placeholder="0"
                                                                 required
+                                                                @blur="saveDetails(task)"
                                                             ></b-form-input>
                                                         </div>
                                                     </td>
-                                                    <td>{{ task.rate_currency }} {{ task.rate || 'N/A'}}</td>
-                                                    <td>{{ task.amount ? task.amount : getAmount(task.allocated_days, task.rate, task.ExtractRawComponents) }}</td>
+                                                    <td
+                                                        v-if="getConsultingRole(task.assignee_position).name === 'External Consultant'"
+                                                    >
+                                                        <div style="width:100px;">
+                                                            {{ task.rate_currency }}
+                                                            <b-form-input
+                                                                v-model="task.rate"
+                                                                type="number"
+                                                                placeholder="0"
+                                                                required
+                                                                @blur="saveDetails(task)"
+                                                            ></b-form-input>
+                                                        </div>
+                                                    </td>
+                                                    <td v-else>{{ task.rate || 'N/A' }}</td>
+
+                                                    <td>{{ getAmount(task.allocated_days, task.rate, task.ExtractRawComponents) }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
+                                </div>
+
+                                <div>
+                                    <h4>Project Total: {{ getTotal }}</h4>
                                 </div>
                             </div>
                         </div>

@@ -51,6 +51,12 @@ export default {
           this.loading = false
         }
       } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
       }
     },
     closeModal() {

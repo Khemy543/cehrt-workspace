@@ -21,11 +21,7 @@ export default {
       title: 'Calendar',
       items: [
         {
-          text: 'Shreyu',
-          href: '/',
-        },
-        {
-          text: 'Apps',
+          text: 'Cehrt',
           href: '/',
         },
         {
@@ -381,14 +377,34 @@ export default {
                     new event by clicking on "Create New event" button or any
                     cell available in calendar below.
                   </p>
+                  <div class="d-flex justify-content-between">
+                    <b-dropdown
+                      class="d-inline"
+                      variant="link"
+                      toggle-class="font-weight-bold p-0 align-middle"
+                    >
+                      <template v-slot:button-content>
+                        <button id="btn-new-event" class="btn btn-primary mt-2 mr-1">
+                          Me
+                          <i class="uil uil-angle-down font-size-16 align-middle"></i>
+                        </button>
+                      </template>
+                      <b-dropdown-item
+                        href="javascript: void(0);"
+                        variant="seconday"
+                      >Gideon Assafuah</b-dropdown-item>
+                      <b-dropdown-item href="javascript: void(0);" variant="seconday">Mamphey Kwakye</b-dropdown-item>
+                      <b-dropdown-item href="javascript: void(0);" variant="seconday">Edem Ahadzi</b-dropdown-item>
+                    </b-dropdown>
 
-                  <button
-                    id="btn-new-event"
-                    class="btn btn-primary mt-2 mr-1"
-                    @click="showmodal = true"
-                  >
-                    <i class="uil-plus-circle"></i> Create New Event
-                  </button>
+                    <button
+                      id="btn-new-event"
+                      class="btn btn-danger mt-2 mr-1"
+                      @click="showmodal = true"
+                    >
+                      <i class="uil-plus-circle"></i> Create New Event
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

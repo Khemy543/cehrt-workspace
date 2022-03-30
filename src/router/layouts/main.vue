@@ -10,9 +10,6 @@ export default {
     return {
       isMenuCondensed: false,
       isMobileMenuOpened: false,
-      department: this.$store
-        ? this.$store.state.auth.userDepartment
-        : {} || {},
       form: {},
     }
   },
@@ -23,6 +20,11 @@ export default {
     },
     show() {
       return this.user.must_change_password ? this.user.must_change_password === 1 : false
+    },
+    department(){
+        return this.$store
+        ? this.$store.state.auth.userDepartment
+        : {} || {}
     }
   },
   created: () => {
