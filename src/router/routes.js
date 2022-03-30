@@ -384,6 +384,19 @@ const leaveRequestRoutes = [
   },
 ]
 
+const trainingRouts = [
+  {
+    path: '/trainings',
+    name: 'Trainings',
+    meta: { authRequired: true },
+    icon: 'award',
+    department: 'all',
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/trainings/index.vue')),
+  },
+]
+
+
 const appsRoutes = [
   ...calendarAppsRoutes,
   ...leaveRequestRoutes,
@@ -392,6 +405,7 @@ const appsRoutes = [
   ...projectAppsRoutes,
   ...adminProjectRoutes,
   ...recycleRoutes,
+  ...trainingRouts,
 ]
 
 // pages

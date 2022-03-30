@@ -163,29 +163,34 @@ export default {
       ],
       statChart: [
         {
+          mainTitle: 'Projects',
+          value: 2,
+          subValue: '5.05%',
+          chartColor: '#ffbe0b',
+          icon: "briefcase"
+        },
+        {
           mainTitle: 'Total Task Assigned',
-          value: 2100,
+          value: 21,
           subValue: '10.21%',
           chartColor: '#5369f8',
+          icon: "grid"
         },
         {
           mainTitle: 'completed Task',
-          value: 1065,
+          value: 10,
           subValue: '5.05%',
           chartColor: '#f77e53',
+          icon: "check-square"
         },
         {
           mainTitle: 'Pending Task',
           value: 11,
           subValue: '25.16%',
           chartColor: '#43d39e',
+          icon: "clock"
         },
-       /*  {
-          mainTitle: 'new visitors',
-          value: 750,
-          subValue: '5.05%',
-          chartColor: '#ffbe0b',
-        }, */
+
       ],
       chatMessages: [
         {
@@ -221,12 +226,36 @@ export default {
         mode: 'range',
       },
       selectedDate: [new Date().setDate(new Date().getDate() - 7), new Date()],
+      projectData: [],
     }
   },
 
+  created() {
+    this.getProjects();
+  },
+
   methods: {
-    editEvent() {},
-    dateClicked() {}
+    editEvent() { },
+    dateClicked() { },
+    async getProjects(link) {
+      try {
+        const response = await this.$http.get(link || '/fetch/projects')
+
+        if (response) {
+          const { data, links } = response.data
+          this.projectData = [...this.projectData, ...data]
+          this.links = links
+          this.loading = false
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
   }
 }
 </script>
@@ -278,22 +307,19 @@ export default {
                 <span>Re-Generate</span>
               </b-dropdown-item>
             </b-dropdown>
-          </div> -->
+          </div>-->
         </form>
       </div>
     </div>
 
     <div class="row">
-      <div
-        v-for="stat of statChart"
-        :key="stat.mainTitle"
-        class="col-md-6 col-xl-4"
-      >
+      <div v-for="stat of statChart" :key="stat.mainTitle" class="col-md-6 col-xl-3">
         <StatChart
           :main-title="stat.mainTitle"
           :value="stat.value"
           :sub-value="stat.subValue"
           :chart-color="stat.chartColor"
+          :icon="stat.icon"
         />
       </div>
     </div>
@@ -357,42 +383,41 @@ export default {
 					</div>
 				</div>
 			</div>
-		</div> -->
+    </div>-->
 
     <div class="row">
       <div class="col-xl-12">
         <div class="card">
           <div class="card-body">
             <div class="app-calendar">
-              <div style="height: 60vh; overflow:scroll;" >
-
-              <FullCalendar
-                ref="fullCalendar"
-                default-view="dayGridMonth"
-                :header="{
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                }"
-                :button-text="{
-                  today: 'Today',
-                  month: 'Month',
-                  week: 'Week',
-                  day: 'Day',
-                  list: 'List',
-                  prev: 'Prev',
-                  next: 'Next',
-                }"
-                :bootstrap-font-awesome="false"
-                :editable="true"
-                :droppable="true"
-                :plugins="calendarPlugins"
-                :events="calendarEvents"
-                :weekends="calendarWeekends"
-                :theme-system="themeSystem"
-                @dateClick="dateClicked"
-                @eventClick="editEvent"
-              />
+              <div style="height: 60vh; overflow:scroll;">
+                <FullCalendar
+                  ref="fullCalendar"
+                  default-view="dayGridMonth"
+                  :header="{
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+                  }"
+                  :button-text="{
+                    today: 'Today',
+                    month: 'Month',
+                    week: 'Week',
+                    day: 'Day',
+                    list: 'List',
+                    prev: 'Prev',
+                    next: 'Next',
+                  }"
+                  :bootstrap-font-awesome="false"
+                  :editable="true"
+                  :droppable="true"
+                  :plugins="calendarPlugins"
+                  :events="calendarEvents"
+                  :weekends="calendarWeekends"
+                  :theme-system="themeSystem"
+                  @dateClick="dateClicked"
+                  @eventClick="editEvent"
+                />
               </div>
             </div>
           </div>
@@ -413,7 +438,7 @@ export default {
 						></apexchart>
 					</div>
 				</div>
-			</div> -->
+      </div>-->
       <div class="col-xl-12">
         <div class="card">
           <div class="card-body">
@@ -422,7 +447,7 @@ export default {
               class="btn btn-primary btn-sm float-right"
             >
               <i class="uil uil-export ml-1"></i> Export
-            </a> -->
+            </a>-->
             <h5 class="card-title mt-0 mb-0 header-title">Projects</h5>
             <div class="table-responsive mt-4 mb-0">
               <b-table-simple class="table table-hover table-nowrap mb-0">
@@ -433,26 +458,29 @@ export default {
                     <b-th>Client</b-th>
                     <b-th>Project Type</b-th>
                     <b-th>Status</b-th>
+                    <b-th>Status</b-th>
                   </b-tr>
                 </b-thead>
                 <b-tbody>
-                  <b-tr v-for="(order, index) in ordersData" :key="order.name">
+                  <b-tr v-for="(project, index) in projectData" :key="project.id">
                     <b-td>{{ index + 1 }}</b-td>
-                    <b-td>{{ order.product }}</b-td>
-                    <b-td>{{ order.name }}</b-td>
-                    <b-td>{{ order.price }}</b-td>
+                    <b-td>{{ project.name }}</b-td>
+                    <b-td>{{ project.client }}</b-td>
+                    <b-td>{{ project.project_type && project.project_type.name }}</b-td>
                     <b-td>
                       <span
                         class="badge"
                         :class="{
-                          'badge-soft-warning': `${order.status}` === 'Pending',
+                          'badge-soft-warning': `${project.status}` === 'pending',
                           'badge-soft-success':
-                            `${order.status}` === 'Delivered',
-                          'badge-soft-danger': `${order.status}` === 'Declined',
+                            `${project.status}` === 'Delivered',
+                          'badge-soft-danger': `${project.status}` === 'Declined',
                         }"
-                        >{{ order.status }}</span
-                      >
+                      >{{ project.status }}</span>
                     </b-td>
+                    <b-td class="text-primary">
+                      <router-link :to="`project/details/${project.id}`">View</router-link>
+                      </b-td>
                   </b-tr>
                 </b-tbody>
               </b-table-simple>
@@ -469,7 +497,7 @@ export default {
               class="btn btn-primary btn-sm float-right"
             >
               <i class="uil uil-export ml-1"></i> Export
-            </a> -->
+            </a>-->
             <h5 class="card-title mt-0 mb-0 header-title">Proposals</h5>
             <div class="table-responsive mt-4 mb-0">
               <b-table-simple class="table table-hover table-nowrap mb-0">
@@ -497,8 +525,7 @@ export default {
                             `${order.status}` === 'Delivered',
                           'badge-soft-danger': `${order.status}` === 'Declined',
                         }"
-                        >{{ order.status }}</span
-                      >
+                      >{{ order.status }}</span>
                     </b-td>
                   </b-tr>
                 </b-tbody>
@@ -553,6 +580,6 @@ export default {
 					title="Recent Conversation"
 				/>
 			</div>
-		</div> -->
+    </div>-->
   </Layout>
 </template>

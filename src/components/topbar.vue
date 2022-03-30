@@ -38,11 +38,11 @@ export default {
 			<!-- LOGO -->
 			<a href="/" class="navbar-brand mr-0 mr-md-2 logo">
 				<span class="logo-lg">
-					<img src="@assets/images/logo.png" alt height="24" />
-					<span class="d-inline h5 ml-2 text-logo">CEHRT WORKSPACE</span>
+					<img src="@assets/images/cehrt-small-logo.png" alt="logo" style="height:45px;" />
+					<span class="d-inline h5 ml-2 text-logo" style="color:#009a44;">CEHRT WORKSPACE</span>
 				</span>
 				<span class="logo-sm">
-					<img src="@assets/images/logo.png" alt height="24" />
+					<img src="@assets/images/cehrt-small-logo.png" alt="logo" />
 				</span>
 			</a>
 
@@ -64,7 +64,7 @@ export default {
 			<ul
 				class="navbar-nav flex-row ml-auto d-flex list-unstyled topnav-menu float-right mb-0"
 			>
-				<li class="d-none d-sm-block">
+				<!-- <li class="d-none d-sm-block">
 					<div class="app-search">
 						<form>
 							<div class="input-group">
@@ -77,7 +77,7 @@ export default {
 							</div>
 						</form>
 					</div>
-				</li>
+				</li> -->
 
 				<b-nav-item-dropdown
 					id="bell-notification"
@@ -87,13 +87,13 @@ export default {
 					title="8 new unread notifications"
 					menu-class="dropdown-lg"
 				>
-					<template v-slot:button-content>
+					<!-- <template v-slot:button-content>
 						<feather type="bell" class="align-middle"></feather>
 						<span class="noti-icon-badge"></span>
 					</template>
 					<b-tooltip target="bell-notification" placement="left"
 						>8 new unread notifications</b-tooltip
-					>
+					> -->
 					<!-- item-->
 					<b-dropdown-text class="noti-title border-bottom pb-2" tag="div">
 						<h5 class="m-0 font-size-16">

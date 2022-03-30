@@ -20,6 +20,10 @@ export default {
       type: String,
       default: '#5369f8',
     },
+    icon: {
+      type: String,
+      default: ""
+    }
   },
   data() {
     return {
@@ -90,26 +94,10 @@ export default {
           <h2 class="mb-0">{{ value }}</h2>
         </div>
         <div class="align-self-center">
-          <apexchart
-            class="apex-chart-widget"
-            type="area"
-            height="45"
-            width="90"
-            :series="series"
-            :options="chartOptions"
-          ></apexchart>
           <span
-            class="text-success font-weight-bold font-size-13"
-            :class="{ 'text-danger': `${subValue}` === '5.05%' }"
+            class="text-secondary font-weight-bold"
           >
-            <i
-              class="uil"
-              :class="{
-                'uil uil-arrow-down': subValue === '5.05%',
-                'uil uil-arrow-up': subValue !== '5.05%',
-              }"
-            ></i>
-            {{ subValue }}
+            <feather  v-if="icon" :type="icon" class="align-self-center icon-dual icon-lg"></feather>
           </span>
         </div>
       </div>
