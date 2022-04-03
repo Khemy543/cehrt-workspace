@@ -2,7 +2,7 @@
   <div>
     <Layout>
       <PageHeader :title="title" :items="items" />
-      <div v-if="loading" class=" d-flex justify-content-center">
+      <div v-if="loading" class="d-flex justify-content-center">
         <b-spinner type="grow" variant="primary"></b-spinner>
       </div>
       <div v-else class="row">
@@ -12,24 +12,24 @@
               <div class="row align-items-center">
                 <div class="col-xl-12 col-lg-12">
                   <div class="mt-4 mt-lg-0">
-                    <h5 class="mt-0 mb-1 font-weight-bold">{{
-                      proposal.title
-                    }}</h5>
+                    <h5 class="mt-0 mb-1 font-weight-bold">
+                      {{
+                        proposal.title
+                      }}
+                    </h5>
 
                     <div class="d-flex items-align-center mt-4">
                       <div>
-                        <div
-                          class="badge badge-soft-primary font-size-13 font-weight-normal"
-                          >{{
+                        <div class="badge badge-soft-primary font-size-13 font-weight-normal">
+                          {{
                             proposal.project_type && proposal.project_type.name
-                          }}</div
-                        >
+                          }}
+                        </div>
                       </div>
                       <div>
                         <div
                           class="badge badge-soft-success font-size-13 font-weight-normal ml-5"
-                          >{{ proposal.funding_option }}</div
-                        >
+                        >{{ proposal.funding_option }}</div>
                       </div>
                     </div>
                     <div class="row">
@@ -52,10 +52,8 @@
                             proposal.submission_date || 'N/A'
                           }}</h5>
                         </div>
-                      </div> -->
-                      <div class="col-md-3">
-
-                      </div>
+                      </div>-->
+                      <div class="col-md-3"></div>
 
                       <div class="col-md-3">
                         <b-dropdown
@@ -64,10 +62,7 @@
                           toggle-class="font-weight-bold p-0 align-middle"
                         >
                           <template v-slot:button-content>
-                            <button
-                              id="btn-new-event"
-                              class="btn btn-primary mt-4 mr-3"
-                            >
+                            <button id="btn-new-event" class="btn btn-primary mt-4 mr-3">
                               <i class="uil-plus-circle"></i> Create New Report
                             </button>
                           </template>
@@ -76,9 +71,7 @@
                             :key="report.id"
                             href="javascript: void(0);"
                             variant="seconday"
-                          >
-                            {{ report.name }}
-                          </b-dropdown-item>
+                          >{{ report.name }}</b-dropdown-item>
                         </b-dropdown>
                       </div>
 
@@ -100,28 +93,24 @@
         <div class="col-12 mt-2">
           <h5>Proposal Reports</h5>
           <div class="row mt-4">
-            <div v-for="n in reportTypes" :key="n.id" class="col-md-4">
+            <router-link v-for="n in reportTypes" :key="n.id" :to="`/proposal/${proposal.id}/deliverable/${n.id}`" class="col-md-4">
               <div class="card">
                 <div class="card-body">
                   <div class="p-2 border rounded mb-3">
                     <div class="media">
                       <div class="avatar-sm font-weight-bold mr-3">
-                        <span
-                          class="avatar-title rounded bg-soft-primary text-primary"
-                        >
+                        <span class="avatar-title rounded bg-soft-primary text-primary">
                           <i class="uil-file-plus-alt font-size-18"></i>
                         </span>
                       </div>
                       <div class="media-body">
-                        <a href="#" class="d-inline-block mt-2">
-                          {{ n.name }}.docx
-                        </a>
+                        <div  class="d-inline-block mt-2">{{ n.name }}.docx</div>
                       </div>
-                      <div class="float-right mt-1">
-                        <a href="#" class="p-2">
+                      <!-- <div class="float-right mt-1">
+                        <div class="p-2">
                           <i class="uil-download-alt font-size-18"></i>
-                        </a>
-                      </div>
+                        </div>
+                      </div> -->
                     </div>
                   </div>
                   <div>
@@ -136,8 +125,7 @@
                             :target="`date-tooltip-${proposal.id}`"
                             triggers="hover"
                             placement="top"
-                            >Due date</b-tooltip
-                          >
+                          >Due date</b-tooltip>
                           <i class="uil uil-calender mr-1"></i>
                           {{ proposal.end_date }}
                         </a>
@@ -152,8 +140,7 @@
                             :target="`task-tooltip-${proposal.id}`"
                             triggers="hover"
                             placement="top"
-                            >Tasks</b-tooltip
-                          >
+                          >Tasks</b-tooltip>
                           <i class="uil uil-bars mr-1"></i>
                           {{ proposal.tasks || 0 }}
                         </a>
@@ -168,8 +155,7 @@
                             :target="`comment-tooltip-${proposal.id}`"
                             triggers="hover"
                             placement="top"
-                            >Comments</b-tooltip
-                          >
+                          >Comments</b-tooltip>
                           <i class="uil uil-comments-alt mr-1"></i>
                           {{ proposal.comments || 0 }}
                         </a>
@@ -193,7 +179,7 @@
                   </div>
                 </div>
               </div>
-            </div>
+            </router-link>
           </div>
         </div>
 
@@ -211,7 +197,7 @@
             alt="no projects"
             style="width:30%"
           />
-        </div> -->
+        </div>-->
         <!-- end col-12 -->
       </div>
     </Layout>

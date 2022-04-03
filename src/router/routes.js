@@ -137,6 +137,19 @@ const userManagementRoutes = [
   },
 ]
 
+// library routes
+const libraryRoutes = [
+  {
+    path: '/library',
+    name: 'Library',
+    meta: { authRequired: true },
+    icon: 'award',
+    department: 'all',
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/library/index.vue')),
+  },
+]
+
 // departments route
 /* const departmentRoutes = [
   {
@@ -193,6 +206,22 @@ const proposalRoutes = [
     meta: { authRequired: true },
     component: () =>
       lazyLoadView(import('@views/pages/consulting/proposals/details.vue')),
+  },
+  {
+    path: '/proposal/:proposal_id/deliverable/:deliverable_id',
+    name: 'Task List',
+
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/proposals/tasks/task-board')),
+  },
+  {
+    path: '/proposal/task/:id/details',
+    name: 'Task Details',
+
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/proposals/tasks/task-list')),
   },
 ]
 
@@ -300,23 +329,15 @@ const projectAppsRoutes = [
 
     meta: { authRequired: true },
     component: () =>
-      lazyLoadView(import('@views/pages/consulting/tasks/task-board')),
+      lazyLoadView(import('@views/pages/consulting/project/tasks/task-board')),
   },
   {
-    path: '/project/task-board',
-    name: 'Kanban Board',
-
-    meta: { authRequired: true },
-    component: () =>
-      lazyLoadView(import('@views/pages/consulting/tasks/task-list')),
-  },
-  {
-    path: '/task/:id/details',
+    path: '/project/task/:id/details',
     name: 'Task Details',
 
     meta: { authRequired: true },
     component: () =>
-      lazyLoadView(import('@views/pages/consulting/tasks/task-list')),
+      lazyLoadView(import('@views/pages/consulting/project/tasks/task-list')),
   },
 ]
 
@@ -403,6 +424,7 @@ const appsRoutes = [
   ...userManagementRoutes,
   ...proposalRoutes,
   ...projectAppsRoutes,
+  ...libraryRoutes,
   ...adminProjectRoutes,
   ...recycleRoutes,
   ...trainingRouts,

@@ -90,10 +90,10 @@ export default {
                 })
             }
         },
-/* 
-        getToal() {
-            return 
-        } */
+        /* 
+                getToal() {
+                    return 
+                } */
     }
 }
 </script>
@@ -123,14 +123,30 @@ export default {
                             </div>
                             <div class="mt-5">
                                 <h4>Project Deliverables</h4>
+                                <div v-if="projectDeliverable.length <= 0" class="mt-5 d-flex align-items-center justify-content-center text-center">
+                                    <div>
+                                        <h6>This project has no deliverbles</h6>
+                                        <router-link
+                                            id="btn-new-event"
+                                            :to="`/project/details/${$route.params.id}`"
+                                            class="btn btn-danger"
+                                        >Go back to Project</router-link>
+                                    </div>
+                                </div>
+
                                 <div
                                     v-for="deliverable in projectDeliverable"
+                                    v-else
                                     :key="deliverable.id"
                                     class="mt-4"
                                 >
                                     <h5>{{ deliverable.name }}</h5>
 
-                                    <div class="w-100">
+                                    <h6
+                                        v-if="deliverable.tasks.length <= 0"
+                                        class="mt-5 text-center"
+                                    >This Deliverble has no task</h6>
+                                    <div v-else class="w-100">
                                         <table class="table mb-0">
                                             <thead class="thead-light">
                                                 <tr>
@@ -184,7 +200,7 @@ export default {
                                     </div>
                                 </div>
 
-                                <div>
+                                <div v-if="projectDeliverable.length > 0" class="mt-4">
                                     <h4>Project Total: {{ getTotal }}</h4>
                                 </div>
                             </div>
