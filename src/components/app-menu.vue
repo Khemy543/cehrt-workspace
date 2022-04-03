@@ -24,13 +24,6 @@
       >
         <feather v-if="item.icon" :type="item.icon"></feather>
         <span>{{ item.name }}</span>
-        <!-- <span
-          v-if="item.badge"
-          :class="
-            'badge badge-' + item.badge.varient + ' float-right font-size-11'
-          "
-          >{{ item.badge.text }}</span
-        > -->
       </router-link>
     </li>
   </ul>
