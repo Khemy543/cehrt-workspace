@@ -143,7 +143,7 @@ const libraryRoutes = [
     path: '/library',
     name: 'Library',
     meta: { authRequired: true },
-    icon: 'award',
+    icon: 'book-open',
     department: 'all',
     component: () =>
       lazyLoadView(import('@views/pages/consulting/library/index.vue')),
