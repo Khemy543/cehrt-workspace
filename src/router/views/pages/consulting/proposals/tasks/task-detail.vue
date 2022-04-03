@@ -1,8 +1,7 @@
 <script>
 import { VueEditor } from 'vue2-editor'
 import 'quill/dist/quill.bubble.css'
-import { todayTasks } from './data-tasklist'
-import CreateTaskModal from '../../../../../components/CreateTaskModal.vue'
+import CreateTaskModal from '@components/CreateTaskModal.vue'
 
 export default {
   components: { VueEditor, CreateTaskModal },
@@ -22,7 +21,6 @@ export default {
         theme: 'bubble',
       },
       form: {},
-      todayTasks: [...todayTasks],
       show: false,
       selectedTask: null,
       formTitle: 'Create SubTask',
@@ -580,75 +578,12 @@ export default {
                         </b-dropdown>
                         <!-- end dropdown-->
                       </div>
-                      <!-- <div class="d-flex">
-                        <router-link
-                          :to="
-                            `/task/${subtask.id}/details?subtask=true&hasSubTask=false`
-                          "
-                        >
-                          <span class="avatar-title rounded text-primary">
-                            <i class="uil uil-eye font-size-18"></i>
-                          </span>
-                        </router-link>
-                        <div class=" ml-2">
-                          <span class="avatar-title rounded text-danger">
-                            <i class="uil uil-trash font-size-18"></i>
-                          </span>
-                        </div>
-                      </div> -->
                     </div>
                   </li>
                 </ul>
               </div>
             </div>
           </div>
-
-          <!-- <div class="row mt-5">
-            <div class="col-sm-12">
-              <a
-                href="javascript: void(0);"
-                class="btn btn-primary"
-                style="float:right;"
-              >
-                <i class="uil uil-plus mr-1"></i>Add New Checklist
-              </a>
-            </div>
-          </div> -->
-
-          <!-- <div class="row mt-4">
-            <div class="col">
-              <h5 class="mb-0">
-                Check List
-                <span class="text-muted font-size-14"
-                  >({{ todayTasks.length }})</span
-                >
-              </h5>
-              <div class="card mb-0 shadow-none">
-                <div class="card-body pt-0">
-                  <div
-                    v-for="(check, index) of todayTasks"
-                    :key="index"
-                    class="row justify-content-sm-between border-bottom mt-2 pt-2"
-                  >
-                    <div class="col-lg-12 mb-2 mb-lg-0">
-                      <div class="custom-control custom-checkbox">
-                        <input
-                          :id="`task-${index}`"
-                          type="checkbox"
-                          class="custom-control-input"
-                        />
-                        <label
-                          class="custom-control-label"
-                          :for="`task-${index}`"
-                          >{{ check.title }}</label
-                        >
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div> -->
         </div>
         <!-- end col -->
       </div>

@@ -97,7 +97,7 @@ export default {
 
 <template>
   <div id="wrapper">
-    <Topbar :user="user" :is-menu-opened="isMobileMenuOpened" />
+    <Topbar :user="user" :is-menu-opened="isMobileMenuOpened" :department="department"/>
     <SideBar
       :is-condensed="isMenuCondensed"
       :user="user"
