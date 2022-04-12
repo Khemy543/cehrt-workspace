@@ -22,7 +22,7 @@ export default {
       this.$emit('showEditModal', this.task)
     },
     goTotask() {
-      return this.$router.push(`/task/${this.task.id}/details?hasSubTask=${this.task.hasSubTask}&subtask=false`)
+      return this.$router.push(`/proposal/task/${this.task.id}/details?hasSubTask=${this.task.hasSubTask}&subtask=false`)
     },
     deleteTask() {
       this.$swal({
@@ -35,7 +35,7 @@ export default {
       }).then(async ({ isConfirmed, isDenied }) => {
         if(isConfirmed) {
           try {
-            const response = await this.$http.delete(`/delete/${this.task.id}/task`);
+            const response = await this.$http.delete(`/delete/${this.task.id}/proposal-report-task`);
 
             if(response) {
               this.$bvToast.toast('Task deleted successful', {

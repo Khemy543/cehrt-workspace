@@ -42,7 +42,7 @@ export default {
   created() {
     const hasSubTask = this.$route.query.hasSubTask === 'true'
     this.getTask()
-    this.getTaksComment()
+    // this.getTaksComment()
     if (hasSubTask) {
       this.getSubTasks()
     }
@@ -52,8 +52,8 @@ export default {
       try {
         const isSubtask = this.$route.query.subtask === 'true'
         const url = isSubtask
-          ? `/fetch/${this.$route.params.id}/sub-task`
-          : `/fetch/${this.$route.params.id}/task`
+          ? `/fetch/${this.$route.params.id}/proposal-report-subtask`
+          : `/fetch/${this.$route.params.id}/proposal-report-task`
         this.loading = true
         const response = await this.$http.get(url)
 
@@ -75,7 +75,7 @@ export default {
     async getSubTasks() {
       try {
         const response = await this.$http.get(
-          `/fetch/${this.$route.params.id}/task/sub-tasks`
+          `/fetch/${this.$route.params.id}/proposal-report-subtasks`
         )
 
         if (response) {

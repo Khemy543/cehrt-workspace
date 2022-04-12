@@ -167,13 +167,27 @@ export default {
     project(newValue) {
       this.form = {
         ...newValue,
+        name: newValue.name || newValue.title || "",
         project_type_id: newValue.project_type.id || '',
         project_sector_id: newValue.project_sector.id || '',
         coordinator_id: newValue.coordinator.id || '',
         start_date: newValue.raw_start_date,
         end_date: newValue.raw_end_date,
       }
+
+      console.log(this.form)
     },
+  },
+  mounted() {
+    this.form = {
+    ...this.project,
+      name: this.project.name || this.project.title || "",
+      project_type_id: this.project.project_type  && this.project.project_type.id || '',
+      project_sector_id: this.project.project_sector && this.project.project_sector.id || '',
+      coordinator_id: this.project.coordinator && this.project.coordinator.id || '',
+      start_date: this.project.raw_start_date,
+      end_date: this.project.raw_end_date,
+    }
   },
   created() {
     this.getSectors()

@@ -480,7 +480,7 @@ export default {
                   >
                     <div class="media d-flex justify-content-between">
                       <router-link
-                        :to="`/task/${subtask.id}/details?subtask=true`"
+                        :to="`/project/task/${subtask.id}/details?subtask=true`"
                         class="media-body overflow-hidden"
                       >
                         <h5 class="font-size-15 mt-2 mb-1">

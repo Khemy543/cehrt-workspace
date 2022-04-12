@@ -145,25 +145,37 @@ const libraryRoutes = [
     meta: { authRequired: true },
     icon: 'book-open',
     department: 'all',
-    component: () =>
-      lazyLoadView(import('@views/pages/consulting/library/index.vue')),
+    component: {
+      render(c) {
+        return c('router-view')
+      },
+    },
+    children: [
+      {
+        name: "Projects",
+        path: "projects",
+        icon: "",
+        component: () =>
+          lazyLoadView(import('@/src/router/views/pages/consulting/library/projects/projects.vue')),
+      },
+      {
+        name: "Projects Files",
+        path: "projects/:id/files",
+        invisible: true,
+        icon: "",
+        component: () =>
+          lazyLoadView(import('@/src/router/views/pages/consulting/library/projects/files.vue')),
+      },
+      {
+        name: "Proposals",
+        path: "proposals",
+        icon: "",
+        component: () =>
+          lazyLoadView(import('@/src/router/views/pages/consulting/library/proposals/proposals.vue')),
+      }
+    ]
   },
 ]
-
-// departments route
-/* const departmentRoutes = [
-  {
-    path: '/department/view-departments',
-    name: 'Department',
-    icon: 'layers',
-    department: 'Administration',
-    component: () =>
-          lazyLoadView(
-            import('@views/pages/administrator/departments/index.vue')
-          ),
-    props: (route) => ({ user: store.state.auth.currentUser || {} })
-  },
-] */
 
 // finance routes
 
@@ -202,23 +214,20 @@ const proposalRoutes = [
   {
     name: 'Proposals details',
     path: '/proposals/details/:id',
-
     meta: { authRequired: true },
     component: () =>
       lazyLoadView(import('@views/pages/consulting/proposals/details.vue')),
   },
   {
-    path: '/proposal/:proposal_id/deliverable/:deliverable_id',
-    name: 'Task List',
-
+    path: '/proposal/:proposal_id/report/:report_id',
+    name: 'Proposal Task List',
     meta: { authRequired: true },
     component: () =>
       lazyLoadView(import('@views/pages/consulting/proposals/tasks/task-board')),
   },
   {
     path: '/proposal/task/:id/details',
-    name: 'Task Details',
-
+    name: 'Proposal Task Details',
     meta: { authRequired: true },
     component: () =>
       lazyLoadView(import('@views/pages/consulting/proposals/tasks/task-list')),
@@ -325,7 +334,7 @@ const projectAppsRoutes = [
   },
   {
     path: '/project/:project_id/deliverable/:deliverable_id',
-    name: 'Task List',
+    name: 'Project Task List',
 
     meta: { authRequired: true },
     component: () =>
@@ -333,7 +342,7 @@ const projectAppsRoutes = [
   },
   {
     path: '/project/task/:id/details',
-    name: 'Task Details',
+    name: 'Project Task Details',
 
     meta: { authRequired: true },
     component: () =>
