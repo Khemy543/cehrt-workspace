@@ -27,9 +27,9 @@
                         </div>
                       </div>
                       <div>
-                        <div
-                          class="badge badge-soft-success font-size-13 font-weight-normal ml-5"
-                        >{{ proposal.funding_option }}</div>
+                        <div class="badge badge-soft-success font-size-13 font-weight-normal ml-5">{{
+                          proposal.funding_option
+                        }}</div>
                       </div>
                     </div>
                     <div class="row">
@@ -56,27 +56,19 @@
                       <div class="col-md-3"></div>
 
                       <div class="col-md-3">
-                        <b-dropdown
-                          class="d-inline"
-                          variant="link"
-                          toggle-class="font-weight-bold p-0 align-middle"
-                        >
+                        <b-dropdown class="d-inline" variant="link" toggle-class="font-weight-bold p-0 align-middle">
                           <template v-slot:button-content>
                             <button id="btn-new-event" class="btn btn-primary mt-4 mr-3">
                               <i class="uil-plus-circle"></i> Create New Report
                             </button>
                           </template>
-                          <b-dropdown-item
-                            v-for="report in reportTypes"
-                            :key="report.id"
-                            href="javascript: void(0);"
-                            variant="seconday"
-                          >{{ report.name }}</b-dropdown-item>
+                          <b-dropdown-item v-for="report in vReportTypes" :key="report.id" href="javascript: void(0);"
+                            variant="seconday" @click="openModal(report)">{{ report.report_title }}</b-dropdown-item>
                         </b-dropdown>
                       </div>
 
                       <div class="col-md-3">
-                        <button class="btn btn-white mt-4">
+                        <button class="btn btn-white mt-4" @click="showCreateProject = true">
                           <i class="uil-sync"></i> Create Project
                         </button>
                       </div>
@@ -93,7 +85,8 @@
         <div class="col-12 mt-2">
           <h5>Proposal Reports</h5>
           <div class="row mt-4">
-            <router-link v-for="n in reportTypes" :key="n.id" :to="`/proposal/${proposal.id}/deliverable/${n.id}`" class="col-md-4">
+            <router-link v-for="report in reports" :key="report.id" :to="`/proposal/${proposal.id}/report/${report.id}`"
+              class="col-md-4">
               <div class="card">
                 <div class="card-body">
                   <div class="p-2 border rounded mb-3">
@@ -104,7 +97,9 @@
                         </span>
                       </div>
                       <div class="media-body">
-                        <div  class="d-inline-block mt-2">{{ n.name }}.docx</div>
+                        <div class="d-inline-block mt-2">{{
+                          report.proposal_type && report.proposal_type.report_title
+                        }}.docx</div>
                       </div>
                       <!-- <div class="float-right mt-1">
                         <div class="p-2">
@@ -116,63 +111,39 @@
                   <div>
                     <ul class="list-inline">
                       <li class="list-inline-item pr-1">
-                        <a
-                          :id="`date-tooltip-${proposal.id}`"
-                          href="javascript: void(0)"
-                          class="text-muted d-inline-block bg-transparent"
-                        >
-                          <b-tooltip
-                            :target="`date-tooltip-${proposal.id}`"
-                            triggers="hover"
-                            placement="top"
-                          >Due date</b-tooltip>
+                        <a :id="`date-tooltip-${report.id}`" href="javascript: void(0)"
+                          class="text-muted d-inline-block bg-transparent">
+                          <b-tooltip :target="`date-tooltip-${report.id}`" triggers="hover" placement="top">Due date
+                          </b-tooltip>
                           <i class="uil uil-calender mr-1"></i>
-                          {{ proposal.end_date }}
+                          {{ report.deadline }}
                         </a>
                       </li>
                       <li class="list-inline-item pr-1">
-                        <a
-                          :id="`task-tooltip-${proposal.id}`"
-                          href="javascript: void(0)"
-                          class="text-muted d-inline-block bg-transparent"
-                        >
-                          <b-tooltip
-                            :target="`task-tooltip-${proposal.id}`"
-                            triggers="hover"
-                            placement="top"
-                          >Tasks</b-tooltip>
+                        <a :id="`task-tooltip-${report.id}`" href="javascript: void(0)"
+                          class="text-muted d-inline-block bg-transparent">
+                          <b-tooltip :target="`task-tooltip-${report.id}`" triggers="hover" placement="top">Tasks
+                          </b-tooltip>
                           <i class="uil uil-bars mr-1"></i>
-                          {{ proposal.tasks || 0 }}
+                          {{ report.tasks || 0 }}
                         </a>
                       </li>
                       <li class="list-inline-item">
-                        <a
-                          :id="`comment-tooltip-${proposal.id}`"
-                          href="javascript: void(0)"
-                          class="text-muted d-inline-block bg-transparent"
-                        >
-                          <b-tooltip
-                            :target="`comment-tooltip-${proposal.id}`"
-                            triggers="hover"
-                            placement="top"
-                          >Comments</b-tooltip>
+                        <a :id="`comment-tooltip-${report.id}`" href="javascript: void(0)"
+                          class="text-muted d-inline-block bg-transparent">
+                          <b-tooltip :target="`comment-tooltip-${report.id}`" triggers="hover" placement="top">
+                            Comments</b-tooltip>
                           <i class="uil uil-comments-alt mr-1"></i>
-                          {{ proposal.comments || 0 }}
+                          {{ report.comments || 0 }}
                         </a>
                       </li>
                       <li class="list-inline-item pr-2">
-                        <a
-                          :id="`date-tooltip-${proposal.id}`"
-                          href="javascript: void(0)"
-                          class="text-muted d-inline-block bg-transparent"
-                        >
-                          <b-tooltip
-                            :target="`date-tooltip-${proposal.progress}`"
-                            triggers="hover"
-                            placement="top"
-                          ></b-tooltip>
+                        <a :id="`date-tooltip-${report.id}`" href="javascript: void(0)"
+                          class="text-muted d-inline-block bg-transparent">
+                          <b-tooltip :target="`date-tooltip-${report.progress}`" triggers="hover" placement="top">
+                          </b-tooltip>
                           <i class="uil uil-check-square mr-1"></i>
-                          {{ proposal.progress || 0 }}%
+                          {{ report.progress || 0 }}%
                         </a>
                       </li>
                     </ul>
@@ -183,22 +154,10 @@
           </div>
         </div>
 
-        <!-- <div
-          v-if="
-            !loading &&
-              !proposal.expression_of_interest &&
-              !proposal.financial_document_path &&
-              !proposal.technical_proposal
-          "
-          class=" w-100 d-flex justify-content-center"
-        >
-          <img
-            :src="require('@assets/svgs/empty.svg')"
-            alt="no projects"
-            style="width:30%"
-          />
-        </div>-->
-        <!-- end col-12 -->
+        <CreateDeliverable :value="show" :action="createReport" :deliverable="vReport" @input="show = $event" />
+
+        <CreateProjectModal :value="showCreateProject" :action="createProjectFromDeliverable" :project="proposal" form-title="Create Project"
+          @input="showCreateProject = $event" />
       </div>
     </Layout>
   </div>
@@ -208,6 +167,8 @@
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
+import CreateDeliverable from '@/src/components/CreateDeliverable.vue'
+import CreateProjectModal from '@/src/components/CreateProjectModal.vue'
 export default {
   page: {
     title: 'Proposal',
@@ -216,6 +177,8 @@ export default {
   components: {
     Layout,
     PageHeader,
+    CreateDeliverable,
+    CreateProjectModal
   },
   data() {
     return {
@@ -236,28 +199,22 @@ export default {
       ],
       proposal: {},
       loading: false,
-      reportTypes: [
-        {
-          id: 1,
-          name: 'Expression of interest Report',
-        },
-        {
-          id: 2,
-          name: 'Technical Report',
-        },
-        {
-          id: 3,
-          name: 'Financial Report',
-        },
-        {
-          id: 4,
-          name: 'Techical & Financial Report',
-        },
-      ],
+      reportTypes: [],
+      reports: [],
+      vReport: null,
+      show: false,
+      showCreateProject: false
+    }
+  },
+  computed: {
+    vReportTypes() {
+      return this.reportTypes.filter(item => !this.reports.some((report) => report.proposal_type && report.proposal_type.id === item.id));
     }
   },
   created() {
     this.getProposal()
+    this.getReportTypes()
+    this.getProposalReports();
   },
   methods: {
     async getProposal() {
@@ -281,6 +238,117 @@ export default {
         })
       }
     },
+
+    async getReportTypes() {
+      try {
+        const response = await this.$http.get(`/fetch/proposal/report/types`);
+
+        if (response) {
+          this.reportTypes = response.data;
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
+
+    async getProposalReports() {
+      try {
+        const response = await this.$http.get(`/fetch/proposal/${this.$route.params.id}/reports`);
+
+        if (response) {
+          this.reports = response.data;
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
+    openModal(report) {
+      this.vReport = report;
+      this.show = true;
+    },
+    async createProjectFromDeliverable(form) {
+      try {
+        const response = await this.$http.post(`/create/project`, {...form, proposal_id: this.$route.params.id});
+
+        if (response) {
+          this.$bvToast.toast('Project deliverable created successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
+          this.$router.push('/project/list')
+        }
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
+    async createReport(report) {
+      try {
+        const response = await this.$http.post(`/create/${this.$route.params.id}/proposal-report`, {
+          report_path: '/root/path',
+          proposal_report_type_id: report.id,
+          deadline: report.deadline
+        });
+
+        if (response) {
+          this.reports.push(response.data.report);
+          this.$bvToast.toast('Project report created successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
+          this.show = false;
+        }
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    }
   },
 }
 </script>

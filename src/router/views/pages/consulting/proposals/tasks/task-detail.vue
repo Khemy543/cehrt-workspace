@@ -79,7 +79,7 @@ export default {
     async createSubTask(form) {
       try {
         const response = await this.$http.post(
-          `/task/${this.$route.params.id}/create/subtask`,
+          `/create/${this.$route.params.id}/proposal-report-subtask`,
           form
         )
         if (response) {
@@ -96,7 +96,7 @@ export default {
           }
 
           return this.$router.push(
-            `/task/${this.$route.params.id}/details?subtask=false&hasSubTask=true`
+            `/proposal/task/${this.$route.params.id}/details?subtask=false&hasSubTask=true`
           )
         }
       } catch (error) {
@@ -120,8 +120,8 @@ export default {
     async editTask(form) {
       try {
         const url = this.isSubTask
-          ? `/update/${form.id}/sub-task`
-          : `/update/${form.id}/task`
+          ? `/update/${form.id}/proposal-report-subtask`
+          : `/update/${form.id}/proposal-report-task`
         const response = await this.$http.put(url, form)
 
         if (response) {
@@ -178,7 +178,7 @@ export default {
     async changeWorkFlow(status) {
       try {
         const response = await this.$http.patch(
-          `/update/${this.$route.params.id}/task-status`,
+          `/update/${this.$route.params.id}/proposal-report-task-status`,
           {
             status: status.api,
           }
@@ -213,8 +213,8 @@ export default {
         if (isConfirmed) {
           try {
             const url = this.isSubTask
-              ? `/delete/${this.$route.params.id}/sub-task`
-              : `/delete/${this.$route.params.id}/task`
+              ? `/delete/${this.$route.params.id}/proposal-report-subtask`
+              : `/delete/${this.$route.params.id}/proposal-report-task`
             const response = await this.$http.delete(url)
 
             if (response) {
@@ -225,7 +225,7 @@ export default {
                 variant: 'success',
               })
 
-              this.$router.push('/')
+              this.$router.push('/proposals/view-proposals')
             }
           } catch (error) {
             this.$bvToast.toast('Something happened, Please try again later', {
@@ -279,9 +279,9 @@ export default {
 
     async changeTaskDescription() {
       try {
-        const url = this.isSubTask
-          ? `/update/${this.$route.params.id}/sub-task`
-          : `/update/${this.$route.params.id}/task`
+       const url = this.isSubTask
+          ? `/update/${this.$route.params.id}/proposal-report-subtask`
+          : `/update/${this.$route.params.id}/proposal-report-task`
         const response = await this.$http.put(url, {
           ...this.form,
         })
@@ -480,7 +480,7 @@ export default {
                   >
                     <div class="media d-flex justify-content-between">
                       <router-link
-                        :to="`/task/${subtask.id}/details?subtask=true`"
+                        :to="`/proposal/task/${subtask.id}/details?subtask=true`"
                         class="media-body overflow-hidden"
                       >
                         <h5 class="font-size-15 mt-2 mb-1">

@@ -9,7 +9,7 @@ import Task from './board-task'
 
 export default {
   page: {
-    title: 'Project Tasks Board',
+    title: 'Proposal Tasks Board',
     meta: [{ name: 'description', content: appConfig.description }],
   },
   components: {
@@ -21,7 +21,7 @@ export default {
   },
   data() {
     return {
-      title: 'Project Tasks Board',
+      title: 'Proposal Tasks Board',
       items: [
         {
           text: 'Cehrt',
@@ -66,9 +66,9 @@ export default {
     },
   },
   created() {
-    this.getworkFlows()
+    // this.getworkFlows()
     this.getTasks()
-    this.getDeliverableDetails()
+    // this.getDeliverableDetails()
   },
   methods: {
     async getworkFlows() {
@@ -110,17 +110,15 @@ export default {
     async createTask(form) {
       try {
         const {
-          project_id: projectId,
-          deliverable_id: deliverableId,
+          report_id: reportId,
         } = this.$route.params
 
         const newForm = {
-          ...form,
-          project_id: projectId,
+          ...form
         }
 
         const response = await this.$http.post(
-          `/project/${deliverableId}/create-task`,
+          `/create/${reportId}/proposal-report-task`,
           newForm
         )
 
@@ -164,7 +162,7 @@ export default {
 
     async editTask(form) {
       try {
-        const response = await this.$http.put(`/update/${form.id}/task`, form)
+        const response = await this.$http.put(`/update/${form.id}/proposal-report-task`, form)
 
         if (response) {
           const index = this.tasks.findIndex((item) => item.id === form.id)
@@ -219,7 +217,7 @@ export default {
       try {
         this.loading = true
         const response = await this.$http.get(
-          `/fetch/${this.$route.params.deliverable_id}/deliverable-tasks`
+          `/fetch/${this.$route.params.report_id}/proposal-report-tasks`
         )
 
         if (response) {
@@ -335,7 +333,7 @@ export default {
         const task = $event.added.element
         try {
           const response = await this.$http.patch(
-            `/update/${task.id}/task-status`,
+            `/update/${task.id}/proposal-report-task-status`,
             {
               status,
             }

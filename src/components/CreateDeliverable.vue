@@ -1,11 +1,11 @@
 <template>
   <b-modal
     v-model="show"
-    :title="deliverable.deliverable_name"
+    :title="title"
     title-class="font-18"
     hide-footer
   >
-    <form @submit.prevent="action(form)">
+    <form @submit.prevent="action({ ...form, ...deliverable })">
       <b-form-group
         id="input-group-1"
         label="Deliverable deadline"
@@ -52,6 +52,9 @@ export default {
       set(val) {
         this.$emit('input', val)
       }
+    },
+    title() {
+      return this.deliverable && this.deliverable.deliverable_name || this.deliverable && this.deliverable.report_title;
     }
   },
   watch: {
