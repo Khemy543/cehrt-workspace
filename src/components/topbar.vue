@@ -1,5 +1,6 @@
 <script>
 import { authComputed } from '@state/helpers'
+import { PublicClientApplication } from '@azure/msal-browser';
 // import VuePerfectScrollbar from 'vue-perfect-scrollbar'
 
 export default {
@@ -25,7 +26,12 @@ export default {
 
 	},
 	data() {
-		return {}
+		return {
+			account: undefined,
+			github: 'https://github.com/cmatskas',
+			twitter: 'https://twitter.com/christosmatskas',
+			signin: 'https://microsoft.com',
+		}
 	},
 	computed: {
 		...authComputed,
@@ -33,10 +39,47 @@ export default {
 			return this.$store ? this.$store.state.auth.userInitials : '' || '';
 		}
 	},
+	created() {
+		this.$msalInstance = new PublicClientApplication(
+			this.$store.state.auth.msalConfig,
+		);
+		// console.log(this.$msalInstance.loginPopup({}));
+	},
+	mounted() {
+		const accounts = this.$msalInstance.getAllAccounts();
+		if (accounts.length === 0) {
+			return;
+		}
+		this.account = accounts[0];
+		this.$emitter.emit('login', this.account);
+	},
 	methods: {
 		toggleMenu() {
 			this.$parent.toggleMenu()
-		}
+		},
+		async SignIn() {
+			console.log('here')
+			await this.$msalInstance
+				.loginPopup({})
+				.then(() => {
+					const myAccounts = this.$msalInstance.getAllAccounts();
+					this.account = myAccounts[0];
+					this.$emitter.emit('login', this.account);
+				})
+				.catch(error => {
+					console.error(`error during authentication: ${error}`);
+				});
+		},
+		async SignOut() {
+			await this.$msalInstance
+				.logout({})
+				.then(() => {
+					this.$emitter.emit('logout', 'logging out');
+				})
+				.catch(error => {
+					console.error(error);
+				});
+		},
 	},
 }
 </script>
@@ -58,11 +101,8 @@ export default {
 
 			<ul class="navbar-nav bd-navbar-nav flex-row list-unstyled menu-left mb-0">
 				<li class>
-					<button
-						class="button-menu-mobile open-left disable-btn"
-						:class="{ open: isMenuOpened }"
-						@click="toggleMenu"
-					>
+					<button class="button-menu-mobile open-left disable-btn" :class="{ open: isMenuOpened }"
+						@click="toggleMenu">
 						<feather type="menu" class="menu-icon align-middle"></feather>
 						<feather type="x" class="close-icon"></feather>
 					</button>
@@ -75,11 +115,10 @@ export default {
 					<b-dropdown class="float-right" variant="black" right toggle-class="p-0">
 						<template v-slot:button-content>
 							<div class="d-flex">
-								<div
-									style="width:40px; height:40px; border-radius:100px;"
-									class="mr-2 d-flex align-items-center justify-content-center bg-primary text-white font-weight-bold"
-								>{{ initials }}</div>
-								<h6 >{{ department.name }}</h6>
+								<div style="width:40px; height:40px; border-radius:100px;"
+									class="mr-2 d-flex align-items-center justify-content-center bg-primary text-white font-weight-bold">
+									{{ initials }}</div>
+								<h6>{{ department.name }}</h6>
 							</div>
 						</template>
 
@@ -102,18 +141,12 @@ export default {
 					</b-dropdown>
 				</div>
 
-				<b-nav-item-dropdown
-					right
-					class="notification-list align-self-center profile-dropdown"
-					toggle-class="nav-user mr-0"
-				>
+				<b-nav-item-dropdown right class="notification-list align-self-center profile-dropdown"
+					toggle-class="nav-user mr-0">
 					<template v-slot:button-content>
 						<div class="media user-profile">
-							<img
-								src="@assets/images/users/avatar-7.jpg"
-								alt="user-image"
-								class="rounded-circle align-self-center"
-							/>
+							<img src="@assets/images/users/avatar-7.jpg" alt="user-image"
+								class="rounded-circle align-self-center" />
 							<div class="media-body text-left">
 								<h6 class="pro-user-name ml-2 my-0">
 									<span>{{ user.name }}</span>
@@ -160,16 +193,19 @@ export default {
 .noti-scroll {
 	height: 220px;
 }
-.ps > .ps__scrollbar-y-rail {
+
+.ps>.ps__scrollbar-y-rail {
 	width: 8px !important;
 	background-color: transparent !important;
 }
-.ps > .ps__scrollbar-y-rail > .ps__scrollbar-y,
-.ps.ps--in-scrolling.ps--y > .ps__scrollbar-y-rail > .ps__scrollbar-y,
-.ps > .ps__scrollbar-y-rail:active > .ps__scrollbar-y,
-.ps > .ps__scrollbar-y-rail:hover > .ps__scrollbar-y {
+
+.ps>.ps__scrollbar-y-rail>.ps__scrollbar-y,
+.ps.ps--in-scrolling.ps--y>.ps__scrollbar-y-rail>.ps__scrollbar-y,
+.ps>.ps__scrollbar-y-rail:active>.ps__scrollbar-y,
+.ps>.ps__scrollbar-y-rail:hover>.ps__scrollbar-y {
 	width: 6px !important;
 }
+
 .button-menu-mobile {
 	outline: none !important;
 }

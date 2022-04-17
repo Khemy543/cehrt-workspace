@@ -167,7 +167,7 @@ const libraryRoutes = [
           lazyLoadView(import('@/src/router/views/pages/consulting/library/projects/files.vue')),
       },
       {
-        name: "Proposals",
+        name: "Proposals-library",
         path: "proposals",
         icon: "",
         component: () =>
@@ -426,6 +426,17 @@ const trainingRouts = [
   },
 ]
 
+const financeRoutes = [
+  {
+    path: '/finance/project',
+    name: "Projects-finance",
+    meta: { authRequired: true },
+    icon: 'briefcase',
+    department: 'Finance',
+    component: () => lazyLoadView(import('@views/pages/finance/projects/index.vue')),
+  }
+]
+
 
 const appsRoutes = [
   ...calendarAppsRoutes,
@@ -437,6 +448,7 @@ const appsRoutes = [
   ...adminProjectRoutes,
   ...recycleRoutes,
   ...trainingRouts,
+  ...financeRoutes
 ]
 
 // pages

@@ -14,6 +14,7 @@ import VueFeather from 'vue-feather'
 import flatPickr from 'vue-flatpickr-component'
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
+import Emitter from 'tiny-emitter';
 
 Vue.use(VueFeather)
 Vue.use(flatPickr)
@@ -41,6 +42,9 @@ Vue.component('apexchart', VueApexCharts)
 // Uncomment this if you are having api served through other url or do not want to use fake backend
 Vue.prototype.$http = require('axios')
 Vue.prototype.$http.defaults.baseURL  = process.env.API_BASE_URL;
+Vue.prototype.$msalInstance = {};
+Vue.prototype.$emitter = new Emitter();
+
 
 const app = new Vue({
   router,
