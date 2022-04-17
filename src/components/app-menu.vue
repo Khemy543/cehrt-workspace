@@ -3,18 +3,18 @@
 
   <ul id="side-menu" class="metismenu">
     <li v-for="item in menuItems" v-show="department.name === item.department || item.department === 'all'"
-      :key="`item-${item.name}`" class="side-nav-title side-nav-item">
+      :key="`item-${item.name.split('-')[0]}`" class="side-nav-title side-nav-item">
       <p v-if="item.header" class="menu-title mb-0">{{ item.header }}</p>
 
       <a v-if="hasItems(item)" href="javascript:void(0);" class="side-nav-link">
         <feather v-if="item.icon" :type="item.icon"></feather>
-        <span>{{ item.name }}</span>
+        <span>{{ item.name.split('-')[0] }}</span>
         <span class="menu-arrow"></span>
       </a>
 
       <router-link v-if="!hasItems(item)" tag="a" :to="`${item.path}`" class="side-nav-link side-nav-link-ref">
         <feather v-if="item.icon" :type="item.icon"></feather>
-        <span>{{ item.name }}</span>
+        <span>{{ item.name.split('-')[0] }}</span>
       </router-link>
 
       <ul v-if="hasItems(item)" class="nav-second-level">
@@ -24,7 +24,7 @@
           <router-link tag="a" :to="`${item.path}/${subitem.path}`"
             class="side-nav-link-ref d-flex align-items-center">
             <feather v-if="subitem.icon" :type="subitem.icon" style="height:15px; margin-right:5px;"></feather>
-            {{ subitem.name }}
+            {{ subitem.name.split('-')[0] }}
           </router-link>
         </li>
       </ul>

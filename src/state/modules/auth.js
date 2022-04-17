@@ -5,7 +5,18 @@ export const state = {
   currentUser: null,
   userInitials:null,
   userToken: getSavedState('auth.token'),
-  userDepartment: getSavedState('user.department')
+  userDepartment: getSavedState('user.department'),
+  msalConfig: {
+    auth: {
+      clientId: '86fdb55a-cbfe-42f8-810a-191bf9a000b4',
+      authority:
+        'https://login.microsoftonline.com/e801a3ad-3690-4aa0-a142-1d77cb360b07',
+    },
+    cache: {
+      cacheLocation: 'localStorage',
+    },
+  },
+  accessToken: ''
 }
 
 export const mutations = {
@@ -22,6 +33,9 @@ export const mutations = {
   SET_USER_DEPARTMENT(state, department) {
     state.userDepartment = department;
     saveState('user.department', department)
+  },
+  setAccessToken(state, token){
+    state.accessToken = token;
   }
 }
 
