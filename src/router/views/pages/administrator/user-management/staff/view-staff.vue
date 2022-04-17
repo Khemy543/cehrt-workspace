@@ -90,10 +90,10 @@ export default {
           this.staff = response.data;
           this.form = {
             ...response.data,
-            consultingRoleId: response.data.position.find(item => item.department_id === this.consultingId).id || "",
-            financeRoleId: response.data.position.find(item => item.department_id === this.financeId).id || "",
-            adminRoleId: response.data.position.find(item => item.department_id === this.adiminId).id || "",
-            supervisor_id: response.data.supervisor && response.data.supervisor.id || '',
+            consultingRoleId: response.data.position.find(item => item.department_id === this.consultingId) && response.data.position.find(item => item.department_id === this.consultingId).id || "",
+            financeRoleId: response.data.position.find(item => item.department_id === this.financeId) && response.data.position.find(item => item.department_id === this.financeId).id || "",
+            adminRoleId: response.data.position.find(item => item.department_id === this.adiminId) && response.data.position.find(item => item.department_id === this.adiminId).id || "",
+            supervisor_id: response.data.supervisor && response.data.supervisor && response.data.supervisor.id || '',
             dob: dateFormate(response.data.dob),
             start_date: dateFormate(response.data.start_date)
           }
@@ -148,7 +148,7 @@ export default {
 
     async handleSubmit() {
       try {
-        const response = await this.$http.patch(`/update/${this.form.id}/staff`, {
+        const response = await this.$http.put(`/admin/update/${this.form.id}/staff`, {
           ...this.form,
           position_ids: [this.form.financeRoleId, this.form.adminRoleId, this.form.consultingRoleId]
         });
