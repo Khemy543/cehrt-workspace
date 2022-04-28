@@ -28,7 +28,8 @@ export default {
           <div
               class="badge badge-success float-right"
               :class="{
-                'badge-warning': `${projectStatus}` === 'Pending',
+                'badge-warning': `${projectStatus}` === 'pending',
+                'badge-danger': `${projectStatus}` === 'overdue',
               }"
               >{{ projectStatus }}</div
             >
