@@ -83,13 +83,13 @@ export default {
       required
     },
     postalAddressOfKin: {
-      required
+      required: false
     },
     telNextOfKin: {
       required
     },
     emailNextOfKin: {
-      required
+      required: false
     },
     form: [
       'firstName',
@@ -134,7 +134,7 @@ export default {
           class="form-group mb-3"
           :class="{ 'has-error': $v.firstName.$error }"
         >
-          <label class="col-md-3 col-form-label">First Name</label>
+          <label class="col-md-3 col-form-label">First Names</label>
           <div class="col-md-12">
             <input
               v-model.trim="firstName"
@@ -211,13 +211,13 @@ export default {
           class="form-group mb-3"
           :class="{ 'has-error': $v.address.$error }"
         >
-          <label class="col-md-12 col-form-label">Address</label>
+          <label class="col-md-12 col-form-label">Residential Address</label>
           <div class="col-md-12">
             <input
               v-model.trim="address"
               class="form-control"
               :class="{ 'is-invalid': $v.address.$error }"
-              placeholder="Address"
+              placeholder="Residential Address"
             />
             <span
               v-if="$v.address.$error && !$v.address.required"
@@ -302,13 +302,13 @@ export default {
       </div>
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.ghanaCardId.$error }">
-          <label class="col-md-12 col-form-label">Ghana Card ID</label>
+          <label class="col-md-12 col-form-label">Identification Card Number (Ghana Card, Passport etc.)</label>
           <div class="col-md-12">
             <input
               v-model.trim="ghanaCardId"
               class="form-control"
               :class="{ 'is-invalid': $v.ghanaCardId.$error }"
-              placeholder="Ghana Card ID"
+              placeholder="Identification Card Number"
             />
             <span
               v-if="$v.ghanaCardId.$error && !$v.ghanaCardId.required"
@@ -510,7 +510,7 @@ export default {
               placeholder="Address of next of kin"
             />
             <span
-              v-if="$v.nhia.$addressOfNextOfKin && !$v.addressOfNextOfKin.required"
+              v-if="$v.addressOfNextOfKin && !$v.addressOfNextOfKin.required"
               class="help-block invalid-feedback"
               >Address is required</span
             >

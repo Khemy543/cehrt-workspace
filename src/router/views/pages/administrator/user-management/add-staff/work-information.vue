@@ -70,7 +70,7 @@ export default {
       required: false
     },
     workLocation: {
-      required
+      required: false
     },
     workPhone: {
       required: false
@@ -241,7 +241,7 @@ export default {
               class="form-control"
               :class="{ 'is-invalid': $v.supervisor.$error }"
             >
-              <option disabled value>Select supervisor</option>
+              <option value="">Select supervisor</option>
               <option
                 v-for="option in staffOptions"
                 :key="option.id"
@@ -340,7 +340,7 @@ export default {
               v-model.trim="rate"
               class="form-control"
               :class="{ 'is-invalid': $v.rate.$error }"
-              placeholder="Work location"
+              placeholder="Rate"
             />
           </div>
         </div>
