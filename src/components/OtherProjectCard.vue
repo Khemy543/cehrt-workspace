@@ -21,7 +21,7 @@ export default {
 </script>
 
 <template>
-  <router-link :to="isProjectPage ? `details/${project.id}` : '#'" class="col-xl-4 col-lg-6">
+  <router-link :to="`/finance/project/${project.id}/details/`" class="col-xl-4 col-lg-6">
     <div class="card border">
       <div class="card-body">
         <slot name="status">

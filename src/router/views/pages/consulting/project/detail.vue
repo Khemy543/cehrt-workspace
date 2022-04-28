@@ -5,16 +5,18 @@ import PageHeader from '@components/page-header'
 import CreateProjectModal from '@components/CreateProjectModal.vue'
 import CreateDeliverable from '@components/CreateDeliverable'
 import ProjectDeletionModal from '../../../../../components/ProjectDeletionModal.vue'
+import ExportProjectForm from '@/src/components/ExportProjectForm.vue'
 
 export default {
   page: {
     title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, PageHeader, CreateProjectModal, CreateDeliverable, ProjectDeletionModal },
+  components: { Layout, PageHeader, CreateProjectModal, CreateDeliverable, ProjectDeletionModal, ExportProjectForm },
   data() {
     return {
       show: false,
+      showExport: false,
       formtitle: 'Edit Project',
       showCreateDeliverable: false,
       loading: true,
@@ -312,6 +314,11 @@ export default {
                       <i class="uil uil-edit mr-1"></i>View Project Plan
                     </button>
                   </router-link>
+                  <div class="btn-group ml-2 d-none d-sm-inline-block">
+                    <button type="button" class="btn btn-soft-success btn-sm" @click="showExport = true">
+                      <i class="uil uil-edit mr-1"></i>Export to Library
+                    </button>
+                  </div>
                   <div class="btn-group ml-2 d-none d-sm-inline-block">
                     <button type="button" class="btn btn-soft-primary btn-sm" @click="show = true">
                       <i class="uil uil-edit mr-1"></i>Edit
@@ -723,6 +730,11 @@ export default {
       :close="() => showProjectDeletionModal = false"
       :value="showProjectDeletionModal"
       @input="showProjectDeletionModal = $event"
+    />
+
+    <ExportProjectForm 
+      :value="showExport"
+      @input="showExport = $event"
     />
   </Layout>
 </template>

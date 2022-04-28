@@ -81,6 +81,9 @@ export default {
     this.fetchSuperviosrs();
   },
   methods: {
+    getIds(departments) {
+      return departments.map((items) => items.id)
+    },
     async fetchSingleStaff() {
       this.loading = true
       try {
@@ -148,15 +151,30 @@ export default {
 
     async handleSubmit() {
       try {
+        const positionIds = [];
+
+        if(this.form.financeRoleId) {
+          positionIds.push(this.form.financeRoleId);
+        }
+
+        if(this.form.adminRoleId) {
+          positionIds.push(this.form.adminRoleId)
+        }
+
+        if(this.form.consultingRoleId) {
+          positionIds.push(this.form.consultingRoleId)
+        }
         const response = await this.$http.put(`/admin/update/${this.form.id}/staff`, {
           ...this.form,
-          position_ids: [this.form.financeRoleId, this.form.adminRoleId, this.form.consultingRoleId]
+          position_ids: positionIds,
+          department_ids: this.getIds(this.form.department)
         });
 
         if (response) {
 
         }
       } catch (error) {
+        console.log(error)
         let message = 'Something happend, Please try again later'
         if (error.response) {
           const { status, data } = error.response
@@ -165,10 +183,11 @@ export default {
             message = data.errors[Object.keys(data.errors)[0]]
           }
         }
-        this.makeToast({
+        this.$bvToast.toast(message,{
           title: 'Error',
-          message,
-          type: 'danger',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
         })
       }
     }
@@ -278,14 +297,14 @@ export default {
                   </b-form-select>
                 </b-form-group>
               </div>
-              <div v-if="form.martial_status === 'married'" class="col-md-6">
+              <div v-if="form.marital_status === 'married'" class="col-md-6">
                 <b-form-group id="spouse_name" label="Spouse name" label-for="spouse_name">
                   <b-form-input id="spouse_name" v-model="form.spouse_name" type="text" placeholder="Spouse Name">
                   </b-form-input>
                 </b-form-group>
               </div>
             </div>
-            <div v-if="form.martial_status === 'married'" class="row">
+            <div v-if="form.marital_status === 'married'" class="row">
               <div class="col-md-6">
                 <b-form-group id="spouse_employer" label="Spouse employer" label-for="spouse_employer">
                   <b-form-input id="spouse_employer" v-model="form.spouse_employer" type="text"
@@ -362,7 +381,7 @@ export default {
               </div>
               <div class="col-md-6">
                 <div class="form-group mb-3">
-                  <label class="col-md-12 col-form-label">Deparatments</label>
+                  <label class="col-md-12 col-form-label">Deparatents</label>
                   <div class="col-md-12">
                     <multiselect v-model="form.department" :options="departmentsOptions" :multiple="true" label="name"
                       track-by="id"></multiselect>

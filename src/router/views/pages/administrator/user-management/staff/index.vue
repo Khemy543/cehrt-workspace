@@ -73,6 +73,7 @@ export default {
 
             if (response) {
               const index = this.staff.findIndex((item) => item.id === user.id)
+              this.$set(this.staff, index, { ...user, is_active: 1 })
               this.staff[index] = { ...user, is_active: 1 }
               this.$bvToast.toast('User account activated', {
                 title: 'Success',
@@ -110,7 +111,7 @@ export default {
 
             if (response) {
               const index = this.staff.findIndex((item) => item.id === user.id)
-              this.staff[index] = { ...user, is_active: 0 }
+              this.$set(this.staff, index, { ...user, is_active: 0 })
               this.$bvToast.toast('User account deactivated', {
                 title: 'Success',
                 autoHideDelay: 5000,
@@ -166,6 +167,7 @@ export default {
                   <tr>
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
+                    <th scope="col">Preferred Name</th>
                     <th scope="col">Email</th>
                     <th scope="col">Phone</th>
                     <th scope="col">Action</th>
@@ -183,6 +185,7 @@ export default {
                       {{ user.firstname }} {{ user.lastname }}
                       {{ user.other_names }}</td
                     >
+                    <td>{{ user.preferred_name }}</td>
                     <td>{{ user.email }}</td>
                     <td>{{ user.phone_number }}</td>
                     <td>

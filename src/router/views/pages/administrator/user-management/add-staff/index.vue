@@ -128,7 +128,7 @@ export default {
           dob: birthDate,
           NHIA_number: nhia,
           ghana_card_number: ghanaCardId,
-          supervisor_id: Number(supervisor),
+          ...(supervisor ? {supervisor_id: Number(supervisor)} : {}),
           ...(maritalStatus === 'married'
             ? {
               spouse_name: spouseName,
