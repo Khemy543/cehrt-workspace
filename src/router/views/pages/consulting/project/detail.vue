@@ -298,9 +298,10 @@ export default {
                         class="badge font-size-13 font-weight-normal ml-3"
                         :class="
                           project.status === 'pending'
-                            ? ' badge-danger'
+                            ? ' badge-warning'
                             : project.status === 'ongoing'
-                              ? 'badge-warning'
+                              ? 'badge-primary' :
+                              project.status === 'overdue' ? 'badge-danger'
                               : 'badge-success'
                         "
                       >{{ project.status }}</div>
