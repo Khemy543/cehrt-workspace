@@ -174,11 +174,9 @@ export default {
         start_date: newValue.raw_start_date,
         end_date: newValue.raw_end_date,
       }
-
-      console.log(this.form)
     },
   },
-  mounted() {
+  /* mounted() {
     this.form = {
     ...this.project,
       name: this.project.name || this.project.title || "",
@@ -188,7 +186,7 @@ export default {
       start_date: this.project.raw_start_date,
       end_date: this.project.raw_end_date,
     }
-  },
+  }, */
   created() {
     this.getSectors()
     this.getProjectTypes()
