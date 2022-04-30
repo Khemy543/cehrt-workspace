@@ -44,7 +44,7 @@ export default {
     async getProjectsLibrary() {
       try {
         this.loading = true;
-        const response = await this.$http.get(`/fetch/projects`);
+        const response = await this.$http.get(`/fetch/library/projects`);
 
         if (response) {
           this.library = response.data.data;
@@ -95,6 +95,9 @@ export default {
                   <tr>
                     <th scope="col">#</th>
                     <th scope="col">Project</th>
+                    <th scope="col">Country</th>
+                    <th scope="col">Region</th>
+                    <th scope="col">District</th>
                     <th scope="col">Year</th>
                     <th scope="col">Client</th>
                     <th scope="col">Type</th>
@@ -104,6 +107,9 @@ export default {
                   <tr v-for="(item, index) in library" :key="item.id" class="library-row" @click="goToFiles(item.id)">
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ item.name }}</td>
+                    <td>{{ item.country }}</td>
+                    <td>Accra</td>
+                    <td>{{ item.district }}</td>
                     <td>2016</td>
                     <td>{{ item.client }}</td>
                     <td>{{ item.project_type.name }}</td>

@@ -54,6 +54,10 @@ export default {
     this.getComments();
   },
   methods: {
+
+    getIds(regions) {
+      return regions.map((items) => items.id)
+    },
     getInitials(name) {
       return name
         .match(/\b(\w)/g)
@@ -267,6 +271,41 @@ export default {
         })
       }
     },
+
+    async exportToLibrary(form) {
+      try {
+        const response = await this.$http.patch(`/export/${this.$route.params.id}/project`, { ...form, regionIds: this.getIds(form.regionIds) });
+
+        if (response) {
+          this.$bvToast.toast('Project export successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
+          this.$router.push('/project/list')
+        }
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    }
   },
 }
 </script>
@@ -274,13 +313,8 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <CreateProjectModal
-      :value="show"
-      :form-title="formtitle"
-      :action="editProject"
-      :project="project"
-      @input="show = $event"
-    />
+    <CreateProjectModal :value="show" :form-title="formtitle" :action="editProject" :project="project"
+      @input="show = $event" />
     <div v-if="loading" class="d-flex justify-content-center">
       <b-spinner type="grow" variant="primary"></b-spinner>
     </div>
@@ -294,23 +328,21 @@ export default {
                   <div class="col-sm-12 col-xl-12">
                     <h4 class="mt-0">
                       Project: {{ project.name }}
-                      <div
-                        class="badge font-size-13 font-weight-normal ml-3"
-                        :class="
-                          project.status === 'pending'
-                            ? ' badge-warning'
-                            : project.status === 'ongoing'
-                              ? 'badge-primary' :
-                              project.status === 'overdue' ? 'badge-danger'
+                      <div class="badge font-size-13 font-weight-normal ml-3" :class="
+                        project.status === 'pending'
+                          ? ' badge-warning'
+                          : project.status === 'ongoing'
+                            ? 'badge-primary' :
+                            project.status === 'overdue' ? 'badge-danger'
                               : 'badge-success'
-                        "
-                      >{{ project.status }}</div>
+                      ">{{ project.status }}</div>
                     </h4>
                   </div>
                 </div>
 
                 <div class="col-sm-4 col-xl-6 text-sm-right">
-                  <router-link :to="`/project/${project.id}/project-plan`" class="btn-group ml-2 d-none d-sm-inline-block">
+                  <router-link :to="`/project/${project.id}/project-plan`"
+                    class="btn-group ml-2 d-none d-sm-inline-block">
                     <button type="button" class="btn btn-soft-info btn-sm">
                       <i class="uil uil-edit mr-1"></i>View Project Plan
                     </button>
@@ -326,11 +358,7 @@ export default {
                     </button>
                   </div>
                   <div class="btn-group d-none d-sm-inline-block ml-1">
-                    <button
-                      type="button"
-                      class="btn btn-soft-danger btn-sm"
-                      @click="showProjectDeletionModal = true"
-                    >
+                    <button type="button" class="btn btn-soft-danger btn-sm" @click="showProjectDeletionModal = true">
                       <i class="uil uil-trash-alt mr-1"></i>Delete
                     </button>
                   </div>
@@ -357,7 +385,7 @@ export default {
                     <div class="media-body">
                       <h4 class="mt-0 mb-0">
                         {{
-                          project.no_of_completed_tasks
+                            project.no_of_completed_tasks
                         }}
                       </h4>
                       <span class="text-muted">Total Tasks Completed</span>
@@ -372,7 +400,7 @@ export default {
                     <div class="media-body">
                       <h4 class="mt-0 mb-0">
                         {{
-                          project.no_of_pending_tasks
+                            project.no_of_pending_tasks
                         }}
                       </h4>
                       <span class="text-muted">Total Pending Task</span>
@@ -406,13 +434,13 @@ export default {
                 <p>{{ project.description }}</p>
                 <div class="badge badge-soft-primary font-size-13 font-weight-normal ml-1">
                   {{
-                    project.project_sector && project.project_sector.name
+                      project.project_sector && project.project_sector.name
                   }}
                 </div>
 
-                <div
-                  class="badge badge-soft-success font-size-13 font-weight-normal ml-1"
-                >{{ project.project_type && project.project_type.name }}</div>
+                <div class="badge badge-soft-success font-size-13 font-weight-normal ml-1">{{ project.project_type &&
+                    project.project_type.name
+                }}</div>
 
                 <div class="row">
                   <div class="col-lg-3 col-md-6">
@@ -454,32 +482,16 @@ export default {
                   <h6 class="font-weight-bold">Assign To</h6>
                   <div v-if="project.assignees !== 0">
                     <a href="javascript: void(0);">
-                      <img
-                        src="@assets/images/users/avatar-2.jpg"
-                        alt
-                        class="avatar-sm m-1 rounded-circle"
-                      />
+                      <img src="@assets/images/users/avatar-2.jpg" alt class="avatar-sm m-1 rounded-circle" />
                     </a>
                     <a href="javascript: void(0);">
-                      <img
-                        src="@assets/images/users/avatar-3.jpg"
-                        alt
-                        class="avatar-sm m-1 rounded-circle"
-                      />
+                      <img src="@assets/images/users/avatar-3.jpg" alt class="avatar-sm m-1 rounded-circle" />
                     </a>
                     <a href="javascript: void(0);">
-                      <img
-                        src="@assets/images/users/avatar-9.jpg"
-                        alt
-                        class="avatar-sm m-1 rounded-circle"
-                      />
+                      <img src="@assets/images/users/avatar-9.jpg" alt class="avatar-sm m-1 rounded-circle" />
                     </a>
                     <a href="javascript: void(0);">
-                      <img
-                        src="@assets/images/users/avatar-10.jpg"
-                        alt
-                        class="avatar-sm m-1 rounded-circle"
-                      />
+                      <img src="@assets/images/users/avatar-10.jpg" alt class="avatar-sm m-1 rounded-circle" />
                     </a>
                   </div>
                   <h5>No Assignees</h5>
@@ -498,14 +510,14 @@ export default {
                     <div class="mr-3">
                       <a href="#">
                         <div
-                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center"
-                        >{{ getInitials(com.user) }}</div>
+                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center">
+                          {{ getInitials(com.user) }}</div>
                       </a>
                     </div>
                     <div class="media-body">
                       <h5 class="mt-0 font-size-15">{{ com.user }}</h5>
                       <p class="text-muted mb-1">
-                       {{com.comment}}
+                        {{ com.comment }}
                       </p>
                     </div>
                   </div>
@@ -514,17 +526,13 @@ export default {
                     <div class="d-flex mr-3">
                       <a href="#">
                         <div
-                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center"
-                        >{{ initials }}</div>
+                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center">
+                          {{ initials }}</div>
                       </a>
                     </div>
                     <div class="media-body">
-                      <input
-                        v-model="comment"
-                        type="text"
-                        class="form-control input-sm"
-                        placeholder="Some text value..."
-                      />
+                      <input v-model="comment" type="text" class="form-control input-sm"
+                        placeholder="Some text value..." />
                     </div>
                   </form>
                 </b-tab>
@@ -637,22 +645,15 @@ export default {
               <h6 class="mt-0 header-title">Project Deliverables</h6>
 
               <ul class="list-unstyled activity-widget">
-                <li
-                  v-for="deliverable in projectDeliverables"
-                  :key="deliverable.id"
-                  class="activity-list"
-                >
+                <li v-for="deliverable in projectDeliverables" :key="deliverable.id" class="activity-list">
                   <div class="media d-flex justify-content-between">
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
-                        <router-link
-                          :to="
-                            `/project/${$route.params.id}/deliverable/${deliverable.id}`
-                          "
-                          class="text-dark"
-                        >
+                        <router-link :to="
+                          `/project/${$route.params.id}/deliverable/${deliverable.id}`
+                        " class="text-dark">
                           {{
-                            deliverable.project_type_deliverable &&
+                              deliverable.project_type_deliverable &&
                               deliverable.project_type_deliverable
                                 .deliverable_name
                           }}
@@ -660,16 +661,10 @@ export default {
                       </h5>
                       <div class="d-flex justify-content-between">
                         <div>
-                          <a
-                            :id="`task-tooltip-${deliverable.id}`"
-                            href="javascript: void(0)"
-                            class="text-muted d-inline-block bg-transparent"
-                          >
-                            <b-tooltip
-                              :target="`task-tooltip-${deliverable.id}`"
-                              triggers="hover"
-                              placement="top"
-                            >Tasks</b-tooltip>
+                          <a :id="`task-tooltip-${deliverable.id}`" href="javascript: void(0)"
+                            class="text-muted d-inline-block bg-transparent">
+                            <b-tooltip :target="`task-tooltip-${deliverable.id}`" triggers="hover" placement="top">Tasks
+                            </b-tooltip>
                             <i class="uil uil-bars mr-1"></i>
                             {{ deliverable.task || 0 }} task(s)
                           </a>
@@ -687,27 +682,20 @@ export default {
                     </div>
                   </div>
                 </li>
-                <li
-                  v-for="deliver in project.project_type &&
-                  project.project_type.deliverables"
-                  :key="deliver.name"
-                >
+                <li v-for="deliver in project.project_type &&
+                project.project_type.deliverables" :key="deliver.name">
                   <div v-if="showDeliverable(deliver)" class="activity-list">
                     <div class="media d-flex justify-content-between">
                       <div class="media-body overflow-hidden">
                         <h5 class="font-size-15 mt-2 mb-1">
                           <div class="text-dark">
                             {{
-                              deliver.deliverable_name
+                                deliver.deliverable_name
                             }}
                           </div>
                         </h5>
                       </div>
-                      <button
-                        type="button"
-                        class="btn btn-soft-primary btn-sm"
-                        @click="openCreateDeliverable(deliver)"
-                      >
+                      <button type="button" class="btn btn-soft-primary btn-sm" @click="openCreateDeliverable(deliver)">
                         <i class="uil uil-plus"></i>
                       </button>
                     </div>
@@ -720,22 +708,12 @@ export default {
       </div>
     </div>
 
-    <CreateDeliverable
-      :action="createDeliverable"
-      :value="showCreateDeliverable"
-      :deliverable="vDeliverable"
-      @input="showCreateDeliverable = $event"
-    />
+    <CreateDeliverable :action="createDeliverable" :value="showCreateDeliverable" :deliverable="vDeliverable"
+      @input="showCreateDeliverable = $event" />
 
-    <ProjectDeletionModal
-      :close="() => showProjectDeletionModal = false"
-      :value="showProjectDeletionModal"
-      @input="showProjectDeletionModal = $event"
-    />
+    <ProjectDeletionModal :close="() => showProjectDeletionModal = false" :value="showProjectDeletionModal"
+      @input="showProjectDeletionModal = $event" />
 
-    <ExportProjectForm 
-      :value="showExport"
-      @input="showExport = $event"
-    />
+    <ExportProjectForm :value="showExport" :action="exportToLibrary" :project="project" @input="showExport = $event" />
   </Layout>
 </template>
