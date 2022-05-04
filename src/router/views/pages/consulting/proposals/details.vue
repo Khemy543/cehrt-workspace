@@ -14,7 +14,7 @@
                   <div class="mt-4 mt-lg-0">
                     <h5 class="mt-0 mb-1 font-weight-bold">
                       {{
-                        proposal.title
+                          proposal.title
                       }}
                     </h5>
 
@@ -22,18 +22,18 @@
                       <div>
                         <div class="badge badge-soft-primary font-size-13 font-weight-normal">
                           {{
-                            proposal.project_type && proposal.project_type.name
+                              proposal.project_type && proposal.project_type.name
                           }}
                         </div>
                       </div>
                       <div>
                         <div class="badge badge-soft-success font-size-13 font-weight-normal ml-5">{{
-                          proposal.funding_option
+                            proposal.funding_option
                         }}</div>
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-md-3">
+                      <div class="col-md-6">
                         <div class="mt-4">
                           <p class="mb-2">
                             <i class="uil-user text-danger"></i> Client
@@ -42,20 +42,7 @@
                         </div>
                       </div>
 
-                      <!-- <div class="col-md-3">
-                        <div class="mt-4">
-                          <p class="mb-2">
-                            <i class="uil-calendar-slash text-danger"></i>
-                            Submission Date
-                          </p>
-                          <h5 class="font-size-16">{{
-                            proposal.submission_date || 'N/A'
-                          }}</h5>
-                        </div>
-                      </div>-->
-                      <div class="col-md-3"></div>
-
-                      <div class="col-md-3">
+                      <div class="col-md-2">
                         <b-dropdown class="d-inline" variant="link" toggle-class="font-weight-bold p-0 align-middle">
                           <template v-slot:button-content>
                             <button id="btn-new-event" class="btn btn-primary mt-4 mr-3">
@@ -67,9 +54,14 @@
                         </b-dropdown>
                       </div>
 
-                      <div class="col-md-3">
+                      <div class="col-md-2">
                         <button class="btn btn-white mt-4" @click="showCreateProject = true">
                           <i class="uil-sync"></i> Create Project
+                        </button>
+                      </div>
+                      <div class="col-md-2">
+                        <button class="btn btn-white mt-4" @click="exportToLibrary">
+                          <i class="uil-sync"></i> Export To Library
                         </button>
                       </div>
                     </div>
@@ -98,7 +90,7 @@
                       </div>
                       <div class="media-body">
                         <div class="d-inline-block mt-2">{{
-                          report.proposal_type && report.proposal_type.report_title
+                            report.proposal_type && report.proposal_type.report_title
                         }}.docx</div>
                       </div>
                       <!-- <div class="float-right mt-1">
@@ -156,8 +148,8 @@
 
         <CreateDeliverable :value="show" :action="createReport" :deliverable="vReport" @input="show = $event" />
 
-        <CreateProjectModal :value="showCreateProject" :action="createProjectFromDeliverable" :project="proposal" form-title="Create Project"
-          @input="showCreateProject = $event" />
+        <CreateProjectModal :value="showCreateProject" :action="createProjectFromDeliverable" :project="proposal"
+          form-title="Create Project" @input="showCreateProject = $event" />
       </div>
     </Layout>
   </div>
@@ -217,6 +209,29 @@ export default {
     this.getProposalReports();
   },
   methods: {
+    exportToLibrary() {
+      this.$swal({
+        title: 'Export proposal to library?',
+        showDenyButton: true,
+        confirmButtonText: 'Export',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.patch(`/export/${this.$route.params.id}}/proposal`);
+
+            if (response) {
+
+            }
+          } catch (error) {
+
+          }
+        }
+      }
+      )
+    },
     async getProposal() {
       try {
         this.loading = true
@@ -278,7 +293,7 @@ export default {
     },
     async createProjectFromDeliverable(form) {
       try {
-        const response = await this.$http.post(`/create/project`, {...form, proposal_id: this.$route.params.id});
+        const response = await this.$http.post(`/create/project`, { ...form, proposal_id: this.$route.params.id });
 
         if (response) {
           this.$bvToast.toast('Project deliverable created successfully', {
@@ -353,4 +368,5 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+</style>

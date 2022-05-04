@@ -122,7 +122,7 @@ export default {
                                 <li class="activity-list">
                                     <div class="media d-flex justify-content-between align-items-center">
                                         <div class="media-body overflow-hidden">
-                                            <h5 class="font-size-15 mt-2 mb-1">
+                                            <h5 class="font-size-18 mt-2 mb-1">
                                                 Contract
                                             </h5>
                                             <div>
@@ -145,7 +145,7 @@ export default {
                                 <li class="activity-list">
                                     <div class="media d-flex justify-content-between align-items-center">
                                         <div class="media-body overflow-hidden">
-                                            <h5 class="font-size-15 mt-2 mb-1">
+                                            <h5 class="font-size-18 mt-2 mb-1">
                                                 Insurance
                                             </h5>
                                             <div>
@@ -165,7 +165,7 @@ export default {
                                     </div>
                                 </li>
                                 <li class="activity-list">
-                                    <h5 class="font-size-15 mt-2 mb-2">
+                                    <h5 class="font-size-18 mt-2 mb-2">
                                         Time Sheet
                                     </h5>
                                     <div v-for="deliverable in getProjectTypes" :key="deliverable.id"
@@ -187,43 +187,34 @@ export default {
                                     </div>
                                 </li>
                                 <li class="activity-list">
-                                    <div class="media d-flex justify-content-between align-items-center">
+                                    <h5 class="font-size-18 mt-2 mb-2">
+                                        Invoice
+                                    </h5>
+                                    <div v-for="deliverable in getProjectTypes" :key="deliverable.id"
+                                        class="media d-flex justify-content-between align-items-center mb-4">
                                         <div class="media-body overflow-hidden">
-                                            <h5 class="font-size-15 mt-2 mb-1">
-                                                Scoping Report
+                                            <h5 class="font-size-14 mt-2 mb-1">
+                                                {{ deliverable.deliverable_name }}
                                             </h5>
                                             <div>
                                                 <input ref="contract" type="file" class="hidden" />
                                             </div>
-                                        </div>
-                                        <div class="d-flex">
-                                            <button type="button" class="btn btn-soft-secondary btn-sm"
-                                                @click="openContractUpload">
-                                                <i class="uil uil-edit"></i>
-                                            </button>
-
-                                            <button type="button" class="btn btn-soft-primary ml-2 btn-sm">
-                                                <i class="uil uil-edit-alt"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li class="activity-list">
-                                    <div class="media d-flex justify-content-between align-items-center">
-                                        <div class="media-body overflow-hidden">
-                                            <h5 class="font-size-15 mt-2 mb-1">
-                                                Final Report
-                                            </h5>
-                                            <div>
-                                                <input ref="contract" type="file" class="hidden" />
+                                            <div class="d-flex mt-3">
+                                                <b-form-group id="input-group-1" label="Status"
+                                                    label-for="input-1">
+                                                    <b-form-select v-model="form" class="mb-2">
+                                                        <option v-for="type in ['unpaid', 'paid']" :key="type"
+                                                            :value="type">{{ type }}</option>
+                                                    </b-form-select>
+                                                </b-form-group>
+                                                <b-form-group id="input-group-1" class=" mx-4" label="Payment days"
+                                                    label-for="input-1">
+                                                    <b-form-input id="input-1" v-model="form" type="number" required
+                                                        placeholder="Days"></b-form-input>
+                                                </b-form-group>
                                             </div>
                                         </div>
                                         <div class="d-flex">
-                                            <button type="button" class="btn btn-soft-secondary btn-sm"
-                                                @click="openContractUpload">
-                                                <i class="uil uil-edit"></i>
-                                            </button>
-
                                             <button type="button" class="btn btn-soft-primary ml-2 btn-sm">
                                                 <i class="uil uil-edit-alt"></i>
                                             </button>
