@@ -47,6 +47,7 @@ button:focus {
     .feather {
       color: $value;
       fill: rgba($value, 0.16);
+      cursor: pointer;
     }
   }
 }

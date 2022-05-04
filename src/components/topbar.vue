@@ -1,11 +1,12 @@
 <script>
 import { authComputed } from '@state/helpers'
-import VuePerfectScrollbar from 'vue-perfect-scrollbar'
+import { PublicClientApplication } from '@azure/msal-browser';
+// import VuePerfectScrollbar from 'vue-perfect-scrollbar'
 
 export default {
-	components: {
+	/* components: {
 		VuePerfectScrollbar,
-	},
+	}, */
 	props: {
 		user: {
 			type: Object,
@@ -16,19 +17,68 @@ export default {
 			type: Boolean,
 			default: false,
 		},
+
+		department: {
+			type: Object,
+			required: false,
+			default: () => ({})
+		}
+
 	},
 	data() {
-		return {}
+		return {
+			account: undefined,
+			github: 'https://github.com/cmatskas',
+			twitter: 'https://twitter.com/christosmatskas',
+			signin: 'https://microsoft.com',
+		}
 	},
 	computed: {
 		...authComputed,
+		initials() {
+			return this.$store ? this.$store.state.auth.userInitials : '' || '';
+		}
+	},
+	created() {
+		this.$msalInstance = new PublicClientApplication(
+			this.$store.state.auth.msalConfig,
+		);
+		// console.log(this.$msalInstance.loginPopup({}));
+	},
+	mounted() {
+		const accounts = this.$msalInstance.getAllAccounts();
+		if (accounts.length === 0) {
+			return;
+		}
+		this.account = accounts[0];
+		this.$emitter.emit('login', this.account);
 	},
 	methods: {
 		toggleMenu() {
 			this.$parent.toggleMenu()
 		},
-		toggleRightSidebar() {
-			this.$parent.toggleRightSidebar()
+		async SignIn() {
+			console.log('here')
+			await this.$msalInstance
+				.loginPopup({})
+				.then(() => {
+					const myAccounts = this.$msalInstance.getAllAccounts();
+					this.account = myAccounts[0];
+					this.$emitter.emit('login', this.account);
+				})
+				.catch(error => {
+					console.error(`error during authentication: ${error}`);
+				});
+		},
+		async SignOut() {
+			await this.$msalInstance
+				.logout({})
+				.then(() => {
+					this.$emitter.emit('logout', 'logging out');
+				})
+				.catch(error => {
+					console.error(error);
+				});
 		},
 	},
 }
@@ -41,277 +91,69 @@ export default {
 			<!-- LOGO -->
 			<a href="/" class="navbar-brand mr-0 mr-md-2 logo">
 				<span class="logo-lg">
-					<img src="@assets/images/logo.png" alt height="24" />
-					<span class="d-inline h5 ml-2 text-logo">Shreyu</span>
+					<img src="@assets/images/cehrt-small-logo.png" alt="logo" style="height:45px;" />
+					<span class="d-inline h5 ml-2 text-logo" style="color:#009a44;">CEHRT WORKSPACE</span>
 				</span>
 				<span class="logo-sm">
-					<img src="@assets/images/logo.png" alt height="24" />
+					<img src="@assets/images/cehrt-small-logo.png" alt="logo" />
 				</span>
 			</a>
 
-			<ul
-				class="navbar-nav bd-navbar-nav flex-row list-unstyled menu-left mb-0"
-			>
+			<ul class="navbar-nav bd-navbar-nav flex-row list-unstyled menu-left mb-0">
 				<li class>
-					<button
-						class="button-menu-mobile open-left disable-btn"
-						:class="{ open: isMenuOpened }"
-						@click="toggleMenu"
-					>
+					<button class="button-menu-mobile open-left disable-btn" :class="{ open: isMenuOpened }"
+						@click="toggleMenu">
 						<feather type="menu" class="menu-icon align-middle"></feather>
 						<feather type="x" class="close-icon"></feather>
 					</button>
 				</li>
 			</ul>
 
-			<ul
-				class="navbar-nav flex-row ml-auto d-flex list-unstyled topnav-menu float-right mb-0"
-			>
-				<li class="d-none d-sm-block">
-					<div class="app-search">
-						<form>
-							<div class="input-group">
-								<input
-									type="text"
-									class="form-control"
-									placeholder="Search..."
-								/>
-								<feather type="search" class="align-middle"></feather>
+			<ul class="navbar-nav flex-row ml-auto d-flex list-unstyled topnav-menu float-right mb-0">
+
+				<div>
+					<b-dropdown class="float-right" variant="black" right toggle-class="p-0">
+						<template v-slot:button-content>
+							<div class="d-flex">
+								<div style="width:40px; height:40px; border-radius:100px;"
+									class="mr-2 d-flex align-items-center justify-content-center bg-primary text-white font-weight-bold">
+									{{ initials }}</div>
+								<h6>{{ department.name }}</h6>
 							</div>
-						</form>
-					</div>
-				</li>
+						</template>
 
-				<b-nav-item-dropdown
-					id="globe-tooltip"
-					right
-					variant="black"
-					class="dropdown d-none d-lg-block"
-					no-caret
-				>
-					<template v-slot:button-content>
-						<feather type="globe"></feather>
-					</template>
-					<b-tooltip target="globe-tooltip" placement="left"
-						>Change language</b-tooltip
-					>
-					<!-- item-->
-					<b-dropdown-text href="javascript:void(0);" class="notify-item">
-						<img
-							src="@assets/images/flags/germany.jpg"
-							alt="user-image"
-							class="mr-2"
-							height="12"
-						/>
-						<span class="align-middle">German</span>
-					</b-dropdown-text>
+						<b-dropdown-item to="/profile" class="notify-item">
+							<feather type="user" class="icon-dual icon-xs mr-2 align-middle"></feather>
+							<span>{{ user.firstname }} {{ user.lastname }}</span>
+						</b-dropdown-item>
 
-					<!-- item-->
-					<b-dropdown-text href="javascript:void(0);" class="notify-item">
-						<img
-							src="@assets/images/flags/italy.jpg"
-							alt="user-image"
-							class="mr-2"
-							height="12"
-						/>
-						<span class="align-middle">Italian</span>
-					</b-dropdown-text>
+						<b-dropdown-item to="/departments" class="notify-item">
+							<feather type="repeat" class="icon-dual icon-xs mr-2 align-middle"></feather>
+							<span>Switch Department</span>
+						</b-dropdown-item>
 
-					<!-- item-->
-					<b-dropdown-text href="javascript:void(0);" class="notify-item">
-						<img
-							src="@assets/images/flags/spain.jpg"
-							alt="user-image"
-							class="mr-2"
-							height="12"
-						/>
-						<span class="align-middle">Spanish</span>
-					</b-dropdown-text>
+						<b-dropdown-divider></b-dropdown-divider>
 
-					<!-- item-->
-					<b-dropdown-text href="javascript:void(0);" class="notify-item">
-						<img
-							src="@assets/images/flags/russia.jpg"
-							alt="user-image"
-							class="mr-2"
-							height="12"
-						/>
-						<span class="align-middle">Russian</span>
-					</b-dropdown-text>
-				</b-nav-item-dropdown>
+						<b-dropdown-item to="/logout" class="notify-item">
+							<feather type="log-out" class="icon-dual icon-xs mr-2 align-middle"></feather>
+							<span>Logout</span>
+						</b-dropdown-item>
+					</b-dropdown>
+				</div>
 
-				<b-nav-item-dropdown
-					id="bell-notification"
-					right
-					variant="white"
-					class="notification-list"
-					title="8 new unread notifications"
-					menu-class="dropdown-lg"
-				>
-					<template v-slot:button-content>
-						<feather type="bell" class="align-middle"></feather>
-						<span class="noti-icon-badge"></span>
-					</template>
-					<b-tooltip target="bell-notification" placement="left"
-						>8 new unread notifications</b-tooltip
-					>
-					<!-- item-->
-					<b-dropdown-text class="noti-title border-bottom pb-2" tag="div">
-						<h5 class="m-0 font-size-16">
-							<span class="float-right">
-								<a href class="text-dark">
-									<small>Clear All</small>
-								</a> </span
-							>Notification
-						</h5>
-					</b-dropdown-text>
-
-					<VuePerfectScrollbar v-once class="noti-scroll">
-						<!-- item-->
-						<b-dropdown-text
-							href="javascript:void(0);"
-							class="notify-item border-bottom"
-						>
-							<div class="notify-icon bg-primary">
-								<i class="uil uil-user-plus"></i>
-							</div>
-							<p class="notify-details">
-								New user registered.
-								<small class="text-muted">5 hours ago</small>
-							</p>
-						</b-dropdown-text>
-
-						<!-- item-->
-						<b-dropdown-text
-							href="javascript:void(0);"
-							class="notify-item border-bottom"
-						>
-							<div class="notify-icon">
-								<img
-									src="@assets/images/users/avatar-1.jpg"
-									class="img-fluid rounded-circle"
-									alt
-								/>
-							</div>
-							<p class="notify-details">Karen Robinson</p>
-							<p class="text-muted mb-0 user-msg">
-								<small>Wow ! this admin looks good and awesome design</small>
-							</p>
-						</b-dropdown-text>
-
-						<!-- item-->
-						<b-dropdown-text
-							href="javascript:void(0);"
-							class="notify-item border-bottom"
-						>
-							<div class="notify-icon">
-								<img
-									src="@assets/images/users/avatar-2.jpg"
-									class="img-fluid rounded-circle"
-									alt
-								/>
-							</div>
-							<p class="notify-details">Cristina Pride</p>
-							<p class="text-muted mb-0 user-msg">
-								<small>Hi, How are you? What about our next meeting</small>
-							</p>
-						</b-dropdown-text>
-
-						<!-- item-->
-						<b-dropdown-text
-							href="javascript:void(0);"
-							class="notify-item border-bottom active"
-						>
-							<div class="notify-icon bg-success">
-								<i class="uil uil-comment-message"></i>
-							</div>
-							<p class="notify-details">
-								Jaclyn Brunswick commented on Dashboard
-								<small class="text-muted">
-									1 min ago
-								</small>
-							</p>
-						</b-dropdown-text>
-
-						<!-- item-->
-						<b-dropdown-text
-							href="javascript:void(0);"
-							class="notify-item border-bottom"
-						>
-							<div class="notify-icon bg-danger">
-								<i class="uil uil-comment-message"></i>
-							</div>
-							<p class="notify-details">
-								Caleb Flakelar commented on Admin
-								<small class="text-muted">
-									4 days ago
-								</small>
-							</p>
-						</b-dropdown-text>
-
-						<!-- item-->
-						<b-dropdown-text href="javascript:void(0);" class="notify-item">
-							<div class="notify-icon bg-primary">
-								<i class="uil uil-heart"></i>
-							</div>
-							<p class="notify-details">
-								Carlos Crouch liked
-								<b>Admin</b>
-								<small class="text-muted">13 days ago</small>
-							</p>
-						</b-dropdown-text>
-					</VuePerfectScrollbar>
-					<!-- All-->
-					<b-dropdown-text
-						href="javascript:void(0);"
-						class="text-center text-primary notify-item notify-all border-top"
-					>
-						View all
-						<i class="fi-arrow-right"></i>
-					</b-dropdown-text>
-				</b-nav-item-dropdown>
-
-				<li
-					id="setting-tooltip"
-					class="dropdown notification-list"
-					title="Settings"
-				>
-					<a
-						href="javascript:void(0);"
-						class="nav-link right-bar-toggle toggle-right"
-						@click="toggleRightSidebar"
-					>
-						<feather type="settings" class="toggle-right"></feather>
-					</a>
-					<b-tooltip target="setting-tooltip" placement="left"
-						>Settings</b-tooltip
-					>
-				</li>
-
-				<b-nav-item-dropdown
-					right
-					class="notification-list align-self-center profile-dropdown"
-					toggle-class="nav-user mr-0"
-				>
+				<b-nav-item-dropdown right class="notification-list align-self-center profile-dropdown"
+					toggle-class="nav-user mr-0">
 					<template v-slot:button-content>
 						<div class="media user-profile">
-							<img
-								src="@assets/images/users/avatar-7.jpg"
-								alt="user-image"
-								class="rounded-circle align-self-center"
-							/>
+							<img src="@assets/images/users/avatar-7.jpg" alt="user-image"
+								class="rounded-circle align-self-center" />
 							<div class="media-body text-left">
 								<h6 class="pro-user-name ml-2 my-0">
 									<span>{{ user.name }}</span>
-									<span class="pro-user-desc text-muted d-block mt-1"
-										>Administrator</span
-									>
+									<span class="pro-user-desc text-muted d-block mt-1">Administrator</span>
 								</h6>
 							</div>
-							<feather
-								type="chevron-down"
-								class="ml-2 align-self-center"
-							></feather>
+							<feather type="chevron-down" class="ml-2 align-self-center"></feather>
 						</div>
 					</template>
 					<b-dropdown-item href="/pages/profile" class="notify-item p-0">
@@ -325,24 +167,18 @@ export default {
 					</b-dropdown-item>
 
 					<b-dropdown-item href="javascript:void(0);" class="notify-item p-0">
-						<feather
-							type="help-circle"
-							class="icon-dual icon-xs mr-2"
-						></feather>
+						<feather type="help-circle" class="icon-dual icon-xs mr-2"></feather>
 						<span>Support</span>
 					</b-dropdown-item>
 
-					<b-dropdown-item
-						href="pages-lock-screen.html"
-						class="notify-item p-0"
-					>
+					<b-dropdown-item href="pages-lock-screen.html" class="notify-item p-0">
 						<feather type="lock" class="icon-dual icon-xs mr-2"></feather>
 						<span>Lock Screen</span>
 					</b-dropdown-item>
 
 					<b-dropdown-divider></b-dropdown-divider>
 
-					<b-dropdown-item href="/logout" class="notify-item p-0">
+					<b-dropdown-item to="/logout" class="notify-item p-0">
 						<feather type="log-out" class="icon-dual icon-xs mr-2"></feather>
 						<span>Logout</span>
 					</b-dropdown-item>
@@ -357,16 +193,19 @@ export default {
 .noti-scroll {
 	height: 220px;
 }
-.ps > .ps__scrollbar-y-rail {
+
+.ps>.ps__scrollbar-y-rail {
 	width: 8px !important;
 	background-color: transparent !important;
 }
-.ps > .ps__scrollbar-y-rail > .ps__scrollbar-y,
-.ps.ps--in-scrolling.ps--y > .ps__scrollbar-y-rail > .ps__scrollbar-y,
-.ps > .ps__scrollbar-y-rail:active > .ps__scrollbar-y,
-.ps > .ps__scrollbar-y-rail:hover > .ps__scrollbar-y {
+
+.ps>.ps__scrollbar-y-rail>.ps__scrollbar-y,
+.ps.ps--in-scrolling.ps--y>.ps__scrollbar-y-rail>.ps__scrollbar-y,
+.ps>.ps__scrollbar-y-rail:active>.ps__scrollbar-y,
+.ps>.ps__scrollbar-y-rail:hover>.ps__scrollbar-y {
 	width: 6px !important;
 }
+
 .button-menu-mobile {
 	outline: none !important;
 }

@@ -1,4 +1,4 @@
-import store from '@state/store'
+import store from '@state/store';
 
 // auth related routes
 const authRoutes = [
@@ -20,38 +20,12 @@ const authRoutes = [
     },
   },
   {
-    path: '/register',
-    name: 'register',
-    component: () => lazyLoadView(import('@views/pages/account/register')),
-    meta: {
-      beforeResolve(routeTo, routeFrom, next) {
-        // If the user is already logged in
-        if (store.getters['auth/loggedIn']) {
-          // Redirect to the home page instead
-          next({ name: 'dashboard' })
-        } else {
-          // Continue to the login page
-          next()
-        }
-      },
-    },
-  },
-  {
-    path: '/confirm-account',
-    name: 'confirm-account',
-    component: () => lazyLoadView(import('@views/pages/account/confirm')),
-    meta: {
-      beforeResolve(routeTo, routeFrom, next) {
-        // If the user is already logged in
-        if (store.getters['auth/loggedIn']) {
-          // Redirect to the home page instead
-          next({ name: 'dashboard' })
-        } else {
-          // Continue to the login page
-          next()
-        }
-      },
-    },
+    path: '/departments',
+    name: 'departments',
+    component: () =>
+      lazyLoadView(import('@views/pages/account/chooseDepartment')),
+    meta: { authRequired: true },
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
   {
     path: '/forget-password',
@@ -72,21 +46,28 @@ const authRoutes = [
     },
   },
   {
-    path: '/logout',
-    name: 'logout',
+    path: '/reset-password',
+    name: 'reset-password',
+    component: () =>
+      lazyLoadView(import('@views/pages/account/resetPassword.vue')),
     meta: {
-      authRequired: true,
       beforeResolve(routeTo, routeFrom, next) {
-        store.dispatch('auth/logOut')
-        const authRequiredOnPreviousRoute = routeFrom.matched.some(
-          (route) => route.meta.authRequired
-        )
-        // Navigate back to previous page, or home as a fallback
-        next(
-          authRequiredOnPreviousRoute ? { name: 'dashboard' } : { ...routeFrom }
-        )
+        // If the user is already logged in
+        if (store.getters['auth/loggedIn']) {
+          // Redirect to the home page instead
+          next({ name: 'dashboard' })
+        } else {
+          // Continue to the login page
+          next()
+        }
       },
     },
+  },
+  {
+    path: '/logout',
+    name: 'logout',
+    component: () => lazyLoadView(import('@views/pages/account/logout.vue')),
+    meta: { authRequired: true },
   },
 ]
 
@@ -115,12 +96,157 @@ const errorPagesRoutes = [
   },
 ]
 
+// administator routes
+
+// user mamangement routes
+const userManagementRoutes = [
+  {
+    path: '/user-management/staff',
+    name: 'User Management',
+    header: 'Activities',
+    icon: 'user-plus',
+    department: 'Administration',
+    meta: { authRequired: true },
+    // create a container component
+    component: () =>
+      lazyLoadView(
+        import('@views/pages/administrator/user-management/staff/index.vue')
+      ),
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+  },
+  {
+    name: 'Staff',
+    path: '/user-management/staff/:id/view-staff',
+    meta: { authRequired: true },
+    props: true,
+    component: () =>
+      lazyLoadView(
+        import(
+          '@views/pages/administrator/user-management/staff/view-staff.vue'
+        )
+      ),
+  },
+  {
+    name: 'Add Staff',
+    path: '/user-management/add-staff',
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(
+        import('@views/pages/administrator/user-management/add-staff/index.vue')
+      ),
+  },
+]
+
+// library routes
+const libraryRoutes = [
+  {
+    path: '/library',
+    name: 'Library',
+    meta: { authRequired: true },
+    icon: 'book-open',
+    department: 'all',
+    component: {
+      render(c) {
+        return c('router-view')
+      },
+    },
+    children: [
+      {
+        name: "Projects",
+        path: "projects",
+        icon: "",
+        component: () =>
+          lazyLoadView(import('@/src/router/views/pages/consulting/library/projects/projects.vue')),
+      },
+      {
+        name: "Projects Files",
+        path: "projects/:id/files",
+        invisible: true,
+        icon: "",
+        component: () =>
+          lazyLoadView(import('@/src/router/views/pages/consulting/library/projects/files.vue')),
+      },
+      {
+        name: "Proposals",
+        path: "proposals",
+        icon: "",
+        component: () =>
+          lazyLoadView(import('@/src/router/views/pages/consulting/library/proposals/proposals.vue')),
+      },
+      {
+        name: "Proposal Files",
+        path: "proposal/:id/files",
+        invisible: true,
+        component:() => lazyLoadView(import('@/src/router/views/pages/consulting/library/proposals/files.vue'))
+      }
+    ]
+  },
+]
+
+// finance routes
+
+// consulting routes
+
+const workFlowRoutes = [
+  {
+    path: '/work-flow',
+    name: 'Work Flows',
+    header: 'Setups',
+    icon: 'activity',
+    department: 'Consultancy',
+    meta: { authRequired: true },
+    // create a container component
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/workflows/workflows.vue')),
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+  },
+]
+
+// proposal routes
+
+const proposalRoutes = [
+  {
+    path: '/proposals/view-proposals',
+    header: 'Activities',
+    name: 'Proposals',
+    icon: 'bookmark',
+    department: 'Consultancy',
+    meta: { authRequired: true },
+    // create a container component
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/proposals/index.vue')),
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+  },
+  {
+    name: 'Proposals details',
+    path: '/proposals/details/:id',
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/proposals/details.vue')),
+  },
+  {
+    path: '/proposal/:proposal_id/report/:report_id',
+    name: 'Proposal Task List',
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/proposals/tasks/task-board')),
+  },
+  {
+    path: '/proposal/task/:id/details',
+    name: 'Proposal Task Details',
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/proposals/tasks/task-list')),
+  },
+]
+
 // dashboard
 const dashboardRoutes = [
   {
     path: '/',
     name: 'Dashboard',
     header: 'Navigation',
+    department: 'all',
     icon: 'home',
     badge: {
       text: '1',
@@ -135,21 +261,22 @@ const dashboardRoutes = [
 // apps
 const calendarAppsRoutes = [
   {
-    path: '/apps/calendar',
+    path: '/calendar',
     name: 'Calendar',
-    header: 'Apps',
     icon: 'calendar',
-    component: () => lazyLoadView(import('@views/pages/apps/calendar')),
+    department: 'all',
+    component: () => lazyLoadView(import('@views/pages/calendar/index.vue')),
     meta: { authRequired: true },
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
-  }
-];
-
+  },
+]
+/* 
 const emailAppsRoutes = [
   {
     path: '/apps/email',
     name: 'Email',
     icon: 'inbox',
+    department: 'Consultancy',
     meta: { authRequired: true },
     // create a container component
     component: {
@@ -163,8 +290,7 @@ const emailAppsRoutes = [
         name: 'Inbox',
         path: 'inbox',
         meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/apps/email/inbox')),
+        component: () => lazyLoadView(import('@views/pages/apps/email/inbox')),
       },
       {
         path: 'read',
@@ -181,87 +307,170 @@ const emailAppsRoutes = [
           lazyLoadView(import('@views/pages/apps/email/emailcompose')),
       },
     ],
-  }
-];
+  },
+] */
 
 const projectAppsRoutes = [
   {
-    path: '/apps/project',
+    path: '/project/list',
     name: 'Project',
     icon: 'briefcase',
+    department: 'Consultancy',
     meta: { authRequired: true },
     // create a container component
-    component: {
-      render(c) {
-        return c('router-view')
-      },
-    },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/project/list')),
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
-    children: [
-      {
-        path: 'list',
-        name: 'List',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/apps/project/list')),
-      },
-      {
-        path: 'detail',
-        name: 'Detail',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/apps/project/detail')),
-      },
-    ],
-  }
-];
-
-const taskAppsRoutes = [
+  },
   {
-    path: '/apps/task',
-    name: 'Task',
-    icon: 'bookmark',
+    path: '/project/details/:id',
+    name: 'Detail',
+
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/project/detail')),
+  },
+  {
+    path: '/project/:id/project-plan',
+    name: 'Project Plan',
+
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/project/project-plan')),
+  },
+  {
+    path: '/project/:project_id/deliverable/:deliverable_id',
+    name: 'Project Task List',
+
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/project/tasks/task-board')),
+  },
+  {
+    path: '/project/task/:id/details',
+    name: 'Project Task Details',
+
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/project/tasks/task-list')),
+  },
+]
+
+const adminProjectRoutes = [
+  {
+    path: '/admin/project-management',
+    name: 'Manage Project',
+    icon: 'briefcase',
+    department: 'Administration',
     meta: { authRequired: true },
     // create a container component
-    component: {
-      render(c) {
-        return c('router-view')
-      },
-    },
+    component: () =>
+      lazyLoadView(import('@views/pages/administrator/project/index')),
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
-    children: [
-      {
-        path: 'list',
-        name: 'Task List',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/apps/tasks/task-list')),
-      },
-      {
-        path: 'task-board',
-        name: 'Kanban Board',
-        meta: { authRequired: true },
-        component: () =>
-          lazyLoadView(import('@views/pages/apps/tasks/task-board')),
-      },
-    ],
+  },
+]
+
+const profileRoute = [
+  {
+    path: '/profile',
+    name: 'Profile',
+    meta: { authRequired: true },
+    component: () => lazyLoadView(import('@views/pages/profile')),
+  },
+]
+
+const recycleRoutes = [
+  {
+    path: '/recycle',
+    name: 'Project Recycle',
+    meta: { authRequired: true },
+    icon: 'refresh-ccw',
+    department: 'Consultancy',
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/recycle/index.vue')),
+  },
+]
+
+const leaveRequestRoutes = [
+  {
+    path: '/leave-request',
+    name: 'Leave Request',
+    meta: { authRequired: true },
+    icon: 'send',
+    department: 'all',
+    component: () =>
+      lazyLoadView(import('@views/pages/leave-request/index.vue')),
+  },
+  {
+    path: '/requested-leave',
+    name: 'Requested Leave',
+    meta: { authRequired: true },
+    icon: 'user-minus',
+    department: 'all',
+    isSupervisor: true,
+    component: () =>
+      lazyLoadView(import('@views/pages/leave-request/requested-leave.vue')),
+  },
+  {
+    path: '/request/:id/details',
+    name: 'Leave',
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/leave-request/view-details.vue')),
+  },
+]
+
+const trainingRouts = [
+  {
+    path: '/trainings',
+    name: 'Trainings',
+    meta: { authRequired: true },
+    icon: 'award',
+    department: 'all',
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/trainings/index.vue')),
+  },
+]
+
+const financeRoutes = [
+  {
+    path: '/finance/project',
+    name: "Projects-Finance",
+    meta: { authRequired: true },
+    icon: 'briefcase',
+    department: 'Finance',
+    component: () => lazyLoadView(import('@views/pages/finance/projects/index.vue')),
+  },
+  {
+    path: '/finance/project/:id/details',
+    name: "Projects finance details",
+    meta: { authRequired: true },
+    component: () => lazyLoadView(import('@views/pages/finance/projects/details.vue')),
   }
-];
+]
+
 
 const appsRoutes = [
   ...calendarAppsRoutes,
-  ...emailAppsRoutes,
+  ...leaveRequestRoutes,
+  ...userManagementRoutes,
+  ...proposalRoutes,
   ...projectAppsRoutes,
-  ...taskAppsRoutes
+  ...libraryRoutes,
+  ...adminProjectRoutes,
+  ...recycleRoutes,
+  ...trainingRouts,
+  ...financeRoutes
 ]
 
 // pages
-const pagesRoutes = [
+/* const pagesRoutes = [
   {
     path: '/pages',
     name: 'Pages',
     icon: 'file-text',
     header: 'Custom',
+    department: "Consultancy",
     meta: { authRequired: true },
     // create a container component
     component: {
@@ -281,11 +490,6 @@ const pagesRoutes = [
         component: () => lazyLoadView(import('@views/pages/secondary/invoice')),
       },
       {
-        path: 'profile',
-        name: 'Profile',
-        component: () => lazyLoadView(import('@views/pages/secondary/profile/')),
-      },
-      {
         path: 'activity',
         name: 'Activity',
         component: () =>
@@ -298,8 +502,8 @@ const pagesRoutes = [
       },
     ],
   },
-]
-
+] */
+/*
 // ui
 const uiRoutes = [
   {
@@ -307,13 +511,10 @@ const uiRoutes = [
     name: 'UI Elements',
     icon: 'package',
     header: 'Components',
+    department: 'all',
     meta: { authRequired: true },
     // create a container component
-    component: {
-      render(c) {
-        return c('router-view')
-      },
-    },
+    component: () => lazyLoadView(import('@views/pages/ui/icons/feather')),
     children: [
       {
         path: 'bootstrap',
@@ -442,19 +643,24 @@ const chartsRoutes = [
     meta: { authRequired: true },
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
-]
-
+] */
 
 const authProtectedRoutes = [
   ...dashboardRoutes,
   ...appsRoutes,
-  ...pagesRoutes,
-  ...uiRoutes,
-  ...formsRoutes,
+  ...workFlowRoutes,
+  /* ...pagesRoutes, */
+  // ...uiRoutes,
+  /* ...formsRoutes,
   ...chartsRoutes,
-  ...tablesRoutes
+  ...tablesRoutes, */
 ]
-const allRoutes = [...authRoutes, ...authProtectedRoutes, ...errorPagesRoutes]
+const allRoutes = [
+  ...authRoutes,
+  ...authProtectedRoutes,
+  ...errorPagesRoutes,
+  ...profileRoute,
+]
 
 export { allRoutes, authProtectedRoutes }
 

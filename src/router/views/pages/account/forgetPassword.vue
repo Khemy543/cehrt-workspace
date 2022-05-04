@@ -30,7 +30,7 @@ export default {
 			this.tryingToReset = true
 			// Reset the authError if it existed.
 			this.error = null
-			return this.resetPassword({
+			return this.requestResetPassword({
 				email: this.email,
 			})
 				.then((data) => {
@@ -64,12 +64,12 @@ export default {
 											<a href="/">
 												<img src="@assets/images/logo.png" alt height="24" />
 												<h3 class="d-inline align-middle ml-1 text-logo"
-													>Shreyu</h3
+													>CEHRT WORKSPACE</h3
 												>
 											</a>
 										</div>
 
-										<h6 class="h5 mb-0 mt-4">Reset Password</h6>
+										<h6 class="h5 mb-0 mt-4">Forgot Password?</h6>
 										<p class="text-muted mt-1 mb-5"
 											>Enter your email address and we'll send you an email with
 											instructions to reset your password.</p
@@ -107,6 +107,7 @@ export default {
 														type="email"
 														class="form-control"
 														placeholder="hello@coderthemes.com"
+														required
 													/>
 												</div>
 											</div>
