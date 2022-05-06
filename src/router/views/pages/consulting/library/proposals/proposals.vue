@@ -101,7 +101,6 @@ export default {
                     <th scope="col">Client</th>
                     <th scope="col">Project Type</th>
                     <th scope="col">Funding Option</th>
-                    <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>

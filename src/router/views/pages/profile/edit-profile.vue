@@ -38,7 +38,9 @@ export default {
           formData.append(`${key}`, this.form[key])
         };
 
-        const response = await this.$http.put(`auth/${this.form.id}/account/update`, formData);
+        formData.append('_method', 'PUT')
+
+        const response = await this.$http.post(`auth/${this.form.id}/account/update`, formData);
 
         if (response) {
 

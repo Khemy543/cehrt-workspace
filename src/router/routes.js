@@ -208,7 +208,7 @@ const proposalRoutes = [
   {
     path: '/proposals/view-proposals',
     header: 'Activities',
-    name: 'Proposals',
+    name: 'Proposals-Consulting',
     icon: 'bookmark',
     department: 'Consultancy',
     meta: { authRequired: true },
@@ -368,6 +368,12 @@ const adminProjectRoutes = [
       lazyLoadView(import('@views/pages/administrator/project/index')),
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
+  {
+    path: '/admin/project/:id/details',
+    name: "Projects Admin details",
+    meta: { authRequired: true },
+    component: () => lazyLoadView(import('@views/pages/administrator/project/details.vue')),
+  }
 ]
 
 const profileRoute = [

@@ -1,7 +1,6 @@
 <script>
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
-import CreateProjectModal from '@components/CreateProjectModal.vue'
 import OtherProjectCard from '@/src/components/OtherProjectCard.vue'
 
 export default {
@@ -9,7 +8,7 @@ export default {
     title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, CreateProjectModal, OtherProjectCard },
+  components: { Layout, OtherProjectCard },
   data() {
     return {
       projectData: [],
@@ -27,12 +26,6 @@ export default {
         },
       ],
       loading: false,
-      show: false,
-      form: {
-        projectType: '',
-        sector: '',
-      },
-      formtitle: 'Create New Project',
     }
   },
   created() {
@@ -59,51 +52,7 @@ export default {
         })
       }
     },
-    closeModal() {
-      this.show = false
-    },
-    async addNewProject(form) {
-      try {
-        const response = await this.$http.post('/create/project', form)
-
-        if (response) {
-          this.form = {}
-
-          this.projectData.push(response.data.project)
-
-          this.closeModal()
-
-          this.$bvToast.toast('New project added successfully', {
-            title: 'Success',
-            autoHideDelay: 5000,
-            appendToast: false,
-            variant: 'success',
-            toastClass: 'text-white',
-          })
-        }
-      } catch (error) {
-        if (error.response) {
-          const { status, data } = error.response
-          if (status === 422) {
-            const { errors } = data
-            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
-              title: 'Error',
-              autoHideDelay: 5000,
-              appendToast: false,
-              variant: 'danger',
-            })
-          }
-        }
-        this.$bvToast.toast('Something happened, Please try again later', {
-          title: 'Error',
-          autoHideDelay: 5000,
-          appendToast: false,
-          variant: 'danger',
-          toastClass: 'text-white',
-        })
-      }
-    },
-  },
+  }
 }
 </script>
 
@@ -156,13 +105,5 @@ export default {
     <div v-if="!loading && projectData.length <= 0" class=" w-100 d-flex justify-content-center">
       <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
     </div>
-
-    <CreateProjectModal
-      :value="show" 
-      :form-title="formtitle"
-      :close="closeModal"
-      :action="addNewProject"
-      @input="show = $event"
-    />
   </Layout>
 </template>
