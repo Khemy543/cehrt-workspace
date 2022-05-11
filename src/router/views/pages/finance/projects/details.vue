@@ -309,6 +309,14 @@ export default {
                 })
             }
         },
+
+        async deletProjectFile(id, key) {
+            try {
+                const response = await this.$http.delete(`/admin/delete/project/{project}/files`);
+            } catch (error) {
+                
+            }
+        },
         openContractUpload() {
             this.$refs['contract'].click();
         },

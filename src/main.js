@@ -41,7 +41,7 @@ Vue.component('apexchart', VueApexCharts)
 
 // Uncomment this if you are having api served through other url or do not want to use fake backend
 Vue.prototype.$http = require('axios')
-Vue.prototype.$http.defaults.baseURL  = process.env.API_BASE_URL;
+Vue.prototype.$http.defaults.baseURL  = 'https://backend-api.cehrtghana.com/api/';
 Vue.prototype.$msalInstance = {};
 Vue.prototype.$emitter = new Emitter();
 

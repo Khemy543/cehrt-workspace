@@ -373,6 +373,23 @@ const adminProjectRoutes = [
     name: "Projects Admin details",
     meta: { authRequired: true },
     component: () => lazyLoadView(import('@views/pages/administrator/project/details.vue')),
+  },
+  {
+    path: '/admin/proposal-management',
+    name: 'Proposal-Admin',
+    icon: 'book-open',
+    department: 'Administration',
+    meta: { authRequired: true },
+    // create a container component
+    component: () =>
+      lazyLoadView(import('@views/pages/administrator/proposals/index')),
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+  },
+  {
+    path: '/admin/proposals/:id/details',
+    name: "Proposal admin details",
+    meta: { authRequired: true },
+    component: () => lazyLoadView(import('@views/pages/administrator/proposals/details.vue'))
   }
 ]
 

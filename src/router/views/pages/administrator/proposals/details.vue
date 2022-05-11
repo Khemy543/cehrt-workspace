@@ -5,7 +5,7 @@ import PageHeader from '@components/page-header'
 
 export default {
   page: {
-    title: 'Projects',
+    title: 'Proposals',
     meta: [{ name: 'description', content: appConfig.description }],
   },
   components: { Layout, PageHeader },
@@ -13,15 +13,15 @@ export default {
     return {
       loading: true,
       project: {},
-      contractForm: {},
-      title: 'Project Overview',
+      proposal: {},
+      title: 'Proposal Overview',
       items: [
         {
           text: 'Cehrt',
           to: '/',
         },
         {
-          text: 'Projects',
+          text: 'Proposal',
           to: '/',
         },
         {
@@ -29,14 +29,13 @@ export default {
           active: true,
         },
       ],
-      contractFile: null,
-      insuranceFile: null,
-      permitFile: null,
-      reviewFile: null,
+      awardOfContractFile: null,
+      requestForEol: null,
+      requestForProposal: null,
       correspondents: [
         {
           id: 1,
-          corespondent_path: null,
+          correspondent_path: null,
         },
       ],
     }
@@ -47,20 +46,17 @@ export default {
     },
   },
   created() {
-    this.getProjectDetials()
+    this.getProposalDetails()
   },
   methods: {
     handleContractChange({ target }) {
-      this.contractFile = target.files[0]
+      this.awardOfContractFile = target.files[0]
     },
-    handleInsuranceChange({ target }) {
-      this.insuranceFile = target.files[0]
+    handleRequestForEolChange({ target }) {
+      this.requestForEol = target.files[0]
     },
-    handlePermitChange({ target }) {
-      this.permitFile = target.files[0]
-    },
-    handleReveiwCommentChange({ target }) {
-      this.reviewFile = target.files[0]
+    handleRequestForProposalChange({ target }) {
+      this.requestForProposal = target.files[0]
     },
     handleChangeCorrespondent(e, corresItem) {
       const index = this.correspondents.findIndex(
@@ -69,36 +65,36 @@ export default {
 
       this.$set(this.correspondents, index, {
         ...corresItem,
-        corespondent_path: e.target.files[0],
+        correspondent_path: e.target.files[0],
       })
     },
     async saveProjectData() {
       try {
         const formData = new FormData()
-        if (this.contractFile && typeof this.contractFile !== 'string') {
-          formData.append('contract', this.contractFile)
+        if (
+          this.awardOfContractFile &&
+          typeof this.awardOfContractFile !== 'string'
+        ) {
+          formData.append('award_of_contract', this.awardOfContractFile)
         }
-        if (this.insuranceFile && typeof this.insuranceFile !== 'string') {
-          formData.append('insurance', this.insuranceFile)
+        if (this.requestForEol && typeof this.requestForEol !== 'string') {
+          formData.append('request_for_eol', this.requestForEol)
         }
-        if (this.permitFile && typeof this.permitFile !== 'string') {
-          formData.append('permit', this.permitFile)
-        }
-        if (this.reviewFile && typeof this.reviewFile !== 'string') {
-          formData.append('review_comment', this.reviewFile)
+        if (
+          this.requestForProposal &&
+          typeof this.requestForProposal !== 'string'
+        ) {
+          formData.append('request_for_proposal', this.requestForProposal)
         }
         this.correspondents.forEach((file) => {
-          if (
-            file.corespondent_path &&
-            typeof file.corespondent_path !== 'string'
-          ) {
-            formData.append('corespondents[]', file.corespondent_path)
+          if (file.correspondent_path && typeof file.correspondent_path !== 'string') {
+            formData.append('correspondents[]', file.correspondent_path)
           }
         })
         formData.append('_method', 'PATCH')
 
         const response = await this.$http.post(
-          `/admin/add/project/${this.$route.params.id}/corespondents`,
+          `/admin/update/${this.$route.params.id}/proposal`,
           formData
         )
 
@@ -134,26 +130,25 @@ export default {
       }
     },
 
-    async getProjectDetials() {
+    async getProposalDetails() {
       try {
         this.loading = true
         const response = await this.$http.get(
-          `/admin/fetch/project/${this.$route.params.id}/corespondents`
+          `/admin/fetch/${this.$route.params.id}/proposal`
         )
 
         if (response && response.data) {
-          this.project = response.data
-          this.contractFile = response.data.contract
-          this.insuranceFile = response.data.insurance
-          this.permitFile = response.data.permit
-          this.reviewFile = response.data.review_comment
+          this.proposal = response.data
+          this.awardOfContractFile = response.data.award_of_contract
+          this.requestForEol = response.data.request_for_eol
+          this.requestForProposal = response.data.request_for_proposal
           this.correspondents =
-            response.data.corespondents.length > 0
-              ? response.data.corespondents
+            response.data.correspondents.length > 0
+              ? response.data.correspondents
               : [
                   {
                     id: 1,
-                    corespondent_path: null,
+                    correspondent_path: null,
                   },
                 ]
           this.items[2].text = response.data.name
@@ -166,39 +161,6 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
-      }
-    },
-    async removeInsuranceFile() {
-      try {
-        if (typeof this.insuranceFile === 'object') {
-          this.insuranceFile = null
-          return
-        }
-        const response = await this.deletProjectFile('insurance')
-        if (response) {
-          this.insuranceFile = null
-        }
-      } catch (error) {}
-    },
-    async deletProjectFile(key) {
-      try {
-        const response = await this.$http.post(
-          `/admin/delete/project/${this.$route.params.id}/files`, {
-            file_to_delete: key,
-            _method: 'DELETE'
-          }
-        )
-
-        if (response) {
-          
-        }
-      } catch (error) {
-        this.$bvToast.toast('Something happened, Please try again later', {
-            title: 'Error',
-            autoHideDelay: 5000,
-            appendToast: false,
-            variant: 'danger',
-          })
       }
     },
     createUrl(file) {
@@ -236,28 +198,47 @@ export default {
     </div>
     <div v-else>
       <div class="row">
-        <div class="col">
+        <div class="col-12">
           <div class="card">
-            <div class="card-body p-0">
+            <div class="card-body">
               <div
                 class="card-title border-bottom p-3 mb-0 w-100 d-flex justify-content-between"
               >
                 <div class="page-title" style="padding:0">
-                  <h4 class="mt-0">
-                    Project: {{ project.name }}
-                    <div
-                      class="badge font-size-13 font-weight-normal ml-3"
-                      :class="
-                        project.status === 'overdue'
-                          ? ' badge-danger'
-                          : project.status === 'ongoing'
-                          ? 'badge-primary'
-                          : 'badge-success'
-                      "
-                      >{{ project.status }}</div
-                    >
-                  </h4>
-                  <p>{{ project.description }}</p>
+                  <div class="mt-4 mt-lg-0">
+                    <h5 class="mt-0 mb-1 font-weight-bold">
+                      {{ proposal.title }}
+                    </h5>
+
+                    <div class="d-flex items-align-center mt-4">
+                      <div>
+                        <div
+                          class="badge badge-soft-primary font-size-13 font-weight-normal"
+                        >
+                          {{
+                            proposal.project_type && proposal.project_type.name
+                          }}
+                        </div>
+                      </div>
+                      <div>
+                        <div
+                          class="badge badge-soft-success font-size-13 font-weight-normal ml-5"
+                        >
+                          {{ proposal.funding_option }}</div
+                        >
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="mt-4">
+                          <p class="mb-2">
+                            <i class="uil-user text-danger"></i> Client
+                          </p>
+                          <h5 class="font-size-16">{{ proposal.client }}</h5>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 <div>
                   <button
@@ -269,8 +250,10 @@ export default {
                 </div>
               </div>
             </div>
+            <!-- end card body-->
           </div>
         </div>
+        <!-- end card -->
       </div>
       <div class="row d-flex">
         <div class="col-xl-8">
@@ -285,11 +268,11 @@ export default {
                   >
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-16 mt-2 mb-1">
-                        Contract
+                        Award of Contract
                       </h5>
-                      <div v-if="createUrl(contractFile)" class="row">
+                      <div v-if="createUrl(awardOfContractFile)" class="row">
                         <a
-                          :href="createUrl(contractFile)"
+                          :href="createUrl(awardOfContractFile)"
                           target="_blank"
                           class="col-6"
                         >
@@ -304,7 +287,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >Contract.docx</div
+                                  >Award-of-contract.docx</div
                                 >
                               </div>
                               <!-- <div class="float-right mt-1">
@@ -329,7 +312,7 @@ export default {
                       <button
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="contractFile = null"
+                        @click="awardOfContractFile = null"
                       >
                         <i class="uil uil-trash"></i>
                       </button>
@@ -343,11 +326,11 @@ export default {
                   >
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-16 mt-2 mb-1">
-                        Insurance
+                        Request for EOl
                       </h5>
-                      <div v-if="createUrl(insuranceFile)" class="row">
+                      <div v-if="createUrl(requestForEol)" class="row">
                         <a
-                          :href="createUrl(insuranceFile)"
+                          :href="createUrl(requestForEol)"
                           target="_blank"
                           class="col-6"
                         >
@@ -362,7 +345,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >Insurance.docx</div
+                                  >Request-for-EOL.docx</div
                                 >
                               </div>
                               <!-- <div class="float-right mt-1">
@@ -375,14 +358,73 @@ export default {
                         </a>
                       </div>
                       <div v-else>
-                        <input type="file" @change="handleInsuranceChange" />
+                        <input
+                          type="file"
+                          @change="handleRequestForEolChange"
+                        />
                       </div>
                     </div>
                     <div class="d-flex">
                       <button
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="removeInsuranceFile"
+                        @click="requestForEol = null"
+                      >
+                        <i class="uil uil-trash"></i>
+                      </button>
+                    </div>
+                  </div>
+                </li>
+
+                <li class="activity-list">
+                  <div
+                    class="media d-flex justify-content-between align-items-center"
+                  >
+                    <div class="media-body overflow-hidden">
+                      <h5 class="font-size-16 mt-2 mb-1">
+                        Request For Proposal
+                      </h5>
+                      <div v-if="createUrl(requestForProposal)" class="row">
+                        <a
+                          :href="createUrl(requestForProposal)"
+                          target="_blank"
+                          class="col-6"
+                        >
+                          <div class="p-2 border rounded mb-4">
+                            <div class="media">
+                              <div class="avatar-sm font-weight-bold mr-3">
+                                <span
+                                  class="avatar-title rounded bg-soft-primary text-primary"
+                                >
+                                  <i class="uil-file-plus-alt font-size-18"></i>
+                                </span>
+                              </div>
+                              <div class="media-body">
+                                <div class="d-inline-block mt-2"
+                                  >Request-For-Proposal.docx</div
+                                >
+                              </div>
+                              <!-- <div class="float-right mt-1">
+                                                                <div class="p-2">
+                                                                    <i class="uil-download-alt font-size-18"></i>
+                                                                </div>
+                                                            </div> -->
+                            </div>
+                          </div>
+                        </a>
+                      </div>
+                      <div v-else>
+                        <input
+                          type="file"
+                          @change="handleRequestForProposalChange"
+                        />
+                      </div>
+                    </div>
+                    <div class="d-flex">
+                      <button
+                        type="button"
+                        class="btn btn-soft-danger btn-sm mx-2"
+                        @click="requestForProposal = null"
                       >
                         <i class="uil uil-trash"></i>
                       </button>
@@ -420,13 +462,13 @@ export default {
                       </h5>
                       <div
                         v-if="
-                          createUrl(correspondents[index].corespondent_path)
+                          createUrl(correspondents[index].correspondent_path)
                         "
                         class="row"
                       >
                         <a
                           :href="
-                            createUrl(correspondents[index].corespondent_path)
+                            createUrl(correspondents[index].correspondent_path)
                           "
                           target="_blank"
                           class="col-6"
@@ -473,114 +515,6 @@ export default {
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
                         @click="removeCorrespondent(deliverable.id)"
-                      >
-                        <i class="uil uil-trash"></i>
-                      </button>
-                    </div>
-                  </div>
-                </li>
-                <li class="activity-list">
-                  <div
-                    class="media d-flex justify-content-between align-items-center"
-                  >
-                    <div class="media-body overflow-hidden">
-                      <h5 class="font-size-16 mt-2 mb-1">
-                        Permit
-                      </h5>
-                      <div v-if="createUrl(permitFile)" class="row">
-                        <a
-                          :href="createUrl(permitFile)"
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >Permit.docx</div
-                                >
-                              </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                      <div v-else>
-                        <input type="file" @change="handlePermitChange" />
-                      </div>
-                    </div>
-                    <div class="d-flex">
-                      <button
-                        type="button"
-                        class="btn btn-soft-danger btn-sm mx-2"
-                        @click="permitFile = null"
-                      >
-                        <i class="uil uil-trash"></i>
-                      </button>
-                    </div>
-                  </div>
-                </li>
-
-                <li class="activity-list">
-                  <div
-                    class="media d-flex justify-content-between align-items-center"
-                  >
-                    <div class="media-body overflow-hidden">
-                      <h5 class="font-size-16 mt-2 mb-1">
-                        Review Comment
-                      </h5>
-                      <div v-if="createUrl(reviewFile)" class="row">
-                        <a
-                          :href="createUrl(reviewFile)"
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >Review-comment.docx
-                                </div>
-                              </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
-                            </div>
-                          </div>
-                        </a>
-                      </div>
-                      <div v-else>
-                        <input
-                          type="file"
-                          @change="handleReveiwCommentChange"
-                        />
-                      </div>
-                    </div>
-                    <div class="d-flex">
-                      <button
-                        type="button"
-                        class="btn btn-soft-danger btn-sm mx-2"
-                        @click="reviewFile = null"
                       >
                         <i class="uil uil-trash"></i>
                       </button>
