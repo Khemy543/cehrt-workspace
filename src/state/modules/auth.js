@@ -124,7 +124,7 @@ export const actions = {
     if (state.currentUser) return Promise.resolve(state.currentUser)
 
     try {
-      const response = await axios.get(`${process.env.API_BASE_URL}auth/user`);
+      const response = await axios.get(`https://backend-api.cehrtghana.com/api/auth/user`);
       const user = response.data;
       commit('SET_CURRENT_USER', user);
       return user;
