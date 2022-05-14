@@ -87,7 +87,10 @@ export default {
           formData.append('request_for_proposal', this.requestForProposal)
         }
         this.correspondents.forEach((file) => {
-          if (file.correspondent_path && typeof file.correspondent_path !== 'string') {
+          if (
+            file.correspondent_path &&
+            typeof file.correspondent_path !== 'string'
+          ) {
             formData.append('correspondents[]', file.correspondent_path)
           }
         })
@@ -99,6 +102,19 @@ export default {
         )
 
         if (response) {
+          const { corespondent } = response.data
+          this.awardOfContractFile = corespondent.award_of_contract
+          this.requestForEol = corespondent.request_for_eol
+          this.requestForProposal = corespondent.request_for_proposal
+          this.correspondents =
+            corespondent.correspondents.length > 0
+              ? corespondent.correspondents
+              : [
+                  {
+                    id: 1,
+                    correspondent_path: null,
+                  },
+                ]
           this.$bvToast.toast('File saved successfully', {
             title: 'Success',
             autoHideDelay: 5000,
@@ -179,12 +195,136 @@ export default {
         file: null,
       })
     },
-    removeCorrespondent(id) {
-      if (this.correspondents.length > 1) {
-        this.correspondents = this.correspondents.filter(
-          (item) => item.id !== id
+    async deleteProposalFile(key) {
+      try {
+        const response = await this.$http.post(
+          `/admin/delete/proposal/${this.$route.params.id}/files`,
+          {
+            file_to_delete: key,
+            _method: 'DELETE',
+          }
         )
+
+        if (response) {
+          return response
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
       }
+    },
+    async deleteAwardOfContractFile() {
+      try {
+        if (typeof this.awardOfContractFile === 'object') {
+          this.awardOfContractFile = null
+          return
+        }
+
+        const response = await this.deleteProposalFile('award_of_contract')
+
+        if (response) {
+          this.awardOfContractFile = null
+          this.$bvToast.toast('File deleted successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+            toastClass: 'text-white',
+          })
+        }
+      } catch (error) {}
+    },
+    async deleteRequestForProposal() {
+      try {
+        if (typeof this.requestForProposal === 'object') {
+          this.requestForProposal = null
+          return
+        }
+
+        const response = await this.deleteProposalFile('request_for_proposal')
+
+        if (response) {
+          this.requestForProposal = null
+          this.$bvToast.toast('File deleted successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+            toastClass: 'text-white',
+          })
+        }
+      } catch (error) {}
+    },
+    async deleteRequestForEol() {
+      try {
+        if (typeof this.requestForEol === 'object') {
+          this.requestForEol = null
+          return
+        }
+
+        const response = await this.deleteProposalFile('request_for_eol')
+
+        if (response) {
+          this.requestForEol = null
+          this.$bvToast.toast('File deleted successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+            toastClass: 'text-white',
+          })
+        }
+      } catch (error) {}
+    },
+    async deleteCorrespondent(id) {
+      try {
+        const response = await this.$http.post(
+          `/admin/delete/proposal/${this.$route.params.id}/files`,
+          {
+            correspondent_id: id,
+            _method: 'DELETE',
+          }
+        )
+        if (response) {
+          return response
+        }
+      } catch (error) {}
+    },
+    async removeCorrespondent(correspondent) {
+      try {
+        const length = this.correspondents.length
+        if (typeof correspondent.correspondent_path === 'string') {
+          const response = await this.deleteCorrespondent(correspondent.id)
+
+          if (response) {
+            if (length > 1) {
+              this.correspondents = this.correspondents.filter(
+                (item) => item.id !== correspondent.id
+              )
+              return
+            }
+            this.$set(this.correspondents, 0, {
+              id: 1,
+              correspondent_path: null,
+            })
+          }
+        } else {
+          if (length > 1) {
+            this.correspondents = this.correspondents.filter(
+              (item) => item.id !== correspondent.id
+            )
+            return
+          }
+          this.$set(this.correspondents, 0, {
+            id: 1,
+            correspondent_path: null,
+          })
+        }
+      } catch (error) {}
     },
   },
 }
@@ -290,11 +430,6 @@ export default {
                                   >Award-of-contract.docx</div
                                 >
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -310,9 +445,10 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="awardOfContractFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="awardOfContractFile = null"
+                        @click="deleteAwardOfContractFile"
                       >
                         <i class="uil uil-trash"></i>
                       </button>
@@ -348,11 +484,6 @@ export default {
                                   >Request-for-EOL.docx</div
                                 >
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -366,9 +497,10 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="requestForEol"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="requestForEol = null"
+                        @click="deleteRequestForEol"
                       >
                         <i class="uil uil-trash"></i>
                       </button>
@@ -404,11 +536,6 @@ export default {
                                   >Request-For-Proposal.docx</div
                                 >
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -422,9 +549,10 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="requestForProposal"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="requestForProposal = null"
+                        @click="deleteRequestForProposal"
                       >
                         <i class="uil uil-trash"></i>
                       </button>
@@ -487,11 +615,6 @@ export default {
                                   >correspondent.docx
                                 </div>
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -514,7 +637,7 @@ export default {
                       <button
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="removeCorrespondent(deliverable.id)"
+                        @click="removeCorrespondent(deliverable)"
                       >
                         <i class="uil uil-trash"></i>
                       </button>

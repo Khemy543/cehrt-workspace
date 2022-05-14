@@ -103,6 +103,20 @@ export default {
         )
 
         if (response) {
+          const { corespondent } = response.data
+          this.contractFile = corespondent.contract
+          this.insuranceFile = corespondent.insurance
+          this.permitFile = corespondent.permit
+          this.reviewFile = corespondent.review_comment
+          this.correspondents =
+            corespondent.corespondents.length > 0
+              ? corespondent.corespondents
+              : [
+                  {
+                    id: 1,
+                    corespondent_path: null,
+                  },
+                ]
           this.$bvToast.toast('File saved successfully', {
             title: 'Success',
             autoHideDelay: 5000,
@@ -112,6 +126,7 @@ export default {
           })
         }
       } catch (error) {
+        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -177,28 +192,101 @@ export default {
         const response = await this.deletProjectFile('insurance')
         if (response) {
           this.insuranceFile = null
+          this.$bvToast.toast('File deleted successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+            toastClass: 'text-white',
+          })
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    async removeContractFile() {
+      try {
+        if (typeof this.contractFile === 'object') {
+          this.contractFile = null
+          return
+        }
+
+        const response = await this.deletProjectFile('contract')
+
+        if (response) {
+          this.contractFile = null
+          this.$bvToast.toast('File deleted successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+            toastClass: 'text-white',
+          })
+        }
+      } catch (error) {}
+    },
+    async removePermitFile() {
+      try {
+        if (typeof this.permitFile === 'object') {
+          this.permitFile = null
+          return
+        }
+
+        const response = await this.deletProjectFile('permit')
+
+        if (response) {
+          this.permitFile = null
+          this.$bvToast.toast('File deleted successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+            toastClass: 'text-white',
+          })
+        }
+      } catch (error) {}
+    },
+    async removeReviewComment() {
+      try {
+        if (typeof this.reviewFile === 'object') {
+          this.reviewFile = null
+          return
+        }
+
+        const response = await this.deletProjectFile('review_comment')
+
+        if (response) {
+          this.reviewFile = null
+          this.$bvToast.toast('File deleted successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+            toastClass: 'text-white',
+          })
         }
       } catch (error) {}
     },
     async deletProjectFile(key) {
       try {
         const response = await this.$http.post(
-          `/admin/delete/project/${this.$route.params.id}/files`, {
+          `/admin/delete/project/${this.$route.params.id}/files`,
+          {
             file_to_delete: key,
-            _method: 'DELETE'
+            _method: 'DELETE',
           }
         )
 
         if (response) {
-          
+          return response
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
-            title: 'Error',
-            autoHideDelay: 5000,
-            appendToast: false,
-            variant: 'danger',
-          })
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
       }
     },
     createUrl(file) {
@@ -217,12 +305,51 @@ export default {
         file: null,
       })
     },
-    removeCorrespondent(id) {
-      if (this.correspondents.length > 1) {
-        this.correspondents = this.correspondents.filter(
-          (item) => item.id !== id
+    async deleteCorrespondent(id) {
+      try {
+        const response = await this.$http.post(
+          `/admin/delete/project/${this.$route.params.id}/files`,
+          {
+            correspondent_id: id,
+            _method: 'DELETE',
+          }
         )
-      }
+        if (response) {
+          return response
+        }
+      } catch (error) {}
+    },
+    async removeCorrespondent(correspondent) {
+      try {
+        const length = this.correspondents.length;
+        if (typeof correspondent.corespondent_path === 'string') {
+          const response = await this.deleteCorrespondent(correspondent.id)
+
+          if (response) {
+            if (length > 1) {
+              this.correspondents = this.correspondents.filter(
+                (item) => item.id !== correspondent.id
+              )
+              return
+            }
+            this.$set(this.correspondents, 0, {
+              id: 1,
+              corespondent_path: null,
+            })
+          }
+        } else {
+          if (length > 1) {
+            this.correspondents = this.correspondents.filter(
+              (item) => item.id !== correspondent.id
+            )
+            return
+          }
+          this.$set(this.correspondents, 0, {
+            id: 1,
+            corespondent_path: null,
+          })
+        }
+      } catch (error) {}
     },
   },
 }
@@ -327,9 +454,10 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="contractFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="contractFile = null"
+                        @click="removeContractFile"
                       >
                         <i class="uil uil-trash"></i>
                       </button>
@@ -380,6 +508,7 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="insuranceFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
                         @click="removeInsuranceFile"
@@ -472,7 +601,7 @@ export default {
                       <button
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="removeCorrespondent(deliverable.id)"
+                        @click="removeCorrespondent(deliverable)"
                       >
                         <i class="uil uil-trash"></i>
                       </button>
@@ -522,9 +651,10 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="permitFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="permitFile = null"
+                        @click="removePermitFile"
                       >
                         <i class="uil uil-trash"></i>
                       </button>
@@ -578,9 +708,10 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="reviewFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="reviewFile = null"
+                        @click="removeReviewComment"
                       >
                         <i class="uil uil-trash"></i>
                       </button>
