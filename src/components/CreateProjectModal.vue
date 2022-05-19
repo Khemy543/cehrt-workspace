@@ -104,7 +104,7 @@
             ></b-form-input>
           </b-form-group>
         </div>
-        <div class="col-6">
+        <!-- <div class="col-6">
           <b-form-group id="input-group-1" label="Date Due" label-for="input-1">
             <b-form-input
               id="input-1"
@@ -113,7 +113,7 @@
               required
             ></b-form-input>
           </b-form-group>
-        </div>
+        </div> -->
       </div>
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>

@@ -151,7 +151,7 @@ export default {
     <div class="row">
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.title.$error }">
-          <label class="col-md-12 col-form-label">Title</label>
+          <label class="col-md-12 col-form-label">Title <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <multiselect
               v-model="title"
@@ -166,7 +166,7 @@ export default {
       </div>
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.departments.$error }">
-          <label class="col-md-12 col-form-label">Deparatments</label>
+          <label class="col-md-12 col-form-label">Deparatments <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <multiselect
               v-model="departments"
@@ -295,7 +295,7 @@ export default {
       </div>
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.startDate.$error }">
-          <label class="col-md-12 col-form-label">Start Date</label>
+          <label class="col-md-12 col-form-label">Start Date <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="startDate"
@@ -315,7 +315,7 @@ export default {
     <div class="row">
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.staffId.$error }">
-          <label class="col-md-12 col-form-label">Staff Identification Number</label>
+          <label class="col-md-12 col-form-label">Staff Identification Number <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="staffId"

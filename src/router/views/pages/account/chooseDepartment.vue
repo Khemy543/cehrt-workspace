@@ -46,7 +46,7 @@ export default {
         return {
           ...department,
           value: 12,
-          icon: department.id === 4? admin : department.id === 24 ? consulting : finance,
+          icon: department.name === 'Administration'? admin : department.name === 'Finance' ? finance : consulting,
           color: 'success'
         }
       })

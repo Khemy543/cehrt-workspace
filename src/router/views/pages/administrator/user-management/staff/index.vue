@@ -96,9 +96,9 @@ export default {
 
     deactivateAccount(user) {
       this.$swal({
-        title: 'Deactive user account?',
+        title: 'Deactivate user account?',
         showDenyButton: true,
-        confirmButtonText: 'Deactive',
+        confirmButtonText: 'Deactivate',
         denyButtonText: `Cancel`,
         confirmButtonColor: '#ff5c75',
         denyButtonColor: '#4b4b5a',
@@ -210,7 +210,7 @@ export default {
                           variant="success"
                           @click="activateAccount(user)"
                         >
-                          <i class="uil uil-unlock-alt mr-2"></i>Active
+                          <i class="uil uil-unlock-alt mr-2"></i>Activate
                         </b-dropdown-item>
                         <b-dropdown-item
                           v-else
@@ -218,7 +218,7 @@ export default {
                           variant="danger"
                           @click="deactivateAccount(user)"
                         >
-                          <i class="uil uil-lock mr-2"></i>Deactive
+                          <i class="uil uil-lock mr-2"></i>Deactivate
                         </b-dropdown-item>
                       </b-dropdown>
                     </td>

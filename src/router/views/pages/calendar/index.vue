@@ -53,39 +53,79 @@ export default {
         name: '',
         start_date: '',
         end_date: '',
-      }
+      },
+      users: [],
+      selectedUser: {}
     }
   },
   created() {
     this.getDashboardData()
     this.getEvents()
     this.getLeaveRequests()
+    this.getUsers()
   },
   methods: {
-    async getLeaveRequests() {
+    async getUsers() {
       try {
-        const response = await this.$http.get(`/fetch/all/leave/requests`);
+        const response = await this.$http.get(`/fetch/all-staff`)
 
         if (response) {
-          const requestedLeaves = response.data.filter(request => request.status !== 'rejected').map((item) => {
-            const colors = {
-              'Sick': 'danger',
-              'Annual': 'primary',
-              'Maternity': 'success',
-              'Compassionate': 'warning',
-              'Others': 'secondary'
-            }
-            const color = item.status === 'pending' ? `text-${colors[item.type]} bg-soft` : 'text-white bg';
-            return {
-              id: item.id,
-              title: `${item.user} (${item.type} Leave) ${item.status}`,
-              editable: true,
-              start: dateFormate(item.start_date),
-              end: dateFormate(item.end_date),
-              reason: item.reason,
-              className: item.type === 'Sick' ? `${color}-danger` : item.type === 'Annual' ? `${color}-primary` : item.type === 'Maternity' ? `${color}-success` : item.type === 'Compassionate' ? `${color}-warning` : `${color}-secondary`
-            }
-          })
+          this.users = response.data
+          this.selectedUser = response.data.find(
+            (user) => user.id === this.$store.state.auth.currentUser.id
+          )
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
+    },
+    async getLeaveRequests() {
+      try {
+        const response = await this.$http.get(
+          `/fetch/${this.selectedUser.id ||
+            this.$store.state.auth.currentUser.id}/all/leave/requests`
+        )
+
+        if (response) {
+          const requestedLeaves = response.data
+            .filter((request) => request.status !== 'rejected')
+            .map((item) => {
+              const colors = {
+                Sick: 'danger',
+                Annual: 'primary',
+                Maternity: 'success',
+                Compassionate: 'warning',
+                Others: 'secondary',
+              }
+              const color =
+                item.status === 'pending'
+                  ? `text-${colors[item.type]} bg-soft`
+                  : 'text-white bg'
+              return {
+                id: item.id,
+                title: `${item.user} (${item.type} Leave) ${item.status}`,
+                editable: true,
+                start: dateFormate(item.start_date),
+                end: dateFormate(item.end_date),
+                reason: item.reason,
+                className:
+                  item.type === 'Sick'
+                    ? `${color}-danger`
+                    : item.type === 'Annual'
+                    ? `${color}-primary`
+                    : item.type === 'Maternity'
+                    ? `${color}-success`
+                    : item.type === 'Compassionate'
+                    ? `${color}-warning`
+                    : `${color}-secondary`,
+              }
+            })
           this.calendarEvents = [...this.calendarEvents, ...requestedLeaves]
         }
       } catch (error) {
@@ -100,7 +140,10 @@ export default {
     },
     async getEvents() {
       try {
-        const response = await this.$http.get(`fetch/events`)
+        const response = await this.$http.get(
+          `/fetch/${this.selectedUser.id ||
+            this.$store.state.auth.currentUser.id}/events`
+        )
 
         if (response) {
           const vEvents = response.data.map((item) => {
@@ -113,10 +156,9 @@ export default {
               className: 'bg-danger text-white',
             }
           })
-          this.calendarEvents = [...this.calendarEvents, ...vEvents];
+          this.calendarEvents = [...this.calendarEvents, ...vEvents]
         }
       } catch (error) {
-        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -127,7 +169,10 @@ export default {
     },
     async getDashboardData() {
       try {
-        const response = await this.$http.get(`/fetch/personal/dashboard-data`)
+        const response = await this.$http.get(
+          `/fetch/${this.selectedUser.id ||
+            this.$store.state.auth.currentUser.id}/personal/dashboard-data`
+        )
 
         if (response) {
           const { subtasks, tasks } = response.data
@@ -135,18 +180,19 @@ export default {
           const vSubtasks =
             subtasks &&
             subtasks.map((item) => {
-              return {
-                id: `subtask-${item.id}`,
-                title: `${item.name} ( ${item.status})`,
-                end: item.end_date,
-                editable: false,
-                url: `/task/${item.id}/details?hasSubTask=false&subtask=true`,
-                start:
-                  item.start_date ||
-                  (item.created_at && item.created_at.split('T')[0]),
-                className: 'bg-primary-text-white',
-              } || []
-
+              return (
+                {
+                  id: `subtask-${item.id}`,
+                  title: `${item.name} ( ${item.status})`,
+                  end: item.end_date,
+                  editable: false,
+                  url: `/task/${item.id}/details?hasSubTask=false&subtask=true`,
+                  start:
+                    item.start_date ||
+                    (item.created_at && item.created_at.split('T')[0]),
+                  className: 'bg-primary-text-white',
+                } || []
+              )
             })
 
           const vTasks =
@@ -165,7 +211,11 @@ export default {
               }
             })
 
-          this.calendarEvents = [...this.calendarEvents, ...vSubtasks, ...vTasks]
+          this.calendarEvents = [
+            ...this.calendarEvents,
+            ...vSubtasks,
+            ...vTasks,
+          ]
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -189,15 +239,19 @@ export default {
             start_date: startDate,
             end_date: endDate,
             id,
-          } = response.data.event
+          } = response.data.event;
+          var date = new Date(endDate);
+          date.setDate(date.getDate() + 1);
           this.calendarEvents = this.calendarEvents.concat({
             id: `event-${id}`,
             title: name,
             start: startDate,
-            end: endDate,
+            end: date,
             editable: true,
             className: 'bg-danger text-white',
+            allDay: false
           })
+          this.event = {}
           this.$bvToast.toast('Event created successfully', {
             title: 'Success',
             autoHideDelay: 5000,
@@ -241,14 +295,21 @@ export default {
      */
     async editSubmit() {
       try {
-        const response = await this.$http.put(`/update/${this.editableEvent.id}/event`, this.editableEvent);
+        const response = await this.$http.put(
+          `/update/${this.editableEvent.id}/event`,
+          this.editableEvent
+        )
 
         if (response) {
-          const { name, start_date: startDate, end_date: endDate } = response.data.event;
-          this.edit.setProp('title', name);
-          this.edit.setProp('start', startDate);
+          const {
+            name,
+            start_date: startDate,
+            end_date: endDate,
+          } = response.data.event
+          this.edit.setProp('title', name)
+          this.edit.setProp('start', startDate)
           this.edit.setProp('end', endDate)
-          this.eventModal = false;
+          this.eventModal = false
 
           this.$bvToast.toast('Event updated successfully', {
             title: 'Success',
@@ -257,7 +318,6 @@ export default {
             variant: 'success',
           })
         }
-
       } catch (error) {
         if (error.response) {
           const { status, data } = error.response
@@ -296,13 +356,15 @@ export default {
         if (isConfirmed) {
           try {
             const deleteId = this.edit.id.split('-')[1]
-            const response = await this.$http.delete(`/delete/${deleteId}/event`);
+            const response = await this.$http.delete(
+              `/delete/${deleteId}/event`
+            )
 
             if (response) {
               this.calendarEvents = this.calendarEvents.filter(
                 (x) => '' + x.id !== '' + this.edit.id
               )
-              this.eventModal = false;
+              this.eventModal = false
               this.$bvToast.toast('Event deleted successfully', {
                 title: 'Success',
                 autoHideDelay: 5000,
@@ -339,7 +401,7 @@ export default {
           id: this.edit.id.split('-')[1],
           name: this.edit.title,
           start_date: dateFormate(this.edit.start),
-          end_date: dateFormate(this.edit.end)
+          end_date: dateFormate(this.edit.end),
         }
         this.eventModal = true
       }
@@ -349,6 +411,13 @@ export default {
      */
     closeModal() {
       this.eventModal = false
+    },
+    selectUser(user) {
+      this.selectedUser = user;
+      this.calendarEvents = []
+      this.getDashboardData()
+      this.getEvents()
+      this.getLeaveRequests()
     },
   },
 }
@@ -371,7 +440,9 @@ export default {
               </div>
               <div class="col-xl-10 col-lg-9">
                 <div class="mt-4 mt-lg-0">
-                  <h5 class="mt-0 mb-1 font-weight-bold">Welcome to Your Calendar</h5>
+                  <h5 class="mt-0 mb-1 font-weight-bold"
+                    >Welcome to Your Calendar</h5
+                  >
                   <p class="text-muted mb-2">
                     Click on event to see or edit the details. You can create
                     new event by clicking on "Create New event" button or any
@@ -384,17 +455,24 @@ export default {
                       toggle-class="font-weight-bold p-0 align-middle"
                     >
                       <template v-slot:button-content>
-                        <button id="btn-new-event" class="btn btn-primary mt-2 mr-1">
-                          Me
-                          <i class="uil uil-angle-down font-size-16 align-middle"></i>
+                        <button
+                          id="btn-new-event"
+                          class="btn btn-primary mt-2 mr-1"
+                        >
+                          {{ selectedUser.name }}
+                          <i
+                            class="uil uil-angle-down font-size-16 align-middle"
+                          ></i>
                         </button>
                       </template>
                       <b-dropdown-item
+                        v-for="user in users"
+                        :key="user.id"
+                        @click="selectUser(user)"
                         href="javascript: void(0);"
                         variant="seconday"
-                      >Gideon Assafuah</b-dropdown-item>
-                      <b-dropdown-item href="javascript: void(0);" variant="seconday">Mamphey Kwakye</b-dropdown-item>
-                      <b-dropdown-item href="javascript: void(0);" variant="seconday">Edem Ahadzi</b-dropdown-item>
+                        >{{ user.name }}</b-dropdown-item
+                      >
                     </b-dropdown>
 
                     <button
@@ -444,7 +522,6 @@ export default {
                 :plugins="calendarPlugins"
                 :events="calendarEvents"
                 :weekends="calendarWeekends"
-                :theme-system="themeSystem"
                 @dateClick="dateClicked"
                 @eventClick="editEvent"
               />
@@ -453,7 +530,12 @@ export default {
         </div>
       </div>
     </div>
-    <b-modal v-model="showmodal" title="Add New Event" title-class="text-black font-18" hide-footer>
+    <b-modal
+      v-model="showmodal"
+      title="Add New Event"
+      title-class="text-black font-18"
+      hide-footer
+    >
       <form @submit.prevent="handleSubmit">
         <div class="row">
           <div class="col-12">
@@ -477,7 +559,7 @@ export default {
                   <input
                     id="name"
                     v-model="event.start_date"
-                    type="date"
+                    type="datetime-local"
                     class="form-control"
                     placeholder="Enter start date"
                     required
@@ -490,7 +572,7 @@ export default {
                   <input
                     id="name"
                     v-model="event.end_date"
-                    type="date"
+                    type="datetime-local"
                     class="form-control"
                     placeholder="Enter end date"
                   />
@@ -502,13 +584,20 @@ export default {
 
         <div class="text-right">
           <button type="submit" class="btn btn-success">Save</button>
-          <b-button class="ml-1" variant="light" @click="hideModal">Close</b-button>
+          <b-button class="ml-1" variant="light" @click="hideModal"
+            >Close</b-button
+          >
         </div>
       </form>
     </b-modal>
 
     <!-- Edit Modal -->
-    <b-modal v-model="eventModal" title="Edit Event" title-class="text-black font-18" hide-footer>
+    <b-modal
+      v-model="eventModal"
+      title="Edit Event"
+      title-class="text-black font-18"
+      hide-footer
+    >
       <form @submit.prevent="editSubmit">
         <div class="row">
           <div class="col-12">
@@ -532,7 +621,7 @@ export default {
                   <input
                     id="name"
                     v-model="editableEvent.start_date"
-                    type="date"
+                    type="datetime-local"
                     class="form-control"
                     placeholder="Enter start date"
                     required
@@ -545,7 +634,7 @@ export default {
                   <input
                     id="name"
                     v-model="editableEvent.end_date"
-                    type="date"
+                    type="datetime-local"
                     class="form-control"
                     placeholder="Enter end date"
                   />
@@ -555,7 +644,9 @@ export default {
           </div>
         </div>
         <div class="d-flex justify-content-between">
-          <b-button type="button" variant="danger" @click="deleteEvent">Delete Event</b-button>
+          <b-button type="button" variant="danger" @click="deleteEvent"
+            >Delete Event</b-button
+          >
           <button type="submit" class="btn btn-success">Save</button>
         </div>
       </form>
