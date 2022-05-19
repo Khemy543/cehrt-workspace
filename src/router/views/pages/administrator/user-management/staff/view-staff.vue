@@ -75,7 +75,6 @@ export default {
     }
   },
   created() {
-    this.fetchSingleStaff();
     this.fetchDepartments();
     this.fetchRoles();
     this.fetchSuperviosrs();
@@ -139,10 +138,12 @@ export default {
     },
     async fetchRoles() {
       try {
+        this.loading = true;
         const response = await this.$http.get('/admin/department/positions');
 
         if (response) {
           this.roles = response.data;
+          this.fetchSingleStaff();
         }
       } catch (error) {
 
@@ -171,7 +172,12 @@ export default {
         });
 
         if (response) {
-
+          this.$bvToast.toast('User updated successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
         }
       } catch (error) {
         console.log(error)

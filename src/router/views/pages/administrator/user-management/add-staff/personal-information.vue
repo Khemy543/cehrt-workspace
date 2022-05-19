@@ -134,7 +134,7 @@ export default {
           class="form-group mb-3"
           :class="{ 'has-error': $v.firstName.$error }"
         >
-          <label class="col-md-3 col-form-label">First Names</label>
+          <label class="col-md-3 col-form-label">First Name <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="firstName"
@@ -155,7 +155,7 @@ export default {
           class="form-group mb-3"
           :class="{ 'has-error': $v.lastName.$error }"
         >
-          <label class="col-md-3 col-form-label">Last Name</label>
+          <label class="col-md-3 col-form-label">Last Name <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="lastName"
@@ -187,7 +187,7 @@ export default {
           class="form-group mb-3"
           :class="{ 'has-error': $v.preferredName.$error }"
         >
-          <label class="col-md-12 col-form-label">Preferred Name</label>
+          <label class="col-md-12 col-form-label">Preferred Name <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="preferredName"
@@ -211,7 +211,7 @@ export default {
           class="form-group mb-3"
           :class="{ 'has-error': $v.address.$error }"
         >
-          <label class="col-md-12 col-form-label">Residential Address</label>
+          <label class="col-md-12 col-form-label">Residential Address <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="address"
@@ -229,7 +229,7 @@ export default {
       </div>
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.email.$error }">
-          <label class="col-md-12 col-form-label">Email Address</label>
+          <label class="col-md-12 col-form-label">Email Address <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="email"
@@ -250,7 +250,7 @@ export default {
     <div class=" row">
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.phone.$error }">
-          <label class="col-md-12 col-form-label">Phone Number</label>
+          <label class="col-md-12 col-form-label">Phone Number <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="phone"
@@ -284,7 +284,7 @@ export default {
           class="form-group mb-3"
           :class="{ 'has-error': $v.birthDate.$error }"
         >
-          <label class="col-md-12 col-form-label">Birth Date</label>
+          <label class="col-md-12 col-form-label">Birth Date <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="birthDate"
@@ -302,7 +302,7 @@ export default {
       </div>
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.ghanaCardId.$error }">
-          <label class="col-md-12 col-form-label">Identification Card Number (Ghana Card, Passport etc.)</label>
+          <label class="col-md-12 col-form-label">Identification Card Number (Ghana Card, Passport etc.) <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="ghanaCardId"
@@ -341,7 +341,7 @@ export default {
       </div>
       <div class="col-md-6">
        <div class="form-group mb-3" :class="{ 'has-error': $v.maritalStatus.$error }">
-          <label class="col-md-12 col-form-label">Marital Status</label>
+          <label class="col-md-12 col-form-label">Marital Status <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <select 
               v-model.trim="maritalStatus"
@@ -425,7 +425,7 @@ export default {
     <div class=" row">
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.nameOfNextOfKin.$error }">
-          <label class="col-md-12 col-form-label">Name of next of kin</label>
+          <label class="col-md-12 col-form-label">Name of next of kin <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="nameOfNextOfKin"
@@ -443,7 +443,7 @@ export default {
       </div>
       <div class="col-md-6">
        <div class="form-group mb-3" :class="{ 'has-error': $v.relationshipOfNextOfKin.$error }">
-          <label class="col-md-12 col-form-label">Relationship</label>
+          <label class="col-md-12 col-form-label">Relationship <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="relationshipOfNextOfKin"
@@ -463,7 +463,7 @@ export default {
     <div class=" row">
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.telNextOfKin.$error }">
-          <label class="col-md-12 col-form-label">Telephone of next of kin</label>
+          <label class="col-md-12 col-form-label">Telephone of next of kin <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="telNextOfKin"
@@ -501,7 +501,7 @@ export default {
     <div class=" row">
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.addressOfNextOfKin.$error }">
-          <label class="col-md-12 col-form-label">Address of next of kin</label>
+          <label class="col-md-12 col-form-label">Address of next of kin <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <input
               v-model.trim="addressOfNextOfKin"

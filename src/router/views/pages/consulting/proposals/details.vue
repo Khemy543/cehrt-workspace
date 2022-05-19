@@ -46,7 +46,7 @@
                         <b-dropdown class="d-inline" variant="link" toggle-class="font-weight-bold p-0 align-middle">
                           <template v-slot:button-content>
                             <button id="btn-new-event" class="btn btn-primary mt-4 mr-3">
-                              <i class="uil-plus-circle"></i> Create New Report
+                              <i class="uil-plus-circle"></i> Create New Proposal
                             </button>
                           </template>
                           <b-dropdown-item v-for="report in vReportTypes" :key="report.id" href="javascript: void(0);"

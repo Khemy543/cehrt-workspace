@@ -400,7 +400,6 @@ export default {
                 :plugins="calendarPlugins"
                 :events="calendarEvents"
                 :weekends="calendarWeekends"
-                :theme-system="themeSystem"
                 @dateClick="dateClicked"
                 @eventClick="editEvent"
               />

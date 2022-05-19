@@ -158,8 +158,9 @@ export default {
             message: 'Staff created successfully',
             type: 'success',
           })
-        
-        this.$router.push('/user-management/staff')
+        setTimeout(() => {
+          this.$router.push('/user-management/staff')
+        }, 2000)
         }
       } catch (error) {
         let message = 'Something happend, Please try again later'
