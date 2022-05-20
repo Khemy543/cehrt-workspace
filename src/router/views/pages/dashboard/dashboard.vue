@@ -17,6 +17,7 @@ import {
   salesDonutChart,
   ordersData,
 } from './data'
+import {dateFormate} from "@utils/format-date";
 
 /**
  * Dashboard-1 Component
@@ -44,7 +45,7 @@ export default {
       themeSystem: 'bootstrap',
       calendarEvents: [],
       createModal: false,
-      showmodal: false,
+      showModal: false,
       eventModal: false,
       categories: [],
       submitted: false,
@@ -52,13 +53,8 @@ export default {
       newEventData: {},
       edit: {},
       deleteId: {},
-      event: {
-        title: '',
-        category: '',
-      },
-      editevent: {
-        editTitle: '',
-      },
+      event: {},
+      editableEvent: {},
       revenueAreaChart: revenueAreaChart,
       targetsBarChart: targetsBarChart,
       salesDonutChart: salesDonutChart,
@@ -68,34 +64,35 @@ export default {
       statChart: [
         {
           mainTitle: 'Projects',
-          value: 2,
+          value: 0,
           subValue: '5.05%',
           chartColor: '#ffbe0b',
           icon: 'briefcase',
         },
         {
           mainTitle: 'Total Task Assigned',
-          value: 21,
+          value: 0,
           subValue: '10.21%',
           chartColor: '#5369f8',
           icon: 'grid',
         },
         {
           mainTitle: 'completed Task',
-          value: 10,
+          value: 0,
           subValue: '5.05%',
           chartColor: '#f77e53',
           icon: 'check-square',
         },
         {
           mainTitle: 'Pending Task',
-          value: 11,
+          value: 0,
           subValue: '25.16%',
           chartColor: '#43d39e',
           icon: 'clock',
         },
       ],
-      projectData: []
+      projectData: [],
+      proposalData: []
     }
   },
 
@@ -106,17 +103,43 @@ export default {
   },
 
   methods: {
-    editEvent() {},
-    dateClicked() {},
+    dateClicked(info) {
+      this.newEventData = info
+      this.showModal = true
+      this.event.start_date = info.dateStr
+    },
+    editEvent(info) {
+      if (info.event.startEditable) {
+        this.edit = info.event
+        this.editableEvent = {
+          id: this.edit.id.split('-')[1],
+          name: this.edit.title,
+          start_date: dateFormate(this.edit.start),
+          end_date: dateFormate(this.edit.end),
+        }
+        this.eventModal = true
+      }
+    },
     async getDashData() {
       try {
         const response = await this.$http.get(`/fetch/dashboard-stats`);
 
         if(response) {
-          
+          const { assignedTask, projects, tasks, project_list: projectList, proposal_list: proposalList } = response.data
+          this.statChart[0].value = projects;
+          this.statChart[1].value = assignedTask;
+          this.statChart[2].value = tasks.find(item => item.status === 'completed') && tasks.find(item => item.status === 'completed').count || 0;
+          this.statChart[3].value = tasks.find(item => item.status === 'pending').count;
+          this.projectData = projectList;
+          this.proposalData = proposalList;
         }
       } catch (error) {
-        
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
       }
     },
     async getProjects(link) {
@@ -140,7 +163,7 @@ export default {
     },
     async getCompanyEvents() {
       try {
-        const response = await this.$http.get(`/fetch/company/events`)
+        const response = await this.$http.get(`/fetch/company-events`)
 
         if (response) {
           const vEvents = response.data.map((item) => {
@@ -163,6 +186,109 @@ export default {
           variant: 'danger',
         })
       }
+    },
+    // [11:09 pm, 15/05/2022] Oteng: api/company/event/create
+    // [11:10 pm, 15/05/2022] Oteng: fetch/company/events
+    // [11:11 pm, 15/05/2022] Oteng: fetch/{event}/company/event
+    // [11:12 pm, 15/05/2022] Oteng: update/{event}/company/event
+    // [11:13 pm, 15/05/2022] Oteng: delete/{event}/company/event
+
+    async handleSubmit() {
+      try {
+        const response = await this.$http.post(`/company/event/create`, this.event)
+        if (response) {
+          const {
+            name,
+            start_date: startDate,
+            end_date: endDate,
+            id,
+          } = response.data.event;
+          const date = new Date(endDate);
+          date.setDate(date.getDate() + 1);
+          this.calendarEvents = this.calendarEvents.concat({
+            id: `event-${id}`,
+            title: name,
+            start: startDate,
+            end: date,
+            editable: true,
+            className: 'bg-danger text-white',
+            allDay: false
+          })
+          this.event = {}
+          this.$bvToast.toast('Event created successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
+        }
+      } catch (error) {
+        console.log(error)
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
+      this.showModal = false
+    },
+    deleteEvent() {
+      this.$swal({
+        title: 'Do you want to delete event?',
+        showDenyButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const deleteId = this.edit.id.split('-')[1]
+            const response = await this.$http.delete(
+                `/delete/${deleteId}/event`
+            )
+
+            if (response) {
+              this.calendarEvents = this.calendarEvents.filter(
+                  (x) => '' + x.id !== '' + this.edit.id
+              )
+              this.eventModal = false
+              this.$bvToast.toast('Event deleted successfully', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success',
+              })
+            }
+          } catch (error) {
+            this.$bvToast.toast('Something happened, please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+      })
+    },
+    hideModal(e) {
+      this.submitted = false
+      this.showModal = false
+      this.event = {}
     },
   },
 }
@@ -216,7 +342,6 @@ export default {
                     next: 'Next',
                   }"
                   :bootstrap-font-awesome="false"
-                  :editable="true"
                   :droppable="true"
                   :plugins="calendarPlugins"
                   :events="calendarEvents"
@@ -242,11 +367,11 @@ export default {
                 <b-thead class="thead-white">
                   <b-tr>
                     <b-th>#</b-th>
-                    <b-th>Product Name</b-th>
+                    <b-th>Title</b-th>
                     <b-th>Client</b-th>
                     <b-th>Project Type</b-th>
                     <b-th>Status</b-th>
-                    <b-th>Status</b-th>
+                    <b-th>Action</b-th>
                   </b-tr>
                 </b-thead>
                 <b-tbody>
@@ -267,9 +392,11 @@ export default {
                           'badge-soft-warning':
                             `${project.status}` === 'pending',
                           'badge-soft-success':
-                            `${project.status}` === 'Delivered',
+                            `${project.status}` === 'completed',
                           'badge-soft-danger':
-                            `${project.status}` === 'Declined',
+                            `${project.status}` === 'overdue',
+                           'badge-soft-primary':
+                            `${project.status}` === 'active',
                         }"
                         >{{ project.status }}</span
                       >
@@ -303,23 +430,24 @@ export default {
                   </b-tr>
                 </b-thead>
                 <b-tbody>
-                  <b-tr v-for="(order, index) in ordersData" :key="order.name">
+                  <b-tr v-for="(proposal, index) in proposalData" :key="proposal.name">
                     <b-td>{{ index + 1 }}</b-td>
-                    <b-td>{{ order.product }}</b-td>
-                    <b-td>{{ order.name }}</b-td>
-                    <b-td>{{ order.price }}</b-td>
-                    <b-td>
-                      <span
+                    <b-td>{{ proposal.title }}</b-td>
+                    <b-td>{{ proposal.client }}</b-td>
+                    <b-td><span
                         class="badge"
                         :class="{
-                          'badge-soft-warning': `${order.status}` === 'Pending',
+                          'badge-soft-warning':
+                            `${proposal.status}` === 'pending',
                           'badge-soft-success':
-                            `${order.status}` === 'Delivered',
-                          'badge-soft-danger': `${order.status}` === 'Declined',
+                            `${proposal.status}` === 'completed',
+                          'badge-soft-danger':
+                            `${proposal.status}` === 'overdue',
+                           'badge-soft-primary':
+                            `${proposal.status}` === 'active',
                         }"
-                        >{{ order.status }}</span
-                      >
-                    </b-td>
+                    >{{ proposal.status }}</span
+                    ></b-td>
                   </b-tr>
                 </b-tbody>
               </b-table-simple>
@@ -328,5 +456,127 @@ export default {
         </div>
       </div>
     </div>
+
+    <b-modal
+        v-model="showModal"
+        title="Add New Event"
+        title-class="text-black font-18"
+        hide-footer
+    >
+      <form @submit.prevent="handleSubmit">
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group">
+              <label for="name">Event Name</label>
+              <input
+                  id="name"
+                  v-model="event.name"
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter name"
+                  required
+              />
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="name">Start Date</label>
+                  <input
+                      id="name"
+                      v-model="event.start_date"
+                      type="datetime-local"
+                      class="form-control"
+                      placeholder="Enter start date"
+                      required
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="name">End Date</label>
+                  <input
+                      id="name"
+                      v-model="event.end_date"
+                      type="datetime-local"
+                      class="form-control"
+                      placeholder="Enter end date"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-right">
+          <button type="submit" class="btn btn-success">Save</button>
+          <b-button class="ml-1" variant="light" @click="hideModal"
+          >Close</b-button
+          >
+        </div>
+      </form>
+    </b-modal>
+
+    <!-- Edit Modal -->
+    <b-modal
+        v-model="eventModal"
+        title="Edit Event"
+        title-class="text-black font-18"
+        hide-footer
+    >
+      <form @submit.prevent="editSubmit">
+        <div class="row">
+          <div class="col-12">
+            <div class="form-group">
+              <label for="name">Event Name</label>
+              <input
+                  id="name"
+                  v-model="editableEvent.name"
+                  type="text"
+                  class="form-control"
+                  placeholder="Enter name"
+                  required
+              />
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="name">Start Date</label>
+                  <input
+                      id="name"
+                      v-model="editableEvent.start_date"
+                      type="datetime-local"
+                      class="form-control"
+                      placeholder="Enter start date"
+                      required
+                  />
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label for="name">End Date</label>
+                  <input
+                      id="name"
+                      v-model="editableEvent.end_date"
+                      type="datetime-local"
+                      class="form-control"
+                      placeholder="Enter end date"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex justify-content-between">
+          <b-button type="button" variant="danger" @click="deleteEvent"
+          >Delete Event</b-button
+          >
+          <button type="submit" class="btn btn-success">Save</button>
+        </div>
+      </form>
+    </b-modal>
   </Layout>
 </template>

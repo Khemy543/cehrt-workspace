@@ -69,7 +69,9 @@ export default {
         if (response) {
           this.form = {}
 
-          this.projectData.push(response.data.project)
+          this.projectData = [response.data.project, ...this.projectData]
+
+          // this.projectData.push(response.data.project)
 
           this.closeModal()
 
