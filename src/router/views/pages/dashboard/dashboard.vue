@@ -17,7 +17,7 @@ import {
   salesDonutChart,
   ordersData,
 } from './data'
-import {dateFormate} from "@utils/format-date";
+import { calendarFormat } from "@utils/format-date";
 
 /**
  * Dashboard-1 Component
@@ -113,8 +113,8 @@ export default {
         this.editableEvent = {
           id: this.edit.id.split('-')[1],
           name: this.edit.title,
-          start_date: dateFormate(this.edit.start),
-          end_date: dateFormate(this.edit.end),
+          start_date: calendarFormat(this.edit.start),
+          end_date: calendarFormat(this.edit.end),
         }
         this.eventModal = true
       }
@@ -124,15 +124,25 @@ export default {
         const response = await this.$http.get(`/fetch/dashboard-stats`);
 
         if(response) {
-          const { assignedTask, projects, tasks, project_list: projectList, proposal_list: proposalList } = response.data
+          const { assignedTask, projects, tasks, project_list: projectList, proposal_list: proposalList, deliverable } = response.data
           this.statChart[0].value = projects;
           this.statChart[1].value = assignedTask;
           this.statChart[2].value = tasks.find(item => item.status === 'completed') && tasks.find(item => item.status === 'completed').count || 0;
           this.statChart[3].value = tasks.find(item => item.status === 'pending').count;
           this.projectData = projectList;
           this.proposalData = proposalList;
+          const vDeliverables = deliverable.map((item) => ({
+            id: `deliverable${item.id}`,
+            title: `${item.project_name} (${item.deliverable_name})`,
+            start: item.deadline,
+            editable: false,
+            className: 'bg-danger text-white',
+            allDay: true
+          }))
+          this.calendarEvents = [...this.calendarEvents, ...vDeliverables]
         }
       } catch (error) {
+        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -153,7 +163,8 @@ export default {
               start: item.start_date,
               end: item.end_date,
               editable: true,
-              className: 'bg-danger text-white',
+              className: 'bg-primary text-white',
+              allDay: false
             }
           })
           this.calendarEvents = [...this.calendarEvents, ...vEvents]
@@ -167,11 +178,57 @@ export default {
         })
       }
     },
-    // [11:09 pm, 15/05/2022] Oteng: api/company/event/create
-    // [11:10 pm, 15/05/2022] Oteng: fetch/company/events
-    // [11:11 pm, 15/05/2022] Oteng: fetch/{event}/company/event
-    // [11:12 pm, 15/05/2022] Oteng: update/{event}/company/event
-    // [11:13 pm, 15/05/2022] Oteng: delete/{event}/company/event
+
+    async editSubmit() {
+      try {
+        const response = await this.$http.put(
+            `/update/${this.editableEvent.id}/company/event`,
+            this.editableEvent
+        )
+
+        if (response) {
+          const index = this.calendarEvents.findIndex(event => event.id === `event-${this.editableEvent.id}`);
+
+          this.$set(this.calendarEvents, index,  {
+            id: `event-${this.editableEvent.id}`,
+            title: this.editableEvent.name,
+            start: this.editableEvent.start_date,
+            end: this.editableEvent.end_date,
+            editable: true,
+            className: 'bg-primary text-white',
+            allDay: false
+          })
+          this.eventModal = false
+
+          this.$bvToast.toast('Event updated successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
+        }
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
+      }
+    },
 
     async handleSubmit() {
       try {
@@ -239,7 +296,7 @@ export default {
           try {
             const deleteId = this.edit.id.split('-')[1]
             const response = await this.$http.delete(
-                `/delete/${deleteId}/event`
+                `delete/${deleteId}/company/event`
             )
 
             if (response) {

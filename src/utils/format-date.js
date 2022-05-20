@@ -12,7 +12,13 @@ export function formatDate(date) {
 export const dateFormate = (date) => {
   date = parseDate(date);
   return format(date, "YYYY-MM-DD")
-} 
+}
+
+export const calendarFormat = (date) => {
+  date = parseDate(date);
+  return format(date, "YYYY-MM-DDTHH:mm")
+}
+
 
 export const dateDifference = (later, earlier) => {
   later = parseDate(later);
