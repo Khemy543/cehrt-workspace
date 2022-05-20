@@ -120,7 +120,7 @@ export default {
 
     async updateWorkflow(workflow) {
       try {
-        const response = await this.$http.put(`/update/${workflow.id}/workflow`, workflow)
+        const response = await this.$http.put(`/update/${this.workflow.id}/workflow`, workflow)
 
         if (response) {
           const index = this.workFlows.findIndex(

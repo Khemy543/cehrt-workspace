@@ -524,6 +524,7 @@ export default {
                 :weekends="calendarWeekends"
                 @dateClick="dateClicked"
                 @eventClick="editEvent"
+                :theme-system="themeSystem"
               />
             </div>
           </div>

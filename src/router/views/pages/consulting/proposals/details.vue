@@ -76,7 +76,7 @@
 
         <div class="col-12 mt-2">
           <h5>Proposal Reports</h5>
-          <div class="row mt-4">
+          <div v-if="!loading && reports.length > 0" class="row mt-4">
             <router-link v-for="report in reports" :key="report.id" :to="`/proposal/${proposal.id}/report/${report.id}`"
               class="col-md-4">
               <div class="card">
@@ -143,6 +143,10 @@
                 </div>
               </div>
             </router-link>
+          </div>
+
+          <div v-if="!loading && reports.length <= 0" class=" w-100 d-flex justify-content-center">
+            <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
           </div>
         </div>
 

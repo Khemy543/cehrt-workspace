@@ -241,13 +241,13 @@ export default {
                               <i class="uil uil-message mr-1"></i>Submit
                             </button>
                           </div>
-                          <div>
-                            <a href="#" class="btn btn-sm px-1 btn-light">
-                              <i class="uil uil-cloud-upload"></i>
-                            </a>
-                            <a href="#" class="btn btn-sm px-1 btn-light">
-                              <i class="uil uil-at"></i>
-                            </a>
+                          <div style="padding-top:14px; padding-bottom: 14px;">
+<!--                            <a href="#" class="btn btn-sm px-1 btn-light">-->
+<!--                              <i class="uil uil-cloud-upload"></i>-->
+<!--                            </a>-->
+<!--                            <a href="#" class="btn btn-sm px-1 btn-light">-->
+<!--                              <i class="uil uil-at"></i>-->
+<!--                            </a>-->
                           </div>
                         </div>
                       </form>

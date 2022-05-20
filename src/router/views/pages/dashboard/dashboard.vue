@@ -97,7 +97,6 @@ export default {
   },
 
   created() {
-    this.getProjects()
     this.getCompanyEvents();
     this.getDashData()
   },
@@ -132,25 +131,6 @@ export default {
           this.statChart[3].value = tasks.find(item => item.status === 'pending').count;
           this.projectData = projectList;
           this.proposalData = proposalList;
-        }
-      } catch (error) {
-        this.$bvToast.toast('Something happened, Please try again later', {
-          title: 'Error',
-          autoHideDelay: 5000,
-          appendToast: false,
-          variant: 'danger',
-        })
-      }
-    },
-    async getProjects(link) {
-      try {
-        const response = await this.$http.get(link || '/fetch/projects')
-
-        if (response) {
-          const { data, links } = response.data
-          this.projectData = [...this.projectData, ...data]
-          this.links = links
-          this.loading = false
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
