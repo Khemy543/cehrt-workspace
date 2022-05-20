@@ -35,16 +35,18 @@ export default {
       },
       gridView: true,
       formtitle: 'Create New Project',
+      status: ''
     }
   },
   created() {
     this.getProjects()
   },
   methods: {
-    async getProjects(link) {
+    async getProjects(link = null, status = '') {
       try {
-        this.loading = true
-        const response = await this.$http.get(link || '/fetch/projects')
+        this.loading = true;
+        this.status = status;
+        const response = await this.$http.get(link || `/fetch/projects?project_status${status}`)
 
         if (response) {
           const { data, links } = response.data
@@ -127,11 +129,11 @@ export default {
             <i class="uil-plus mr-1"></i> Create Project
           </button>
           <div class="btn-group mb-3 mb-sm-0">
-            <button type="button" class="btn btn-primary">All</button>
+            <button type="button" class="btn" :class="status === '' ? 'btn-primary' : 'btn-white'" @click="getProjects(null, '')">All</button>
           </div>
           <div class="btn-group ml-1">
-            <button type="button" class="btn btn-white">Ongoing</button>
-            <button type="button" class="btn btn-white">Finished</button>
+            <button type="button" class="btn" :class="status === 'active' ? 'btn-primary' : 'btn-white'" @click="getProjects(null, 'active')">Ongoing</button>
+            <button type="button" class="btn" :class="status === 'completed' ? 'btn-primary' : 'btn-white'" @click="getProjects(null, 'completed')">Finished</button>
           </div>
           <div class="btn-group ml-2 d-none d-sm-inline-block">
             <button type="button" class="btn btn-sm" :class="!gridView ? 'btn-white' : 'btn-primary'" @click="gridView = true">
@@ -169,7 +171,7 @@ export default {
     <div v-if="links.next" class="row mb-3 mt-2">
       <div class="col-12">
         <div class="text-center">
-          <div class="btn btn-white" @click="getProjects(links.next)">
+          <div class="btn btn-white" @click="getProjects(links.next, status)">
             <feather
               type="loader"
               class="icon-dual icon-xs mr-2 align-middle"

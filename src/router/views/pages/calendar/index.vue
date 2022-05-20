@@ -5,7 +5,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import bootstrapPlugin from '@fullcalendar/bootstrap'
 import listPlugin from '@fullcalendar/list'
-import { dateFormate } from '@src/utils/format-date.js'
+import { calendarFormat } from '@src/utils/format-date.js'
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
@@ -111,8 +111,8 @@ export default {
                 id: item.id,
                 title: `${item.user} (${item.type} Leave) ${item.status}`,
                 editable: true,
-                start: dateFormate(item.start_date),
-                end: dateFormate(item.end_date),
+                start: calendarFormat(item.start_date),
+                end: calendarFormat(item.end_date),
                 reason: item.reason,
                 className:
                   item.type === 'Sick'
@@ -301,15 +301,18 @@ export default {
         )
 
         if (response) {
-          const {
-            name,
-            start_date: startDate,
-            end_date: endDate,
-          } = response.data.event
-          this.edit.setProp('title', name)
-          this.edit.setProp('start', startDate)
-          this.edit.setProp('end', endDate)
-          this.eventModal = false
+          const index = this.calendarEvents.findIndex(event => event.id === `event-${this.editableEvent.id}`);
+          this.$set(this.calendarEvents, index,  {
+            id: `event-${this.editableEvent.id}`,
+            title: this.editableEvent.name,
+            start: this.editableEvent.start_date,
+            end: this.editableEvent.end_date,
+            editable: true,
+            className: 'bg-danger text-white',
+            allDay: false
+          })
+
+          this.closeModal()
 
           this.$bvToast.toast('Event updated successfully', {
             title: 'Success',
@@ -400,8 +403,8 @@ export default {
         this.editableEvent = {
           id: this.edit.id.split('-')[1],
           name: this.edit.title,
-          start_date: dateFormate(this.edit.start),
-          end_date: dateFormate(this.edit.end),
+          start_date: calendarFormat(this.edit.start),
+          end_date: calendarFormat(this.edit.end),
         }
         this.eventModal = true
       }
@@ -521,10 +524,10 @@ export default {
                 :droppable="true"
                 :plugins="calendarPlugins"
                 :events="calendarEvents"
+                :theme-system="themeSystem"
                 :weekends="calendarWeekends"
                 @dateClick="dateClicked"
                 @eventClick="editEvent"
-                :theme-system="themeSystem"
               />
             </div>
           </div>

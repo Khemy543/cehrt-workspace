@@ -169,6 +169,7 @@ export default {
               start: dateFormate(startDate),
               end: dateFormate(endDate),
               editable: true,
+              allDay: false,
               reason,
               className: type === 'Sick' ? `bg-soft-danger text-danger` : type === 'Annual' ? 'bg-soft-primary text-primary' : type === 'Maternity' ? 'bg-soft-success text-success' : type === 'Compassionate' ? 'bg-soft-warning text-warning' : 'bg-soft-secondary text-secondary'
             }
@@ -219,10 +220,19 @@ export default {
         const response = await this.$http.put(`/update/${this.editevent.id}/leave/request`, this.editevent);
 
         if (response) {
-          const { name, start_date: startDate, end_date: endDate } = response.data.event;
-          this.edit.setProp('title', name);
-          this.edit.setProp('start', startDate);
-          this.edit.setProp('end', endDate)
+          const index = this.calendarEvents.findIndex(event => event.id === this.editevent.id);
+          const { type } = this.editevent
+          this.$set(this.calendarEvents, index,  {
+            id: this.editevent.id,
+            title: this.editevent.name,
+            start: this.editevent.start_date,
+            end: this.editevent.end_date,
+            editable: true,
+            reason: this.editevent.reason,
+            className: type === 'Sick' ? `bg-soft-danger text-danger` : type === 'Annual' ? 'bg-soft-primary text-primary' : type === 'Maternity' ? 'bg-soft-success text-success' : type === 'Compassionate' ? 'bg-soft-warning text-warning' : 'bg-soft-secondary text-secondary',
+            allDay: false
+          })
+          this.eventModal = false
           this.eventModal = false;
 
           this.$bvToast.toast('Request updated successfully', {
@@ -399,6 +409,7 @@ export default {
                 :droppable="true"
                 :plugins="calendarPlugins"
                 :events="calendarEvents"
+                :theme-system="themeSystem"
                 :weekends="calendarWeekends"
                 @dateClick="dateClicked"
                 @eventClick="editEvent"
