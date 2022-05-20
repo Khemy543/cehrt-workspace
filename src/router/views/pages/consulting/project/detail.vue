@@ -40,12 +40,30 @@ export default {
       vDeliverable: {},
       showProjectDeletionModal: false,
       comment: "",
-      comments: []
-    }
-  },
-  computed: {
-    initials() {
-      return 'AB'
+      comments: [],
+      selectedStatus: {},
+      projectStatuses: [
+        {
+          id: 1,
+          name: 'Pending',
+          api: 'pending',
+        },
+        {
+          id: 2,
+          name: 'On going',
+          api: 'active',
+        },
+        {
+          id: 3,
+          name: 'Completed',
+          api: 'completed',
+        },
+        {
+          id: 4,
+          name: 'On hold',
+          api: 'hold'
+        }
+      ],
     }
   },
   created() {
@@ -126,6 +144,7 @@ export default {
         if (response && response.data) {
           this.project = response.data
           this.items[2].text = response.data.name
+          this.selectedStatus = this.projectStatuses.find(status => status.api === this.project.status)
           this.loading = false
         }
       } catch (error) {
@@ -272,6 +291,26 @@ export default {
       }
     },
 
+    async changeStatus(status) {
+      try {
+        const response = await this.$http.put(`/update/${this.project.id}/project`, {
+          status: status.api
+        });
+        if(response) {
+          this.project = { ...this.project, status: status.api}
+          this.selectedStatus = status;
+        }
+      }catch (e) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+
+    },
+
     async exportToLibrary(form) {
       try {
         const response = await this.$http.patch(`/export/${this.$route.params.id}/project`, { ...form, regionIds: this.getIds(form.regionIds) });
@@ -325,18 +364,39 @@ export default {
             <div class="card-body p-0">
               <div class="card-title border-bottom p-3 mb-0 w-100 d-flex justify-content-between">
                 <div class="row page-title" style="padding:0">
-                  <div class="col-sm-12 col-xl-12">
+                  <div class="col-sm-12 col-xl-12 d-flex">
                     <h4 class="mt-0">
-                      Project: {{ project.name }}
-                      <div class="badge font-size-13 font-weight-normal ml-3" :class="
-                        project.status === 'pending'
-                          ? ' badge-warning'
-                          : project.status === 'ongoing'
-                            ? 'badge-primary' :
-                            project.status === 'overdue' ? 'badge-danger'
-                              : 'badge-success'
-                      ">{{ project.status }}</div>
+                     {{ project.name }}
                     </h4>
+<!--                      <div class="badge font-size-13 font-weight-normal ml-3 mx-4" :class="-->
+<!--                        project.status === 'pending'-->
+<!--                          ? ' badge-warning'-->
+<!--                          : project.status === 'ongoing'-->
+<!--                            ? 'badge-primary' :-->
+<!--                            project.status === 'overdue' ? 'badge-danger'-->
+<!--                              : 'badge-success'-->
+<!--                      ">{{ project.status }}</div>-->
+                      <div class=" mx-4">
+                        <b-dropdown
+                            class="d-inline"
+                            variant="link"
+                            toggle-class="font-weight-bold p-0 align-middle"
+                        >
+                          <template v-slot:button-content>
+                            {{ selectedStatus.name }}
+                            <i class="uil uil-angle-down font-size-16 align-middle"></i>
+                          </template>
+                          <b-dropdown-item
+                              v-for="status in projectStatuses"
+                              :key="status.id"
+                              href="javascript: void(0);"
+                              variant="seconday"
+                              @click="changeStatus(status)"
+                          >
+                            {{ status.name }}
+                          </b-dropdown-item>
+                        </b-dropdown>
+                      </div>
                   </div>
                 </div>
 
@@ -459,14 +519,14 @@ export default {
                       <h5 class="font-size-16">{{ project.start_date }}</h5>
                     </div>
                   </div>
-                  <div class="col-lg-3 col-md-6">
-                    <div class="mt-4">
-                      <p class="mb-2">
-                        <i class="uil-calendar-slash text-danger"></i> Due Date
-                      </p>
-                      <h5 class="font-size-16">{{ project.end_date }}</h5>
-                    </div>
-                  </div>
+<!--                  <div class="col-lg-3 col-md-6">-->
+<!--                    <div class="mt-4">-->
+<!--                      <p class="mb-2">-->
+<!--                        <i class="uil-calendar-slash text-danger"></i> Due Date-->
+<!--                      </p>-->
+<!--                      <h5 class="font-size-16">{{ project.end_date }}</h5>-->
+<!--                    </div>-->
+<!--                  </div>-->
 
                   <div class="col-lg-3 col-md-6">
                     <div class="mt-4">
@@ -523,13 +583,13 @@ export default {
                   </div>
 
                   <form class="media" @submit.prevent="sendComment">
-                    <div class="d-flex mr-3">
-                      <a href="#">
-                        <div
-                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center">
-                          {{ initials }}</div>
-                      </a>
-                    </div>
+<!--                    <div class="d-flex mr-3">-->
+<!--                      <a href="#">-->
+<!--                        <div-->
+<!--                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center">-->
+<!--                          {{ initials }}</div>-->
+<!--                      </a>-->
+<!--                    </div>-->
                     <div class="media-body">
                       <input v-model="comment" type="text" class="form-control input-sm"
                         placeholder="Some text value..." />
@@ -659,14 +719,23 @@ export default {
                           }}
                         </router-link>
                       </h5>
-                      <div class="d-flex justify-content-between">
+                      <div class="d-flex">
                         <div>
                           <a :id="`task-tooltip-${deliverable.id}`" href="javascript: void(0)"
                             class="text-muted d-inline-block bg-transparent">
                             <b-tooltip :target="`task-tooltip-${deliverable.id}`" triggers="hover" placement="top">Tasks
                             </b-tooltip>
-                            <i class="uil uil-bars mr-1"></i>
+                            <i class="uil uil-bars mr-1 text-primary"></i>
                             {{ deliverable.task || 0 }} task(s)
+                          </a>
+                        </div>
+                        <div class=" mx-2">
+                          <a :id="`task-tooltip-${deliverable.id}`" href="javascript: void(0)"
+                             class="text-muted d-inline-block bg-transparent">
+                            <b-tooltip :target="`task-tooltip-${deliverable.id}`" triggers="hover" placement="top">Due Date
+                            </b-tooltip>
+                            <i class="uil-calendar-slash mr-1 text-danger"></i>
+                            {{ deliverable.deadline }}
                           </a>
                         </div>
                       </div>

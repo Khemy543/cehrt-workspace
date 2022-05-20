@@ -97,9 +97,13 @@ export default {
         this.$emit('input', val)
       },
     },
+    // consultingStaff() {
+    //   return this.staff.find(user => user.)
+    // }
   },
   watch: {
     task(newTask) {
+      this.form = {}
       if (newTask) {
         this.form = {
           ...newTask,

@@ -22,7 +22,7 @@ export default {
 
 <template>
   <router-link :to="isProjectPage ? `details/${project.id}` : '#'" class="col-xl-4 col-lg-6">
-    <div class="card border">
+    <div class="card border" style="height: 380px">
       <div class="card-body">
         <slot name="status">
           <div

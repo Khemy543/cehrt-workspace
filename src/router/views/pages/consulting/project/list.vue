@@ -3,13 +3,14 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import CreateProjectModal from '@components/CreateProjectModal.vue'
 import ProjectCard from '@components/project-card.vue'
+import ProjectTable from "@components/ProjectTable";
 
 export default {
   page: {
     title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, CreateProjectModal, ProjectCard },
+  components: { Layout, CreateProjectModal, ProjectCard, ProjectTable },
   data() {
     return {
       projectData: [],
@@ -32,6 +33,7 @@ export default {
         projectType: '',
         sector: '',
       },
+      gridView: true,
       formtitle: 'Create New Project',
     }
   },
@@ -132,12 +134,12 @@ export default {
             <button type="button" class="btn btn-white">Finished</button>
           </div>
           <div class="btn-group ml-2 d-none d-sm-inline-block">
-            <button type="button" class="btn btn-primary btn-sm">
+            <button type="button" class="btn btn-sm" :class="!gridView ? 'btn-white' : 'btn-primary'" @click="gridView = true">
               <i class="uil uil-apps"></i>
             </button>
           </div>
           <div class="btn-group d-none d-sm-inline-block">
-            <button type="button" class="btn btn-white btn-sm">
+            <button type="button" class="btn btn-sm" :class="gridView ? 'btn-white' : 'btn-primary'" @click="gridView = false">
               <i class="uil uil-align-left-justify"></i>
             </button>
           </div>
@@ -150,11 +152,18 @@ export default {
     </div>
 
     <div v-else class="row">
-      <ProjectCard
-        v-for="project in projectData"
-        :key="project.id"
-        :project="project"
-      />
+      <div class="col-12">
+      <div v-if="gridView" class="row">
+        <ProjectCard
+            v-for="project in projectData"
+            :key="project.id"
+            :project="project"
+        />
+      </div>
+      <div v-else>
+        <ProjectTable :projects="projectData" />
+      </div>
+      </div>
     </div>
 
     <div v-if="links.next" class="row mb-3 mt-2">
