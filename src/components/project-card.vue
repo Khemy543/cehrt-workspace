@@ -41,7 +41,7 @@ export default {
         <h5 cl>
           <a href="javascript: void(0)" class="text-dark">{{ project.name }}</a>
         </h5>
-        <p class="text-muted mb-4">{{ project.description }}</p>
+        <p class="text-muted mb-4 description_text">{{ project.description }}</p>
 
         <div>
           <a href="javascript: void(0);">
@@ -64,7 +64,7 @@ export default {
         <div>
           <div>
             <ul class="list-inline">
-              <li class="list-inline-item pr-1">
+              <!-- <li class="list-inline-item pr-1">
                 <a
                   :id="`date-tooltip-${project.id}`"
                   href="javascript: void(0)"
@@ -79,7 +79,7 @@ export default {
                   <i class="uil uil-calender mr-1"></i>
                   {{ project.end_date }}
                 </a>
-              </li>
+              </li> -->
               <li class="list-inline-item pr-1">
                 <a
                   :id="`task-tooltip-${project.id}`"
@@ -119,10 +119,10 @@ export default {
                   class="text-muted d-inline-block bg-transparent"
                 >
                   <b-tooltip
-                    :target="`date-tooltip-${project.progress}`"
+                    :target="`date-tooltip-${project.id}`"
                     triggers="hover"
                     placement="top"
-                    ></b-tooltip
+                    >Completed Tasks</b-tooltip
                   >
                   <i class="uil uil-check-square mr-1"></i>
                   {{ project.progress || 0 }}%
@@ -143,3 +143,12 @@ export default {
     </div>
   </router-link>
 </template>
+<style scoped>
+.description_text {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>

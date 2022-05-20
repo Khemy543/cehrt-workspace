@@ -42,7 +42,7 @@ export default {
         <h5 cl>
           <a href="javascript: void(0)" class="text-dark">{{ project.name }}</a>
         </h5>
-        <p class="text-muted mb-4">{{ project.description }}</p>
+        <p class="text-muted mb-4 description_text">{{ project.description }}</p>
       </div>
       <div class="card-body border-top">
         <div>
@@ -71,3 +71,12 @@ export default {
     </div>
   </router-link>
 </template>
+<style scoped>
+.description_text {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+</style>
