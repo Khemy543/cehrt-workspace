@@ -103,11 +103,17 @@ export default {
 
   methods: {
     dateClicked(info) {
+      if(this.$store.state.auth.userDepartment.name !== 'Administration') {
+        return;
+      }
       this.newEventData = info
       this.showModal = true
       this.event.start_date = info.dateStr
     },
     editEvent(info) {
+      if(this.$store.state.auth.userDepartment.name !== 'Administration') {
+        return;
+      }
       if (info.event.startEditable) {
         this.edit = info.event
         this.editableEvent = {

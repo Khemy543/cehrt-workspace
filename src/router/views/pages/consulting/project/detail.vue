@@ -66,6 +66,27 @@ export default {
       ],
     }
   },
+  computed: {
+    assignees() {
+      const uniqueIds = []
+      const unique = this.project.assignees && this.project.assignees.filter(element => {
+        const isDuplicate = uniqueIds.includes(element.id);
+
+        if (!isDuplicate) {
+          uniqueIds.push(element.id);
+
+          return true;
+        }
+
+        return false;
+      });
+
+      return unique || [];
+    },
+    assigneesCount() {
+      return this.assignees.length
+    }
+  },
   created() {
     this.getProjectDetials()
     this.getProjectDeliverables()
@@ -112,7 +133,7 @@ export default {
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
-            const { errors } = data
+            const { errors } = data;
             return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
               title: 'Error',
               autoHideDelay: 5000,
@@ -473,7 +494,7 @@ export default {
                   <div class="media p-3">
                     <feather type="users" class="align-self-center icon-dual icon-lg mr-4"></feather>
                     <div class="media-body">
-                      <h4 class="mt-0 mb-0">{{ project.assignees }}</h4>
+                      <h4 class="mt-0 mb-0">{{ assigneesCount }}</h4>
                       <span class="text-muted">Total Assignees</span>
                     </div>
                   </div>
@@ -503,7 +524,7 @@ export default {
                 }}</div>
 
                 <div class="row">
-                  <div class="col-lg-3 col-md-6">
+                  <div class="col-lg-4 col-md-6">
                     <div class="mt-4">
                       <p class="mb-2">
                         <i class="uil-user text-danger"></i> Coordinator
@@ -511,7 +532,7 @@ export default {
                       <h5 class="font-size-16">{{ project.coordinator.name || 'N/A' }}</h5>
                     </div>
                   </div>
-                  <div class="col-lg-3 col-md-6">
+                  <div class="col-lg-4 col-md-6">
                     <div class="mt-4">
                       <p class="mb-2">
                         <i class="uil-calender text-danger"></i> Start Date
@@ -519,16 +540,7 @@ export default {
                       <h5 class="font-size-16">{{ project.start_date }}</h5>
                     </div>
                   </div>
-<!--                  <div class="col-lg-3 col-md-6">-->
-<!--                    <div class="mt-4">-->
-<!--                      <p class="mb-2">-->
-<!--                        <i class="uil-calendar-slash text-danger"></i> Due Date-->
-<!--                      </p>-->
-<!--                      <h5 class="font-size-16">{{ project.end_date }}</h5>-->
-<!--                    </div>-->
-<!--                  </div>-->
-
-                  <div class="col-lg-3 col-md-6">
+                  <div class="col-lg-4 col-md-6">
                     <div class="mt-4">
                       <p class="mb-2">
                         <i class="uil-user text-danger"></i> Client
@@ -540,21 +552,23 @@ export default {
 
                 <div class="assign team mt-4">
                   <h6 class="font-weight-bold">Assign To</h6>
-                  <div v-if="project.assignees !== 0">
-                    <a href="javascript: void(0);">
-                      <img src="@assets/images/users/avatar-2.jpg" alt class="avatar-sm m-1 rounded-circle" />
-                    </a>
-                    <a href="javascript: void(0);">
-                      <img src="@assets/images/users/avatar-3.jpg" alt class="avatar-sm m-1 rounded-circle" />
-                    </a>
-                    <a href="javascript: void(0);">
-                      <img src="@assets/images/users/avatar-9.jpg" alt class="avatar-sm m-1 rounded-circle" />
-                    </a>
-                    <a href="javascript: void(0);">
-                      <img src="@assets/images/users/avatar-10.jpg" alt class="avatar-sm m-1 rounded-circle" />
-                    </a>
+                  <div v-if="assignees.length > 0" class="route d-flex">
+                    <div
+                        v-for="user in assignees"
+                        :id="`${user.id}-assignee`"
+                        :key="user.id"
+                        class="rounded-circle default-avatar member-overlap-item d-flex justify-content-center align-items-center"
+                        style="cursor: pointer;"
+                    >
+                      <b-tooltip
+                          :target="`${user.id}-assignee`"
+                          triggers="hover"
+                          placement="bottom"
+                      >{{ user.name }}</b-tooltip>
+                      {{ getInitials(user.name) }}
+                    </div>
                   </div>
-                  <h5>No Assignees</h5>
+                  <h5 v-else>No Assignees</h5>
                 </div>
               </div>
             </div>
@@ -786,3 +800,51 @@ export default {
     <ExportProjectForm :value="showExport" :action="exportToLibrary" :project="project" @input="showExport = $event" />
   </Layout>
 </template>
+<style scoped>
+
+#grid_groups_wrapper {
+  max-width: 800px;
+}
+
+.default-avatar {
+  background-color: #5369f8;
+  font-weight: 500;
+  color: #fff;
+  font-size: 16px;
+}
+
+.default-avatar,
+.member-overlap-item {
+  height: 50px;
+  width: 50px;
+}
+
+.table td,
+.table th {
+  padding: 0.75rem;
+  vertical-align: middle;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.member-overlap-item {
+  margin-right: -10px;
+  border: 2px solid #fff;
+}
+
+.group {
+  min-height: 40px;
+  height: auto;
+  line-height: 1.6rem;
+}
+
+.grid-icon {
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.group-class {
+  height: 1rem;
+  line-height: 4rem;
+  vertical-align: middle;
+}
+</style>
