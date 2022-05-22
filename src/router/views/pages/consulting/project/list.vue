@@ -46,10 +46,13 @@ export default {
       try {
         this.loading = true;
         this.status = status;
-        const response = await this.$http.get(link || `/fetch/projects?project_status${status}`)
+        const response = await this.$http.get(link || `/fetch/projects?project_status=${status}`)
 
         if (response) {
-          const { data, links } = response.data
+          const { data, links, meta } = response.data
+          if(meta.current_page === 1) {
+            this.projectData = []
+          }
           this.projectData = [...this.projectData, ...data]
           this.links = links
           this.loading = false

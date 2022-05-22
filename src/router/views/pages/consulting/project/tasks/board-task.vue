@@ -96,11 +96,6 @@ export default {
       <span v-else class="badge badge-soft-success">Low</span>
 
       <p class="mb-0 mt-4">
-        <!-- <img
-          :src="task.user"
-          alt="user-img"
-          class="avatar-xs rounded-circle mr-2"
-        /> -->
 
         <span v-if="task.assignee.id" class="avatar-xs rounded-circle mr-2 bg-primary mb-2 p-2 text-white">
           {{initals}}

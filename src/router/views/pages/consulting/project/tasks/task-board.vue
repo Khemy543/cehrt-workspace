@@ -263,7 +263,21 @@ export default {
             )
 
             if (response) {
-              this.tasks = response.data.tasks;
+              this.tasks = response.data.tasks.map(item => ({
+                id: item.id,
+                status: item.status,
+                priority: item.priority,
+                reviewer: {id:null, name: null},
+                name: item.name,
+                is_due: false,
+                hasSubTask: false,
+                formatted_end_date: null,
+                formatted_start_date: null,
+                end_date: null,
+                description: null,
+                assignee: {id: null, name: null},
+                assigner: { id: null, name: null }
+              }));
 
               console.log(this.tasks)
               this.todoTasks =
