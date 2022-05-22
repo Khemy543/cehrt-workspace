@@ -65,7 +65,6 @@ export default {
         },
 
         getAmount(days, rate, currency) {
-            console.log(days, rate)
             return (Number(days) * Number(rate)).toFixed(2)
         },
 
@@ -90,10 +89,19 @@ export default {
                 })
             }
         },
-        /* 
-                getToal() {
-                    return 
-                } */
+      getDeliverableTotalPrice(tasks) {
+          let total = 0;
+
+          for(const task of tasks) {
+            const taskTotal = this.getAmount(task.allocated_days, task.rate, task.ExtractRawComponents);
+            total = Number(total) + Number(taskTotal)
+          }
+
+          return total.toFixed(2);
+      },
+      getTotal() {
+          return 0;
+      }
     }
 }
 </script>
@@ -144,8 +152,8 @@ export default {
 
                                     <h6
                                         v-if="deliverable.tasks.length <= 0"
-                                        class="mt-5 text-center"
-                                    >This Deliverble has no task</h6>
+                                        class="mt-2"
+                                    >This Deliverable has no task</h6>
                                     <div v-else class="w-100">
                                         <table class="table mb-0">
                                             <thead class="thead-light">
@@ -180,24 +188,33 @@ export default {
                                                     <td
                                                         v-if="getConsultingRole(task.assignee_position).name === 'External Consultant'"
                                                     >
-                                                        <div style="width:100px;">
-                                                            {{ task.rate_currency }}
+                                                        <div style="width:200px; display: flex;">
+                                                          <div style="width: 200px">
+                                                            <b-form-select id="input-1" v-model="task.rate_currency">
+                                                              <option value="">CUR</option>
+                                                              <option v-for="curr in ['GHS', 'USD']" :key="curr" :value="curr">{{
+                                                                  curr
+                                                                }}</option>
+                                                            </b-form-select>
+                                                          </div>
                                                             <b-form-input
                                                                 v-model="task.rate"
-                                                                type="number"
+                                                                type="text"
                                                                 placeholder="0"
                                                                 required
+                                                                class=" mx-2"
                                                                 @blur="saveDetails(task)"
                                                             ></b-form-input>
                                                         </div>
                                                     </td>
-                                                    <td v-else>{{ task.rate || 'N/A' }}</td>
+                                                    <td v-else>{{ task.rate_currency }} {{ task.rate || 'N/A' }}</td>
 
                                                     <td>{{ getAmount(task.allocated_days, task.rate, task.ExtractRawComponents) }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
                                     </div>
+                                    <h5 v-if="deliverable.tasks.length > 0">Total Price {{ getDeliverableTotalPrice(deliverable.tasks) }}</h5>
                                 </div>
 
                                 <div v-if="projectDeliverable.length > 0" class="mt-4">
