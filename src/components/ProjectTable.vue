@@ -22,6 +22,8 @@
               v-for="(project, index) in projects"
               :key="project.id"
               :title="project.description"
+              style="cursor: pointer"
+              @click="goToProjet(project.id)"
           >
             <th scope="row">{{ index + 1 }}</th>
             <td>{{ project.name }}</td>
@@ -62,6 +64,11 @@ export default {
     projects: {
       type: Array,
       default: () => ([])
+    }
+  },
+  methods: {
+    goToProjet(id) {
+      this.$router.push(`/project/details/${id}`)
     }
   }
 }
