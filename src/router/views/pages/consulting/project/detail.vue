@@ -314,7 +314,7 @@ export default {
 
     async changeStatus(status) {
       try {
-        const response = await this.$http.put(`/update/${this.project.id}/project`, {
+        const response = await this.$http.patch(`/update/${this.project.id}/project-status`, {
           status: status.api
         });
         if(response) {
@@ -740,7 +740,7 @@ export default {
                             <b-tooltip :target="`task-tooltip-${deliverable.id}`" triggers="hover" placement="top">Tasks
                             </b-tooltip>
                             <i class="uil uil-bars mr-1 text-primary"></i>
-                            {{ deliverable.task || 0 }} task(s)
+                            {{ deliverable.tasks_count || 0 }} task(s)
                           </a>
                         </div>
                         <div class=" mx-2">
