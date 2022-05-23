@@ -202,17 +202,17 @@ const workFlowRoutes = [
   },
 ]
 
-const exchangeRateRoute = [
-  {
-    path: '/exchange-rate',
-    name: 'Exchange Rate',
-    icon: 'activity',
-    department: 'Consultancy',
-    meta: { authRequired: true },
-    component: () => lazyLoadView(import('@views/pages/consulting/exchangeRate/index')),
-    props: (route) => ({ user: store.state.auth.currentUser || {} })
-  }
-]
+// const exchangeRateRoute = [
+//   {
+//     path: '/exchange-rate',
+//     name: 'Exchange Rate',
+//     icon: 'activity',
+//     department: 'Consultancy',
+//     meta: { authRequired: true },
+//     component: () => lazyLoadView(import('@views/pages/consulting/exchangeRate/index')),
+//     props: (route) => ({ user: store.state.auth.currentUser || {} })
+//   }
+// ]
 
 // proposal routes
 
@@ -644,8 +644,7 @@ const chartsRoutes = [
 const authProtectedRoutes = [
   ...dashboardRoutes,
   ...appsRoutes,
-  ...workFlowRoutes,
-  ...exchangeRateRoute
+  ...workFlowRoutes
   /* ...pagesRoutes, */
   // ...uiRoutes,
   /* ...formsRoutes,
