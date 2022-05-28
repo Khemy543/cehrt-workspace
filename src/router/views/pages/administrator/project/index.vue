@@ -6,19 +6,18 @@
         <b-tab title="Projects" active>
           <div class="row page-title align-items-center">
             <div class="col-md-3 col-xl-6">
-              <h4 class="mb-1 mt-0">Projects</h4>
             </div>
-            <div class="col-md-9 col-xl-6 text-md-right">
-              <div class="mt-4 mt-md-0">
-                <div class="btn-group mb-3 mb-sm-0">
-                  <button type="button" class="btn btn-primary">All</button>
-                </div>
-                <div class="btn-group ml-1">
-                  <button type="button" class="btn btn-white">Ongoing</button>
-                  <button type="button" class="btn btn-white">Finished</button>
-                </div>
-              </div>
-            </div>
+<!--            <div class="col-md-9 col-xl-6 text-md-right">-->
+<!--              <div class="mt-4 mt-md-0">-->
+<!--                <div class="btn-group mb-3 mb-sm-0">-->
+<!--                  <button type="button" class="btn btn-primary">All</button>-->
+<!--                </div>-->
+<!--                <div class="btn-group ml-1">-->
+<!--                  <button type="button" class="btn btn-white">Ongoing</button>-->
+<!--                  <button type="button" class="btn btn-white">Finished</button>-->
+<!--                </div>-->
+<!--              </div>-->
+<!--            </div>-->
           </div>
 
           <div v-if="loading" class=" d-flex justify-content-center">
@@ -47,7 +46,7 @@
         <b-tab title="Project Deletion Request">
           <div class=" card">
             <div class="card-body">
-              <div class="table-responsive">
+              <div v-if="!loading && requests.length > 0" class="table-responsive">
                 <table class="table mb-0">
                   <thead class="thead-light">
                     <tr>
@@ -87,6 +86,9 @@
                     </tr>
                   </tbody>
                 </table>
+              </div>
+              <div v-if="!loading && requests.length <= 0" class=" w-100 d-flex justify-content-center">
+                <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
               </div>
             </div>
           </div>

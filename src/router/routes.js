@@ -183,6 +183,17 @@ const libraryRoutes = [
   },
 ]
 
+const projectPlanRoutes = [
+  {
+    path: '/project-plans',
+    name: 'Project Plans',
+    meta: { authRequired: true },
+    icon: 'book-open',
+    department: 'Consultancy',
+    component: () => lazyLoadView(import('@views/pages/consulting/project-plan/index.vue'))
+  }
+]
+
 // finance routes
 
 // consulting routes
@@ -455,6 +466,7 @@ const appsRoutes = [
   ...libraryRoutes,
   ...adminProjectRoutes,
   ...recycleRoutes,
+  ...projectPlanRoutes,
   ...trainingRouts,
   ...financeRoutes
 ]

@@ -19,7 +19,7 @@ export default {
       roles: [],
       staffId: null,
       rate: "",
-      rateCurrency: '',
+      rateCurrency: 'GHS',
       consultingRoleId: '',
       adminRoleId: '',
       financeRoleId: ''
@@ -345,22 +345,22 @@ export default {
           </div>
         </div>
       </div>
-      <div class="col-md-6">
-        <div class="form-group mb-3" :class="{ 'has-error': $v.rateCurrency.$error }">
-          <label class="col-md-12 col-form-label">Rate Currency</label>
-          <div class="col-md-12">
-            <select
-              v-model.trim="rateCurrency"
-              class="form-control"
-              :class="{ 'is-invalid': $v.rateCurrency.$error }"
-            >
-              <option disabled value>Select Currency</option>
-              <option value="GHS">GHS</option>
-              <option value="USD">USD</option>
-            </select>
-          </div>
-        </div>
-      </div>
+<!--      <div class="col-md-6">-->
+<!--        <div class="form-group mb-3" :class="{ 'has-error': $v.rateCurrency.$error }">-->
+<!--          <label class="col-md-12 col-form-label">Rate Currency</label>-->
+<!--          <div class="col-md-12">-->
+<!--            <select-->
+<!--              v-model.trim="rateCurrency"-->
+<!--              class="form-control"-->
+<!--              :class="{ 'is-invalid': $v.rateCurrency.$error }"-->
+<!--            >-->
+<!--              <option disabled value>Select Currency</option>-->
+<!--              <option value="GHS">GHS</option>-->
+<!--              <option value="USD">USD</option>-->
+<!--            </select>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
     </div>
   </div>
 </template>
