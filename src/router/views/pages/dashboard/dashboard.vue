@@ -134,7 +134,7 @@ export default {
           this.statChart[0].value = projects;
           this.statChart[1].value = assignedTask;
           this.statChart[2].value = tasks.find(item => item.status === 'completed') && tasks.find(item => item.status === 'completed').count || 0;
-          this.statChart[3].value = tasks.find(item => item.status === 'pending').count;
+          this.statChart[3].value = tasks.find(item => item.status === 'pending') && tasks.find(item => item.status === 'pending').count || 0;
           this.projectData = projectList;
           this.proposalData = proposalList;
           const vDeliverables = deliverable.map((item) => ({
@@ -470,6 +470,7 @@ export default {
                     <b-th>Client</b-th>
                     <b-th>Project Type</b-th>
                     <b-th>Status</b-th>
+                    <b-th>Status</b-th>
                   </b-tr>
                 </b-thead>
                 <b-tbody>
@@ -477,6 +478,7 @@ export default {
                     <b-td>{{ index + 1 }}</b-td>
                     <b-td>{{ proposal.title }}</b-td>
                     <b-td>{{ proposal.client }}</b-td>
+                    <b-td>{{ proposal.project_type }}</b-td>
                     <b-td><span
                         class="badge"
                         :class="{
@@ -491,6 +493,11 @@ export default {
                         }"
                     >{{ proposal.status }}</span
                     ></b-td>
+                    <b-td>
+                       <router-link :to="`proposals/details/${proposal.id}`"
+                        >View</router-link
+                      >
+                    </b-td>
                   </b-tr>
                 </b-tbody>
               </b-table-simple>

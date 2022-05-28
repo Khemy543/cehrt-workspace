@@ -100,7 +100,12 @@ export default {
           return total.toFixed(2);
       },
       getTotal() {
-          return 0;
+          let total = 0;
+          for(const deliverable of this.projectDeliverable) {
+            const deliverableTotal = this.getDeliverableTotalPrice(deliverable.tasks);
+            total = Number(total) + Number(deliverableTotal)
+          }
+          return total.toFixed(2);
       }
     }
 }
@@ -186,17 +191,11 @@ export default {
                                                         </div>
                                                     </td>
                                                     <td
+                                                        style="width:200px"
                                                         v-if="getConsultingRole(task.assignee_position).name === 'External Consultant'"
                                                     >
-                                                        <div style="width:200px; display: flex;">
-                                                          <div style="width: 200px">
-                                                            <b-form-select id="input-1" v-model="task.rate_currency">
-                                                              <option value="">CUR</option>
-                                                              <option v-for="curr in ['GHS', 'USD']" :key="curr" :value="curr">{{
-                                                                  curr
-                                                                }}</option>
-                                                            </b-form-select>
-                                                          </div>
+                                                        <div style="display: flex; align-items: center">
+                                                            <div>GHS</div>
                                                             <b-form-input
                                                                 v-model="task.rate"
                                                                 type="text"
@@ -218,7 +217,7 @@ export default {
                                 </div>
 
                                 <div v-if="projectDeliverable.length > 0" class="mt-4">
-                                    <h4>Project Total: {{ getTotal }}</h4>
+                                    <h4>Project Total: {{ getTotal() }}</h4>
                                 </div>
                             </div>
                         </div>
