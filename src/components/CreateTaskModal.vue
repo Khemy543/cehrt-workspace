@@ -97,9 +97,9 @@ export default {
         this.$emit('input', val)
       },
     },
-    // consultingStaff() {
-    //   return this.staff.find(user => user.)
-    // }
+    getConsultingId() {
+      return this.$store.state.auth.userDepartment.id
+    }
   },
   watch: {
     task(newTask) {
@@ -126,44 +126,13 @@ export default {
   methods: {
     async getStaff() {
       try {
-        const response = await this.$http.get(`/fetch/all-staff`)
+        const response = await this.$http.get(`/fetch/${this.getConsultingId}/department-staff`)
 
         if (response) {
           this.staff = response.data
         }
       } catch (error) {}
     },
-    async editTask() {
-      try {
-        const response = await this.$http.patch(``);
-
-        if(response) {
-          this.$emit('updateTask', response.data.task)
-          this.$bvToast.toast('Task updated successfully', {
-            title: 'Succeess',
-            autoHideDelay: 5000,
-            appendToast: false,
-            variant: 'success',
-          })
-        }
-      } catch (error) {
-        if (error.response) {
-          let message = 'Something happened, Please try again later'
-          const { status, data } = error.response
-
-          if (status === 422) {
-            message = message = data.errors[Object.keys(data.errors)[0]]
-          }
-
-          this.$bvToast.toast(message, {
-            title: 'Error',
-            autoHideDelay: 5000,
-            appendToast: false,
-            variant: 'danger',
-          })
-        }
-      }
-    }
   },
 }
 </script>

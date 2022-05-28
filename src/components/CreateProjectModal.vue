@@ -44,10 +44,10 @@
         <b-form-select v-model="form.project_type_id" class="mb-2">
           <option value="" disabled>Select project type</option>
           <option
-            v-for="type in projectTypes"
-            :key="type.id"
-            :value="type.id"
-            >{{ type.name }}</option
+            v-for="mytype in projectTypes"
+            :key="mytype.id"
+            :value="mytype.id"
+            >{{ mytype.name }}</option
           >
         </b-form-select>
       </b-form-group>
