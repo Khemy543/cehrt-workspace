@@ -1,5 +1,6 @@
 <script>
 import appConfig from '@src/app.config'
+import graph from '@/src/msalConfig/graph'
 import Layout from '@layouts/main'
 import CreateProjectModal from '@components/CreateProjectModal.vue'
 import ProjectCard from '@components/project-card.vue'
@@ -82,6 +83,8 @@ export default {
 
           this.closeModal()
 
+          await graph.createFolder({ name: response.data.project.name, folder: {} });
+
           this.$bvToast.toast('New project added successfully', {
             title: 'Success',
             autoHideDelay: 5000,
@@ -91,6 +94,7 @@ export default {
           })
         }
       } catch (error) {
+        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
