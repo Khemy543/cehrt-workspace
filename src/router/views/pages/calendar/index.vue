@@ -471,9 +471,9 @@ export default {
                       <b-dropdown-item
                         v-for="user in users"
                         :key="user.id"
-                        @click="selectUser(user)"
                         href="javascript: void(0);"
                         variant="seconday"
+                        @click="selectUser(user)"
                         >{{ user.name }}</b-dropdown-item
                       >
                     </b-dropdown>

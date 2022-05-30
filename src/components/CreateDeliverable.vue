@@ -5,7 +5,8 @@
     title-class="font-18"
     hide-footer
   >
-    <form @submit.prevent="action({ ...form, ...deliverable })">
+    <form @submit.prevent="action({ ...form, ...deliverable, file, filename })">
+    {{ form }}
       <b-form-group
         id="input-group-1"
         label="Deliverable deadline"
@@ -18,12 +19,24 @@
           required
         ></b-form-input>
       </b-form-group>
+      <b-form-group
+        id="input-group-1"
+        label="Upload Delivrable File"
+        label-for="input-1"
+      >
+        <input
+          id="input-1"
+          type="file"
+          @change="onFileChange"
+        />
+      </b-form-group>
       <button type="submit" class="btn btn-primary">Submit</button>
     </form>
   </b-modal>
 </template>
 
 <script>
+// import { signInWithMsal, getMsalToken} from '@src/msalConfig/auth.js'; 
 export default {
   props: {
     value: {
@@ -42,6 +55,8 @@ export default {
   data() {
     return {
       form: {},
+      file: "",
+      filename: ''
     }
   },
   computed: {
@@ -61,6 +76,22 @@ export default {
     deliverable(newValue) {
       this.form = newValue
     }
+  },
+  methods: {
+    onFileChange(e) {
+      this.file = e.target.files[0];
+      this.filename = e.target.files[0].name;
+    },
+    /* async handleAction() {
+      try { 
+        const response = await getMsalToken()
+        if(response) {
+          this.action({ ...this.form, ...this.deliverable })
+        }
+      } catch (error) {
+        
+      }
+    } */
   },
 }
 </script>

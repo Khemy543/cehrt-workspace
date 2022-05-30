@@ -1,5 +1,6 @@
 <script>
 import appConfig from '@src/app.config'
+import graph from '@/src/msalConfig/graph'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import CreateProjectModal from '@components/CreateProjectModal.vue'
@@ -12,7 +13,14 @@ export default {
     title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, PageHeader, CreateProjectModal, CreateDeliverable, ProjectDeletionModal, ExportProjectForm },
+  components: {
+    Layout,
+    PageHeader,
+    CreateProjectModal,
+    CreateDeliverable,
+    ProjectDeletionModal,
+    ExportProjectForm,
+  },
   data() {
     return {
       show: false,
@@ -39,7 +47,7 @@ export default {
       projectDeliverables: [],
       vDeliverable: {},
       showProjectDeletionModal: false,
-      comment: "",
+      comment: '',
       comments: [],
       selectedStatus: {},
       projectStatuses: [
@@ -61,39 +69,56 @@ export default {
         {
           id: 4,
           name: 'On hold',
-          api: 'hold'
-        }
+          api: 'hold',
+        },
       ],
     }
   },
   computed: {
     assignees() {
       const uniqueIds = []
-      const unique = this.project.assignees && this.project.assignees.filter(element => {
-        const isDuplicate = uniqueIds.includes(element.id);
+      const unique =
+        this.project.assignees &&
+        this.project.assignees.filter((element) => {
+          const isDuplicate = uniqueIds.includes(element.id)
 
-        if (!isDuplicate) {
-          uniqueIds.push(element.id);
+          if (!isDuplicate) {
+            uniqueIds.push(element.id)
 
-          return true;
-        }
+            return true
+          }
 
-        return false;
-      });
+          return false
+        })
 
-      return unique || [];
+      return unique || []
     },
     assigneesCount() {
       return this.assignees.length
-    }
+    },
   },
   created() {
     this.getProjectDetials()
     this.getProjectDeliverables()
-    this.getComments();
+    this.getComments()
   },
   methods: {
+    async updateDeliverableWithPathName(item) {
+      try {
+        const response = await this.$http.patch(
+          `/update/${item.id}/deliverable/path`,
+          {
+            document_path: item.document_path,
+          }
+        )
 
+        if (response) {
+          console.log(response)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
     getIds(regions) {
       return regions.map((items) => items.id)
     },
@@ -105,10 +130,12 @@ export default {
     },
     async getComments() {
       try {
-        const response = await this.$http.get(`/fetch/project/${this.$route.params.id}/comments`);
+        const response = await this.$http.get(
+          `/fetch/project/${this.$route.params.id}/comments`
+        )
 
         if (response) {
-          this.comments = response.data;
+          this.comments = response.data
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -121,19 +148,22 @@ export default {
     },
     async sendComment() {
       try {
-        const response = await this.$http.post(`/add/project/${this.$route.params.id}/comment`, {
-          comment: this.comment
-        });
+        const response = await this.$http.post(
+          `/add/project/${this.$route.params.id}/comment`,
+          {
+            comment: this.comment,
+          }
+        )
 
         if (response) {
-          this.comments.push(response.data.comment);
-          this.comment = ""
+          this.comments.push(response.data.comment)
+          this.comment = ''
         }
       } catch (error) {
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
-            const { errors } = data;
+            const { errors } = data
             return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
               title: 'Error',
               autoHideDelay: 5000,
@@ -165,7 +195,9 @@ export default {
         if (response && response.data) {
           this.project = response.data
           this.items[2].text = response.data.name
-          this.selectedStatus = this.projectStatuses.find(status => status.api === this.project.status)
+          this.selectedStatus = this.projectStatuses.find(
+            (status) => status.api === this.project.status
+          )
           this.loading = false
         }
       } catch (error) {
@@ -187,7 +219,7 @@ export default {
         if (response) {
           this.projectDeliverables = response.data
         }
-      } catch (error) { }
+      } catch (error) {}
     },
     async editProject(form) {
       try {
@@ -271,7 +303,6 @@ export default {
       this.vDeliverable = deliverable
       this.showCreateDeliverable = true
     },
-
     async createDeliverable(form) {
       try {
         const response = await this.$http.post(
@@ -289,8 +320,22 @@ export default {
           })
 
           this.showCreateDeliverable = false
+
+          const data = await graph.uploadFile({
+            fileName: `${form.deliverable_name}.docx`,
+            fileContent: form.file,
+            folder: this.project.name,
+          })
+
+          await this.updateDeliverableWithPathName({
+            ...response.data.deliverable,
+            document_path: data.webUrl,
+          })
+
+          console.log(data)
         }
       } catch (error) {
+        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -314,14 +359,17 @@ export default {
 
     async changeStatus(status) {
       try {
-        const response = await this.$http.patch(`/update/${this.project.id}/project-status`, {
-          status: status.api
-        });
-        if(response) {
-          this.project = { ...this.project, status: status.api}
-          this.selectedStatus = status;
+        const response = await this.$http.patch(
+          `/update/${this.project.id}/project-status`,
+          {
+            status: status.api,
+          }
+        )
+        if (response) {
+          this.project = { ...this.project, status: status.api }
+          this.selectedStatus = status
         }
-      }catch (e) {
+      } catch (e) {
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -329,12 +377,14 @@ export default {
           variant: 'danger',
         })
       }
-
     },
 
     async exportToLibrary(form) {
       try {
-        const response = await this.$http.patch(`/export/${this.$route.params.id}/project`, { ...form, regionIds: this.getIds(form.regionIds) });
+        const response = await this.$http.patch(
+          `/export/${this.$route.params.id}/project`,
+          { ...form, regionIds: this.getIds(form.regionIds) }
+        )
 
         if (response) {
           this.$bvToast.toast('Project export successfully', {
@@ -365,7 +415,7 @@ export default {
           variant: 'danger',
         })
       }
-    }
+    },
   },
 }
 </script>
@@ -373,8 +423,13 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <CreateProjectModal :value="show" :form-title="formtitle" :action="editProject" :project="project"
-      @input="show = $event" />
+    <CreateProjectModal
+      :value="show"
+      :form-title="formtitle"
+      :action="editProject"
+      :project="project"
+      @input="show = $event"
+    />
     <div v-if="loading" class="d-flex justify-content-center">
       <b-spinner type="grow" variant="primary"></b-spinner>
     </div>
@@ -383,63 +438,81 @@ export default {
         <div class="col">
           <div class="card">
             <div class="card-body p-0">
-              <div class="card-title border-bottom p-3 mb-0 w-100 d-flex justify-content-between">
+              <div
+                class="card-title border-bottom p-3 mb-0 w-100 d-flex justify-content-between"
+              >
                 <div class="row page-title" style="padding:0">
                   <div class="col-sm-12 col-xl-12 d-flex">
                     <h4 class="mt-0">
-                     {{ project.name }}
+                      {{ project.name }}
                     </h4>
-<!--                      <div class="badge font-size-13 font-weight-normal ml-3 mx-4" :class="-->
-<!--                        project.status === 'pending'-->
-<!--                          ? ' badge-warning'-->
-<!--                          : project.status === 'ongoing'-->
-<!--                            ? 'badge-primary' :-->
-<!--                            project.status === 'overdue' ? 'badge-danger'-->
-<!--                              : 'badge-success'-->
-<!--                      ">{{ project.status }}</div>-->
-                      <div class=" mx-4">
-                        <b-dropdown
-                            class="d-inline"
-                            variant="link"
-                            toggle-class="font-weight-bold p-0 align-middle"
+                    <!--                      <div class="badge font-size-13 font-weight-normal ml-3 mx-4" :class="-->
+                    <!--                        project.status === 'pending'-->
+                    <!--                          ? ' badge-warning'-->
+                    <!--                          : project.status === 'ongoing'-->
+                    <!--                            ? 'badge-primary' :-->
+                    <!--                            project.status === 'overdue' ? 'badge-danger'-->
+                    <!--                              : 'badge-success'-->
+                    <!--                      ">{{ project.status }}</div>-->
+                    <div class=" mx-4">
+                      <b-dropdown
+                        class="d-inline"
+                        variant="link"
+                        toggle-class="font-weight-bold p-0 align-middle"
+                      >
+                        <template v-slot:button-content>
+                          {{ selectedStatus.name }}
+                          <i
+                            class="uil uil-angle-down font-size-16 align-middle"
+                          ></i>
+                        </template>
+                        <b-dropdown-item
+                          v-for="status in projectStatuses"
+                          :key="status.id"
+                          href="javascript: void(0);"
+                          variant="seconday"
+                          @click="changeStatus(status)"
                         >
-                          <template v-slot:button-content>
-                            {{ selectedStatus.name }}
-                            <i class="uil uil-angle-down font-size-16 align-middle"></i>
-                          </template>
-                          <b-dropdown-item
-                              v-for="status in projectStatuses"
-                              :key="status.id"
-                              href="javascript: void(0);"
-                              variant="seconday"
-                              @click="changeStatus(status)"
-                          >
-                            {{ status.name }}
-                          </b-dropdown-item>
-                        </b-dropdown>
-                      </div>
+                          {{ status.name }}
+                        </b-dropdown-item>
+                      </b-dropdown>
+                    </div>
                   </div>
                 </div>
 
                 <div class="col-sm-4 col-xl-6 text-sm-right">
-                  <router-link :to="`/project/${project.id}/project-plan`"
-                    class="btn-group ml-2 d-none d-sm-inline-block">
+                  <router-link
+                    :to="`/project/${project.id}/project-plan`"
+                    class="btn-group ml-2 d-none d-sm-inline-block"
+                  >
                     <button type="button" class="btn btn-soft-info btn-sm">
                       <i class="uil uil-edit mr-1"></i>View Project Plan
                     </button>
                   </router-link>
                   <div class="btn-group ml-2 d-none d-sm-inline-block">
-                    <button type="button" class="btn btn-soft-success btn-sm" @click="showExport = true">
+                    <button
+                      type="button"
+                      class="btn btn-soft-success btn-sm"
+                      @click="showExport = true"
+                    >
                       <i class="uil uil-edit mr-1"></i>Export to Library
                     </button>
                   </div>
                   <div class="btn-group ml-2 d-none d-sm-inline-block">
-                    <button type="button" class="btn btn-soft-primary btn-sm" @click="show = true">
+                    <button
+                      type="button"
+                      class="btn btn-soft-primary btn-sm"
+                      @click="show = true"
+                    >
                       <i class="uil uil-edit mr-1"></i>Edit
                     </button>
                   </div>
                   <div class="btn-group d-none d-sm-inline-block ml-1">
-                    <button type="button" class="btn btn-soft-danger btn-sm" @click="showProjectDeletionModal = true">
+                    <button
+                      type="button"
+                      class="btn btn-soft-danger btn-sm"
+                      @click="showProjectDeletionModal = true"
+                    >
                       <i class="uil uil-trash-alt mr-1"></i>Delete
                     </button>
                   </div>
@@ -451,7 +524,10 @@ export default {
                 <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
-                    <feather type="grid" class="align-self-center icon-dual icon-lg mr-4"></feather>
+                    <feather
+                      type="grid"
+                      class="align-self-center icon-dual icon-lg mr-4"
+                    ></feather>
                     <div class="media-body">
                       <h4 class="mt-0 mb-0">{{ project.tasks }}</h4>
                       <span class="text-muted">Total Task</span>
@@ -462,12 +538,13 @@ export default {
                 <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
-                    <feather type="check-square" class="align-self-center icon-dual icon-lg mr-4"></feather>
+                    <feather
+                      type="check-square"
+                      class="align-self-center icon-dual icon-lg mr-4"
+                    ></feather>
                     <div class="media-body">
                       <h4 class="mt-0 mb-0">
-                        {{
-                            project.no_of_completed_tasks
-                        }}
+                        {{ project.no_of_completed_tasks }}
                       </h4>
                       <span class="text-muted">Total Tasks Completed</span>
                     </div>
@@ -477,12 +554,13 @@ export default {
                 <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
-                    <feather type="clock" class="align-self-center icon-dual icon-lg mr-4"></feather>
+                    <feather
+                      type="clock"
+                      class="align-self-center icon-dual icon-lg mr-4"
+                    ></feather>
                     <div class="media-body">
                       <h4 class="mt-0 mb-0">
-                        {{
-                            project.no_of_pending_tasks
-                        }}
+                        {{ project.no_of_pending_tasks }}
                       </h4>
                       <span class="text-muted">Total Pending Task</span>
                     </div>
@@ -492,7 +570,10 @@ export default {
                 <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
                   <div class="media p-3">
-                    <feather type="users" class="align-self-center icon-dual icon-lg mr-4"></feather>
+                    <feather
+                      type="users"
+                      class="align-self-center icon-dual icon-lg mr-4"
+                    ></feather>
                     <div class="media-body">
                       <h4 class="mt-0 mb-0">{{ assigneesCount }}</h4>
                       <span class="text-muted">Total Assignees</span>
@@ -513,15 +594,16 @@ export default {
 
               <div class="text-muted mt-3">
                 <p>{{ project.description }}</p>
-                <div class="badge badge-soft-primary font-size-13 font-weight-normal ml-1">
-                  {{
-                      project.project_sector && project.project_sector.name
-                  }}
+                <div
+                  class="badge badge-soft-primary font-size-13 font-weight-normal ml-1"
+                >
+                  {{ project.project_sector && project.project_sector.name }}
                 </div>
 
-                <div class="badge badge-soft-success font-size-13 font-weight-normal ml-1">{{ project.project_type &&
-                    project.project_type.name
-                }}</div>
+                <div
+                  class="badge badge-soft-success font-size-13 font-weight-normal ml-1"
+                  >{{ project.project_type && project.project_type.name }}</div
+                >
 
                 <div class="row">
                   <div class="col-lg-4 col-md-6">
@@ -529,7 +611,9 @@ export default {
                       <p class="mb-2">
                         <i class="uil-user text-danger"></i> Coordinator
                       </p>
-                      <h5 class="font-size-16">{{ project.coordinator.name || 'N/A' }}</h5>
+                      <h5 class="font-size-16">{{
+                        project.coordinator.name || 'N/A'
+                      }}</h5>
                     </div>
                   </div>
                   <div class="col-lg-4 col-md-6">
@@ -554,17 +638,18 @@ export default {
                   <h6 class="font-weight-bold">Assign To</h6>
                   <div v-if="assignees.length > 0" class="route d-flex">
                     <div
-                        v-for="user in assignees"
-                        :id="`${user.id}-assignee`"
-                        :key="user.id"
-                        class="rounded-circle default-avatar member-overlap-item d-flex justify-content-center align-items-center"
-                        style="cursor: pointer;"
+                      v-for="user in assignees"
+                      :id="`${user.id}-assignee`"
+                      :key="user.id"
+                      class="rounded-circle default-avatar member-overlap-item d-flex justify-content-center align-items-center"
+                      style="cursor: pointer;"
                     >
                       <b-tooltip
-                          :target="`${user.id}-assignee`"
-                          triggers="hover"
-                          placement="bottom"
-                      >{{ user.name }}</b-tooltip>
+                        :target="`${user.id}-assignee`"
+                        triggers="hover"
+                        placement="bottom"
+                        >{{ user.name }}</b-tooltip
+                      >
                       {{ getInitials(user.name) }}
                     </div>
                   </div>
@@ -579,13 +664,21 @@ export default {
             <div class="card-body">
               <b-tabs pills class="navtab-bg">
                 <b-tab title="Discussion" active>
-                  <h5 class="mb-4 pb-1 header-title">Comments ({{ comments.length }})</h5>
-                  <div v-for="com in comments" :key="com.id" class="media mb-4 font-size-14">
+                  <h5 class="mb-4 pb-1 header-title"
+                    >Comments ({{ comments.length }})</h5
+                  >
+                  <div
+                    v-for="com in comments"
+                    :key="com.id"
+                    class="media mb-4 font-size-14"
+                  >
                     <div class="mr-3">
                       <a href="#">
                         <div
-                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center">
-                          {{ getInitials(com.user) }}</div>
+                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center"
+                        >
+                          {{ getInitials(com.user) }}</div
+                        >
                       </a>
                     </div>
                     <div class="media-body">
@@ -597,115 +690,54 @@ export default {
                   </div>
 
                   <form class="media" @submit.prevent="sendComment">
-<!--                    <div class="d-flex mr-3">-->
-<!--                      <a href="#">-->
-<!--                        <div-->
-<!--                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center">-->
-<!--                          {{ initials }}</div>-->
-<!--                      </a>-->
-<!--                    </div>-->
+                    <!--                    <div class="d-flex mr-3">-->
+                    <!--                      <a href="#">-->
+                    <!--                        <div-->
+                    <!--                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center">-->
+                    <!--                          {{ initials }}</div>-->
+                    <!--                      </a>-->
+                    <!--                    </div>-->
                     <div class="media-body">
-                      <input v-model="comment" type="text" class="form-control input-sm"
-                        placeholder="Some text value..." />
+                      <input
+                        v-model="comment"
+                        type="text"
+                        class="form-control input-sm"
+                        placeholder="Some text value..."
+                      />
                     </div>
                   </form>
                 </b-tab>
                 <b-tab title="Files/Resources">
                   <h5 class="mb-3 header-title">Attached Files</h5>
-                  <div>
-                    <div class="p-2 border rounded mb-3">
-                      <div class="media">
-                        <div class="avatar-sm font-weight-bold mr-3">
-                          <span class="avatar-title rounded bg-soft-primary text-primary">
-                            <i class="uil-file-plus-alt font-size-18"></i>
-                          </span>
+                  <div class="row">
+                    <div
+                      v-for="dev in projectDeliverables"
+                      :key="dev.id"
+                      class="col-md-4"
+                    >
+                      <a :href="dev.document_path" target="_blank">
+                        <div class="p-2 border rounded mb-3">
+                          <div class="media">
+                            <div class="avatar-sm font-weight-bold mr-3">
+                              <span
+                                class="avatar-title rounded bg-soft-primary text-primary"
+                              >
+                                <i class="uil-file-plus-alt font-size-18"></i>
+                              </span>
+                            </div>
+                            <div class="media-body">
+                              <a href="#" class="d-inline-block mt-2">{{
+                                dev.project_type_deliverable.deliverable_name
+                              }}</a>
+                            </div>
+                            <div class="float-right mt-1">
+                              <a href="#" class="p-2">
+                                <i class="uil-download-alt font-size-18"></i>
+                              </a>
+                            </div>
+                          </div>
                         </div>
-                        <div class="media-body">
-                          <a href="#" class="d-inline-block mt-2">Landing 1.psd</a>
-                        </div>
-                        <div class="float-right mt-1">
-                          <a href="#" class="p-2">
-                            <i class="uil-download-alt font-size-18"></i>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="p-2 border rounded mb-3">
-                      <div class="media">
-                        <div class="avatar-sm font-weight-bold mr-3">
-                          <span class="avatar-title rounded bg-soft-primary text-primary">
-                            <i class="uil-file-plus-alt font-size-18"></i>
-                          </span>
-                        </div>
-                        <div class="media-body">
-                          <a href="#" class="d-inline-block mt-2">Landing 2.psd</a>
-                        </div>
-                        <div class="float-right mt-1">
-                          <a href="#" class="p-2">
-                            <i class="uil-download-alt font-size-18"></i>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="p-2 border rounded mb-3">
-                      <div>
-                        <a href="#" class="d-inline-block m-1">
-                          <img src="@assets/images/small/img-2.jpg" alt class="avatar-lg rounded" />
-                        </a>
-                        <a href="#" class="d-inline-block m-1">
-                          <img src="@assets/images/small/img-3.jpg" alt class="avatar-lg rounded" />
-                        </a>
-                        <a href="#" class="d-inline-block m-1">
-                          <img src="@assets/images/small/img-4.jpg" alt class="avatar-lg rounded" />
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="p-2 border rounded mb-3">
-                      <div class="media">
-                        <div class="avatar-sm font-weight-bold mr-3">
-                          <span class="avatar-title rounded bg-soft-primary text-primary">
-                            <i class="uil-file-plus-alt font-size-18"></i>
-                          </span>
-                        </div>
-                        <div class="media-body">
-                          <a href="#" class="d-inline-block mt-2">Logo.psd</a>
-                        </div>
-                        <div class="float-right mt-1">
-                          <a href="#" class="p-2">
-                            <i class="uil-download-alt font-size-18"></i>
-                          </a>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="p-2 border rounded mb-3">
-                      <div>
-                        <a href="#" class="d-inline-block m-1">
-                          <img src="@assets/images/small/img-7.jpg" alt class="avatar-lg rounded" />
-                        </a>
-                        <a href="#" class="d-inline-block m-1">
-                          <img src="@assets/images/small/img-6.jpg" alt class="avatar-lg rounded" />
-                        </a>
-                      </div>
-                    </div>
-
-                    <div class="p-2 border rounded mb-3">
-                      <div class="media">
-                        <div class="avatar-sm font-weight-bold mr-3">
-                          <span class="avatar-title rounded bg-soft-primary text-primary">
-                            <i class="uil-file-plus-alt font-size-18"></i>
-                          </span>
-                        </div>
-                        <div class="media-body">
-                          <a href="#" class="d-inline-block mt-2">Clients.psd</a>
-                        </div>
-                        <div class="float-right mt-1">
-                          <a href="#" class="p-2">
-                            <i class="uil-download-alt font-size-18"></i>
-                          </a>
-                        </div>
-                      </div>
+                      </a>
                     </div>
                   </div>
                 </b-tab>
@@ -719,15 +751,22 @@ export default {
               <h6 class="mt-0 header-title">Project Deliverables</h6>
 
               <ul class="list-unstyled activity-widget">
-                <li v-for="deliverable in projectDeliverables" :key="deliverable.id" class="activity-list">
+                <li
+                  v-for="deliverable in projectDeliverables"
+                  :key="deliverable.id"
+                  class="activity-list"
+                >
                   <div class="media d-flex justify-content-between">
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
-                        <router-link :to="
-                          `/project/${$route.params.id}/deliverable/${deliverable.id}`
-                        " class="text-dark">
+                        <router-link
+                          :to="
+                            `/project/${$route.params.id}/deliverable/${deliverable.id}`
+                          "
+                          class="text-dark"
+                        >
                           {{
-                              deliverable.project_type_deliverable &&
+                            deliverable.project_type_deliverable &&
                               deliverable.project_type_deliverable
                                 .deliverable_name
                           }}
@@ -735,18 +774,32 @@ export default {
                       </h5>
                       <div class="d-flex">
                         <div>
-                          <a :id="`task-tooltip-${deliverable.id}`" href="javascript: void(0)"
-                            class="text-muted d-inline-block bg-transparent">
-                            <b-tooltip :target="`task-tooltip-${deliverable.id}`" triggers="hover" placement="top">Tasks
+                          <a
+                            :id="`task-tooltip-${deliverable.id}`"
+                            href="javascript: void(0)"
+                            class="text-muted d-inline-block bg-transparent"
+                          >
+                            <b-tooltip
+                              :target="`task-tooltip-${deliverable.id}`"
+                              triggers="hover"
+                              placement="top"
+                              >Tasks
                             </b-tooltip>
                             <i class="uil uil-bars mr-1 text-primary"></i>
                             {{ deliverable.tasks_count || 0 }} task(s)
                           </a>
                         </div>
                         <div class=" mx-2">
-                          <a :id="`task-tooltip-${deliverable.id}`" href="javascript: void(0)"
-                             class="text-muted d-inline-block bg-transparent">
-                            <b-tooltip :target="`task-tooltip-${deliverable.id}`" triggers="hover" placement="top">Due Date
+                          <a
+                            :id="`task-tooltip-${deliverable.id}`"
+                            href="javascript: void(0)"
+                            class="text-muted d-inline-block bg-transparent"
+                          >
+                            <b-tooltip
+                              :target="`task-tooltip-${deliverable.id}`"
+                              triggers="hover"
+                              placement="top"
+                              >Due Date
                             </b-tooltip>
                             <i class="uil-calendar-slash mr-1 text-danger"></i>
                             {{ deliverable.deadline }}
@@ -755,30 +808,41 @@ export default {
                       </div>
                     </div>
                     <div class="d-flex">
-                      <button type="button" class="btn btn-soft-secondary btn-sm">
+                      <button
+                        type="button"
+                        class="btn btn-soft-secondary btn-sm"
+                      >
                         <i class="uil uil-edit"></i>
                       </button>
 
-                      <button type="button" class="btn btn-soft-danger ml-2 btn-sm">
+                      <button
+                        type="button"
+                        class="btn btn-soft-danger ml-2 btn-sm"
+                      >
                         <i class="uil uil-trash-alt"></i>
                       </button>
                     </div>
                   </div>
                 </li>
-                <li v-for="deliver in project.project_type &&
-                project.project_type.deliverables" :key="deliver.name">
+                <li
+                  v-for="deliver in project.project_type &&
+                    project.project_type.deliverables"
+                  :key="deliver.name"
+                >
                   <div v-if="showDeliverable(deliver)" class="activity-list">
                     <div class="media d-flex justify-content-between">
                       <div class="media-body overflow-hidden">
                         <h5 class="font-size-15 mt-2 mb-1">
                           <div class="text-dark">
-                            {{
-                                deliver.deliverable_name
-                            }}
+                            {{ deliver.deliverable_name }}
                           </div>
                         </h5>
                       </div>
-                      <button type="button" class="btn btn-soft-primary btn-sm" @click="openCreateDeliverable(deliver)">
+                      <button
+                        type="button"
+                        class="btn btn-soft-primary btn-sm"
+                        @click="openCreateDeliverable(deliver)"
+                      >
                         <i class="uil uil-plus"></i>
                       </button>
                     </div>
@@ -791,17 +855,28 @@ export default {
       </div>
     </div>
 
-    <CreateDeliverable :action="createDeliverable" :value="showCreateDeliverable" :deliverable="vDeliverable"
-      @input="showCreateDeliverable = $event" />
+    <CreateDeliverable
+      :action="createDeliverable"
+      :value="showCreateDeliverable"
+      :deliverable="vDeliverable"
+      @input="showCreateDeliverable = $event"
+    />
 
-    <ProjectDeletionModal :close="() => showProjectDeletionModal = false" :value="showProjectDeletionModal"
-      @input="showProjectDeletionModal = $event" />
+    <ProjectDeletionModal
+      :close="() => (showProjectDeletionModal = false)"
+      :value="showProjectDeletionModal"
+      @input="showProjectDeletionModal = $event"
+    />
 
-    <ExportProjectForm :value="showExport" :action="exportToLibrary" :project="project" @input="showExport = $event" />
+    <ExportProjectForm
+      :value="showExport"
+      :action="exportToLibrary"
+      :project="project"
+      @input="showExport = $event"
+    />
   </Layout>
 </template>
 <style scoped>
-
 #grid_groups_wrapper {
   max-width: 800px;
 }
