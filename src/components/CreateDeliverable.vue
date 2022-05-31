@@ -6,7 +6,6 @@
     hide-footer
   >
     <form @submit.prevent="action({ ...form, ...deliverable, file, filename })">
-    {{ form }}
       <b-form-group
         id="input-group-1"
         label="Deliverable deadline"

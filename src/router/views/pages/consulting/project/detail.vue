@@ -113,7 +113,11 @@ export default {
         )
 
         if (response) {
-          console.log(response)
+          const index = this.projectDeliverables.findIndex(
+            (element) => element.id === item.id
+          );
+
+          this.$set(this.projectDeliverables, index, response.data.deliverable)
         }
       } catch (error) {
         console.log(error)
@@ -726,13 +730,13 @@ export default {
                               </span>
                             </div>
                             <div class="media-body">
-                              <a href="#" class="d-inline-block mt-2">{{
+                              <div href="#" class="d-inline-block mt-2">{{
                                 dev.project_type_deliverable.deliverable_name
-                              }}</a>
+                              }}</div>
                             </div>
                             <div class="float-right mt-1">
                               <a href="#" class="p-2">
-                                <i class="uil-download-alt font-size-18"></i>
+                                <i class="uil uil-edit font-size-16"></i>
                               </a>
                             </div>
                           </div>

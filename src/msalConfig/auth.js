@@ -66,7 +66,7 @@ export default {
   //
   // Login a user with a popup
   //
-  async login(scopes = ['user.read', 'files.read', 'files.read.all', 'files.readwrite', 'files.readwrite.all', 'openid', 'profile', 'email']) {
+  async login(scopes = ['user.read', 'files.readwrite.selected', 'files.readwrite.appfolder', 'files.read', 'files.read.all', 'files.readwrite', 'files.readwrite.all', 'openid', 'profile', 'email']) {
     if (!msalApp) {
       return
     }
