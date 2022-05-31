@@ -53,7 +53,6 @@ export default {
   },
 
   async uploadFile({ fileName, fileContent, folder }) {
-    console.log('here')
     let resp = await putGraph(`/me/drive/root:/${folder}/${fileName}:/content`, fileContent);
     if (resp) {
       let data = await resp.json()
@@ -146,7 +145,7 @@ async function putGraph(apiPath, data) {
       authorization: `bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(data)
+    body: data
   })
 
   if (!resp.ok) {
