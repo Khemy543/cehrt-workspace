@@ -5,7 +5,7 @@
     title-class="font-18"
     hide-footer
   >
-    <form @submit.prevent="action({ ...form, ...deliverable, file, filename })">
+    <form @submit.prevent="action({ ...deliverable, ...form, file, filename })">
       <b-form-group
         id="input-group-1"
         label="Deliverable deadline"
@@ -19,6 +19,7 @@
         ></b-form-input>
       </b-form-group>
       <b-form-group
+        v-if="!editting"
         id="input-group-1"
         label="Upload Delivrable File"
         label-for="input-1"
@@ -35,7 +36,7 @@
 </template>
 
 <script>
-// import { signInWithMsal, getMsalToken} from '@src/msalConfig/auth.js'; 
+import { dateFormate } from '@utils/format-date'
 export default {
   props: {
     value: {
@@ -49,6 +50,10 @@ export default {
     deliverable: {
       type: Object,
       default: () =>{}
+    },
+    editting: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -68,12 +73,17 @@ export default {
       }
     },
     title() {
-      return this.deliverable && this.deliverable.deliverable_name || this.deliverable && this.deliverable.report_title;
+      return this.deliverable && this.deliverable.deliverable_name ||
+      this.deliverable && this.deliverable.report_title ||
+      this.deliverable && this.deliverable.project_type_deliverable && this.deliverable.project_type_deliverable.deliverable_name
     }
   },
   watch: {
     deliverable(newValue) {
-      this.form = newValue
+      this.form = {
+        ...newValue,
+        deadline: newValue.deadline ? dateFormate(newValue.deadline) : ''
+      }
     }
   },
   methods: {
@@ -81,16 +91,6 @@ export default {
       this.file = e.target.files[0];
       this.filename = e.target.files[0].name;
     },
-    /* async handleAction() {
-      try { 
-        const response = await getMsalToken()
-        if(response) {
-          this.action({ ...this.form, ...this.deliverable })
-        }
-      } catch (error) {
-        
-      }
-    } */
   },
 }
 </script>

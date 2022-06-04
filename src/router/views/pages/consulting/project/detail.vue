@@ -45,7 +45,8 @@ export default {
         },
       ],
       projectDeliverables: [],
-      vDeliverable: {},
+      vDeliverable: null,
+      editting: false,
       showProjectDeletionModal: false,
       comment: '',
       comments: [],
@@ -115,13 +116,18 @@ export default {
         if (response) {
           const index = this.projectDeliverables.findIndex(
             (element) => element.id === item.id
-          );
+          )
 
           this.$set(this.projectDeliverables, index, response.data.deliverable)
         }
       } catch (error) {
         console.log(error)
       }
+    },
+    showUpdateDeliverable(deliverable) {
+      this.vDeliverable = deliverable
+      this.editting = true
+      this.showCreateDeliverable = true
     },
     getIds(regions) {
       return regions.map((items) => items.id)
@@ -331,15 +337,14 @@ export default {
             folder: this.project.name,
           })
 
+          this.vDeliverable = null
+
           await this.updateDeliverableWithPathName({
             ...response.data.deliverable,
             document_path: data.webUrl,
           })
-
-          console.log(data)
         }
       } catch (error) {
-        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -352,6 +357,8 @@ export default {
             })
           }
         }
+        this.showCreateDeliverable = false
+        this.vDeliverable = null
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -359,6 +366,97 @@ export default {
           variant: 'danger',
         })
       }
+    },
+
+    async EditDeliverable(form) {
+      try {
+        const response = await this.$http.put(
+          `/update/${form.id}/deliverable`,
+          {
+            ...form,
+            project_type_deliverable_id: form.project_type_deliverable.id,
+          }
+        )
+
+        if (response) {
+          const index = this.projectDeliverables.findIndex(
+            (item) => item.id === form.id
+          );
+
+          this.$set(this.projectDeliverables, index, response.data.deliverable);
+
+          this.$bvToast.toast('Project deliverable updated successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          });
+
+          this.showCreateDeliverable = false;
+        }
+      } catch (error) {
+        this.showCreateDeliverable = false
+        this.vDeliverable = null
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
+
+    deleteDeliverable(deliverable) {
+      this.$swal({
+        title: 'Delete Deliverable',
+        text: `Delete ${deliverable.project_type_deliverable.deliverable_name}`,
+        showDenyButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.delete(
+              `/delete/${deliverable.id}/deliverable`
+            )
+
+            if (response) {
+              this.$bvToast.toast('Deliverable deleted successfully', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success',
+              })
+              this.projectDeliverables = this.projectDeliverables.filter(
+                (item) => item.id !== deliverable.id
+              )
+            }
+          } catch (error) {
+            let message = 'Something happened, Please try again later'
+            if (error.response) {
+              const { status, data } = error.response
+              if (status === 422) {
+                message = data.message
+              }
+            }
+            this.$bvToast.toast(message, {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+      })
+    },
+
+    action(form) {
+      if (this.editting) {
+        return this.EditDeliverable(form)
+      }
+      return this.createDeliverable(form)
     },
 
     async changeStatus(status) {
@@ -815,6 +913,7 @@ export default {
                       <button
                         type="button"
                         class="btn btn-soft-secondary btn-sm"
+                        @click="showUpdateDeliverable(deliverable)"
                       >
                         <i class="uil uil-edit"></i>
                       </button>
@@ -822,6 +921,7 @@ export default {
                       <button
                         type="button"
                         class="btn btn-soft-danger ml-2 btn-sm"
+                        @click="deleteDeliverable(deliverable)"
                       >
                         <i class="uil uil-trash-alt"></i>
                       </button>
@@ -860,9 +960,10 @@ export default {
     </div>
 
     <CreateDeliverable
-      :action="createDeliverable"
+      :action="action"
       :value="showCreateDeliverable"
       :deliverable="vDeliverable"
+      :editting="editting"
       @input="showCreateDeliverable = $event"
     />
 

@@ -1,6 +1,7 @@
 <script>
 import appConfig from '@src/app.config'
 import auth from './msalConfig/auth'
+import graph from './msalConfig/graph'
 
 export default {
   page: {
@@ -15,6 +16,8 @@ export default {
       // Restore any cached or saved local user
       this.user = auth.user()
       console.log(`configured ${auth.isConfigured()}`)
+
+      await graph.getFiles()
     
   },
 }

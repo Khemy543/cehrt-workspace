@@ -1,6 +1,7 @@
 <script>
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
+import formateAmount from '@src/utils/formate-money.js'
 
 export default {
   page: {
@@ -31,12 +32,24 @@ export default {
       project: {},
       submitModal: false,
       form: {
-          principal: ""
+        principal: '',
       },
       staff: [],
     }
   },
   computed: {
+    positions() {
+      return this.$store
+        ? this.$store.state.auth.currentUser.position
+        : [] || []
+    },
+    isPrincipalConsultant() {
+      return (
+        this.positions.some(
+          (position) => position.name === 'Principal Consultant'
+        ) && this.$route.query.isPrincipalConsultant === 'true'
+      )
+    },
     projectDeliverable() {
       return this.project.deliverable || []
     },
@@ -44,7 +57,11 @@ export default {
       return this.$store ? this.$store.state.auth.userDepartment : {} || {}
     },
     principalConsultants() {
-        return this.staff.filter(staff => staff.position.some(item => item.name === 'Principal Consultant')) || []
+      return (
+        this.staff.filter((staff) =>
+          staff.position.some((item) => item.name === 'Principal Consultant')
+        ) || []
+      )
     },
   },
   created() {
@@ -54,6 +71,9 @@ export default {
   methods: {
     showSubmitModal() {
       this.submitModal = true
+    },
+    amountFormat(amount) {
+      return formateAmount(amount)
     },
     async getConsultingStaff() {
       try {
@@ -136,6 +156,14 @@ export default {
 
       return total.toFixed(2)
     },
+    getTotalDaysAllocated(tasks) {
+      let total = 0
+      for (const task of tasks) {
+        total = Number(total) + Number(task.allocated_days)
+      }
+
+      return total
+    },
     getTotal() {
       let total = 0
       for (const deliverable of this.projectDeliverable) {
@@ -148,9 +176,21 @@ export default {
     },
     async submitPlanForApproval() {
       try {
-        const response = await this.$http.get(``)
+        const response = await this.$http.patch(
+          `/submit/project/${this.$route.params.id}/approval/request`,
+          {
+            principal_consultant_id: this.form.principal,
+          }
+        )
 
         if (response) {
+          this.submitModal = false
+          this.$bvToast.toast('Request submitted successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -160,6 +200,54 @@ export default {
           variant: 'danger',
         })
       }
+    },
+
+    approvalProjectPlan() {
+      this.$swal({
+        title: 'Approve Project Plan?',
+        showDenyButton: true,
+        confirmButtonText: 'Approve',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.patch(
+              `/approve/project/${this.$route.params.id}/plan`
+            )
+
+            if (response) {
+              this.$bvToast.toast('Project plan approved successfully', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success',
+              })
+
+              setTimeout(() => {
+                this.$router.push(`/project/details/${this.$route.params.id}`)
+              }, 2000)
+            }
+          } catch (error) {
+            this.$bvToast.toast('Something happened, Please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+      })
+    },
+
+    saveProjectPlan() {
+      this.$bvToast.toast('Project plan saved successfully', {
+        title: 'Success',
+        autoHideDelay: 5000,
+        appendToast: false,
+        variant: 'success',
+      })
     },
   },
 }
@@ -188,10 +276,20 @@ export default {
                   <button
                     type="button"
                     class="btn btn-primary mr-4 mb-3 mb-sm-0"
+                    @click="saveProjectPlan"
                   >
                     <i class="uil-files-landscapes mr-1"></i> Save Project Plan
                   </button>
                   <button
+                    v-if="isPrincipalConsultant"
+                    type="button"
+                    class="btn btn-danger mr-4 mb-3 mb-sm-0"
+                    @click="approvalProjectPlan"
+                  >
+                    Approve Project Plan
+                  </button>
+                  <button
+                    v-else
                     type="button"
                     class="btn btn-danger mr-4 mb-3 mb-sm-0"
                     @click="showSubmitModal"
@@ -280,28 +378,52 @@ export default {
                           </td>
                           <td v-else
                             >{{ task.rate_currency }}
-                            {{ task.rate || 'N/A' }}</td
+                            {{ amountFormat(task.rate) || 'N/A' }}</td
                           >
 
                           <td>{{
-                            getAmount(
-                              task.allocated_days,
-                              task.rate,
-                              task.ExtractRawComponents
+                            amountFormat(
+                              getAmount(
+                                task.allocated_days,
+                                task.rate,
+                                task.ExtractRawComponents
+                              )
                             )
                           }}</td>
+                        </tr>
+                        <tr>
+                          <td></td>
+                          <td>Total</td>
+                          <td></td>
+                          <td
+                            >{{
+                              getTotalDaysAllocated(deliverable.tasks)
+                            }}
+                            days</td
+                          >
+                          <td></td>
+                          <td
+                            >GHS
+                            {{
+                              amountFormat(
+                                getDeliverableTotalPrice(deliverable.tasks)
+                              )
+                            }}</td
+                          >
                         </tr>
                       </tbody>
                     </table>
                   </div>
-                  <h5 v-if="deliverable.tasks.length > 0"
-                    >Total Price
-                    {{ getDeliverableTotalPrice(deliverable.tasks) }}</h5
-                  >
+                  <!-- <div class=" d-flex justify-content-end">
+                    <h5 v-if="deliverable.tasks.length > 0"
+                      >
+                      {{ getDeliverableTotalPrice(deliverable.tasks) }}</h5
+                    >
+                  </div> -->
                 </div>
 
                 <div v-if="projectDeliverable.length > 0" class="mt-4">
-                  <h4>Project Total: {{ getTotal() }}</h4>
+                  <h4>Project Total: GHS {{ amountFormat(getTotal()) }}</h4>
                 </div>
               </div>
             </div>
@@ -316,7 +438,7 @@ export default {
       title-class="font-18"
       hide-footer
     >
-      <form @submit="submitPlanForApproval">
+      <form @submit.prevent="submitPlanForApproval">
         <b-form-group
           id="input-group-1"
           label="Principal Consultant"

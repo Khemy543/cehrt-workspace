@@ -79,28 +79,18 @@
           <div v-if="!loading && reports.length > 0" class="row mt-4">
             <router-link v-for="report in reports" :key="report.id" :to="`/proposal/${proposal.id}/report/${report.id}`"
               class="col-md-4">
-              <div class="card">
-                <div class="card-body">
+              <div class="card" style="min-height: 300px;">
+                <div class="card-body position-relative">
                   <div class="p-2 border rounded mb-3">
                     <div class="media">
-                      <div class="avatar-sm font-weight-bold mr-3">
-                        <span class="avatar-title rounded bg-soft-primary text-primary">
-                          <i class="uil-file-plus-alt font-size-18"></i>
-                        </span>
-                      </div>
                       <div class="media-body">
                         <div class="d-inline-block mt-2">{{
                             report.proposal_type && report.proposal_type.report_title
-                        }}.docx</div>
+                        }}</div>
                       </div>
-                      <!-- <div class="float-right mt-1">
-                        <div class="p-2">
-                          <i class="uil-download-alt font-size-18"></i>
-                        </div>
-                      </div> -->
                     </div>
                   </div>
-                  <div>
+                  <div class=" position-absolute" style="bottom: 5px;">
                     <ul class="list-inline">
                       <li class="list-inline-item pr-1">
                         <a :id="`date-tooltip-${report.id}`" href="javascript: void(0)"
@@ -165,6 +155,7 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import CreateDeliverable from '@/src/components/CreateDeliverable.vue'
 import CreateProjectModal from '@/src/components/CreateProjectModal.vue'
+import graph from '@/src/msalConfig/graph'
 export default {
   page: {
     title: 'Proposal',
@@ -331,8 +322,15 @@ export default {
     },
     async createReport(report) {
       try {
+         const data = await graph.uploadFile({
+            fileName: `${report.report_title}.docx`,
+            fileContent: report.file,
+            folder: this.proposal.title,
+          });
+
+
         const response = await this.$http.post(`/create/${this.$route.params.id}/proposal-report`, {
-          report_path: '/root/path',
+          report_path: data.webUrl,
           proposal_report_type_id: report.id,
           deadline: report.deadline
         });
