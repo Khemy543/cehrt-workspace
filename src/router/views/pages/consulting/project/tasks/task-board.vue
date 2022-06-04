@@ -249,7 +249,7 @@ export default {
     createTaskWithDeliverable(workflow) {
       this.$swal({
         title: `Create tasks from ${workflow.name}?`,
-        text: 'This action will delete all current tasks',
+        text: 'This action will delete all current tasks on this deliv',
         showDenyButton: true,
         confirmButtonText: 'Create',
         denyButtonText: `Cancel`,
@@ -278,8 +278,6 @@ export default {
                 assignee: {id: null, name: null},
                 assigner: { id: null, name: null }
               }));
-
-              console.log(this.tasks)
               this.todoTasks =
                 this.tasks.filter((item) => item.status === 'pending' || item.status === null) || []
               this.inProgressTasks =
@@ -294,7 +292,9 @@ export default {
                 autoHideDelay: 5000,
                 appendToast: false,
                 variant: 'success',
-              })
+              });
+
+              window.location.reload()
             }
           } catch (error) {
             if (error.response) {

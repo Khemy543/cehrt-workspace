@@ -3,6 +3,7 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import CreateProposalModal from '@components/CreateProposalModal.vue'
+import graph from '@/src/msalConfig/graph'
 
 export default {
   page: {
@@ -77,6 +78,7 @@ export default {
 
         if (response && response.data) {
           this.proposals.push(response.data.proposal)
+          await graph.createFolder({ name: response.data.proposal.title, folder: {} });
           this.show = false
           this.$bvToast.toast('Proposal created successfully', {
             title: 'Success',

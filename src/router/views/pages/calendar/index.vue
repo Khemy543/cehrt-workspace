@@ -186,7 +186,7 @@ export default {
                   title: `${item.name} ( ${item.status})`,
                   end: item.end_date,
                   editable: false,
-                  url: `/task/${item.id}/details?hasSubTask=false&subtask=true`,
+                  url: `/project/task/${item.id}/details?hasSubTask=false&subtask=true`,
                   start:
                     item.start_date ||
                     (item.created_at && item.created_at.split('T')[0]),
@@ -203,7 +203,7 @@ export default {
                 title: `${item.name} ( ${item.status} )`,
                 end: item.end_date,
                 editable: false,
-                url: `/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
+                url: `/project/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
                 start:
                   item.start_date ||
                   (item.created_at && item.created_at.split('T')[0]),

@@ -427,7 +427,7 @@ const leaveRequestRoutes = [
   },
 ]
 
-const trainingRouts = [
+/* const trainingRouts = [
   {
     path: '/trainings',
     name: 'Trainings',
@@ -437,7 +437,7 @@ const trainingRouts = [
     component: () =>
       lazyLoadView(import('@views/pages/consulting/trainings/index.vue')),
   },
-]
+] */
 
 const financeRoutes = [
   {
@@ -467,7 +467,7 @@ const appsRoutes = [
   ...adminProjectRoutes,
   ...recycleRoutes,
   ...projectPlanRoutes,
-  ...trainingRouts,
+  // ...trainingRouts,
   ...financeRoutes
 ]
 
