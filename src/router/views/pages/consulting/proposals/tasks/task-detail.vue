@@ -455,11 +455,11 @@ export default {
                   <!-- Button -->
                   <a
                     v-b-tooltip.hover
-                    title="Download"
+                    title="open"
                     href="javascript:void(0);"
                     class="btn btn-link text-muted btn-lg p-0"
                   >
-                    <i class="uil uil-cloud-download font-size-14"></i>
+                    <feather type="log-in" class="font-size-14"></feather>
                   </a>
                 </div>
               </div>

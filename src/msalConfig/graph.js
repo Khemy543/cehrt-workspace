@@ -23,7 +23,7 @@ const GRAPH_SCOPES = [
 let accessToken
 
 const driveId = 'eb3548181cf4dc64';
-const itemId = 'EB3548181CF4DC64!122';
+const itemId = 'EB3548181CF4DC64!166';
 
 export default {
   //
@@ -47,7 +47,7 @@ export default {
   },
 
   async createFolder(item) {
-    let resp = await postGraph(`/drives/${driveId}/root/children`, item);
+    let resp = await postGraph(`/drives/${driveId}/items/${itemId}/children`, item);
 
     if(resp) {
       let data = await resp.json()
@@ -55,8 +55,16 @@ export default {
     }
   },
 
-  async uploadFile({ fileName, fileContent, folder }) {
-    let resp = await putGraph(`/drives/${driveId}/items/${itemId}:/${folder}/${fileName}:/content`, fileContent);
+  async uploadProposalFile({ fileName, fileContent, folder }) {
+    let resp = await putGraph(`/drives/${driveId}/items/${itemId}:/Proposals/${folder}/${fileName}:/content`, fileContent);
+    if (resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
+  async uploadProjectFile({ fileName, fileContent, folder }) {
+    let resp = await putGraph(`/drives/${driveId}/items/${itemId}:/Projects/${folder}/${fileName}:/content`, fileContent);
     if (resp) {
       let data = await resp.json()
       return data

@@ -371,7 +371,7 @@ export default {
                   }}</b></span
                 >
               </div>-->
-              <div class="col">
+              <!-- <div class="col">
                 <label class="font-weight-bold d-inline mr-2">
                   <feather type="activity" class="icon-dual icon-xs mr-2 align-middle"></feather>Work Flows:
                 </label>
@@ -394,7 +394,7 @@ export default {
                     @click="createTaskWithDeliverable(workflow)"
                   >{{ workflow.name }}</b-dropdown-item>
                 </b-dropdown>
-              </div>
+              </div> -->
               <div class="col text-right">
                 <button id="btn-new-event" class="btn btn-primary" @click="showCreateModal">
                   <i class="uil-plus mr-1"></i>Add New Task

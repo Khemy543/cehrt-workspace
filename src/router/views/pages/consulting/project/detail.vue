@@ -331,7 +331,7 @@ export default {
 
           this.showCreateDeliverable = false
 
-          const data = await graph.uploadFile({
+          const data = await graph.uploadProjectFile({
             fileName: `${form.deliverable_name}.docx`,
             fileContent: form.file,
             folder: this.project.name,
@@ -548,14 +548,6 @@ export default {
                     <h4 class="mt-0">
                       {{ project.name }}
                     </h4>
-                    <!--                      <div class="badge font-size-13 font-weight-normal ml-3 mx-4" :class="-->
-                    <!--                        project.status === 'pending'-->
-                    <!--                          ? ' badge-warning'-->
-                    <!--                          : project.status === 'ongoing'-->
-                    <!--                            ? 'badge-primary' :-->
-                    <!--                            project.status === 'overdue' ? 'badge-danger'-->
-                    <!--                              : 'badge-success'-->
-                    <!--                      ">{{ project.status }}</div>-->
                     <div class=" mx-4">
                       <b-dropdown
                         class="d-inline"
@@ -833,8 +825,8 @@ export default {
                               }}</div>
                             </div>
                             <div class="float-right mt-1">
-                              <a href="#" class="p-2">
-                                <i class="uil uil-edit font-size-16"></i>
+                              <a :href="dev.document_path" target="_blank">
+                                <feather type="log-in" class="icons-xs"></feather>
                               </a>
                             </div>
                           </div>

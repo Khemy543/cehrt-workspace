@@ -433,7 +433,7 @@ export default {
 
           <div class="card mb-2 shadow-none border">
             <div class="p-1 px-2">
-              <div class="row align-items-center">
+              <a target="_blank" :href="task.deliverable.document_path" class="row align-items-center">
                 <div class="col-auto">
                   <div class="avatar-sm font-weight-bold mr-3">
                     <span
@@ -447,7 +447,7 @@ export default {
                   <a
                     href="javascript:void(0);"
                     class="text-muted font-weight-bold"
-                    >Inception Report</a
+                    >{{ task.deliverable.name }}</a
                   >
                   <p class="mb-0">2kb</p>
                 </div>
@@ -455,14 +455,14 @@ export default {
                   <!-- Button -->
                   <a
                     v-b-tooltip.hover
-                    title="Download"
+                    title="open"
                     href="javascript:void(0);"
                     class="btn btn-link text-muted btn-lg p-0"
                   >
-                    <i class="uil uil-cloud-download font-size-14"></i>
+                    <feather type="log-in" class="icons-xs"></feather>
                   </a>
                 </div>
-              </div>
+              </a>
             </div>
           </div>
           <!-- end attachments -->

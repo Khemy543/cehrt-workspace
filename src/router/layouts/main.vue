@@ -80,7 +80,11 @@ export default {
             autoHideDelay: 5000,
             appendToast: false,
             variant: 'success',
-          })
+          });
+
+          setTimeout(() => {
+            window.location.reload()
+          }, 2000)
         })
         .catch(() => {
           this.$bvToast.toast('Something happend, please try again', {
