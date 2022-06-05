@@ -3,7 +3,6 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import CreateProposalModal from '@components/CreateProposalModal.vue'
-import graph from '@/src/msalConfig/graph'
 
 export default {
   page: {
@@ -55,7 +54,7 @@ export default {
           this.proposals = response.data
           this.loading = false
         }
-      } catch (error) { 
+      } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -78,7 +77,6 @@ export default {
 
         if (response && response.data) {
           this.proposals.push(response.data.proposal)
-          await graph.createFolder({ name: response.data.proposal.title, folder: {} });
           this.show = false
           this.$bvToast.toast('Proposal created successfully', {
             title: 'Success',
@@ -107,7 +105,7 @@ export default {
     },
 
     async updateProposal(form) {
-      const fakeForm = { ...form };
+      const fakeForm = { ...form }
       delete fakeForm['submission_date']
       try {
         const response = await this.$http.put(
@@ -169,19 +167,15 @@ export default {
       }).then(async ({ isConfirmed, isDenied }) => {
         if (isConfirmed) {
           try {
-            const response = await this.$http.delete(
-              `/delete/${id}/proposal`
-            )
+            const response = await this.$http.delete(`/delete/${id}/proposal`)
 
             if (response) {
-              this.workFlows = this.proposals.filter(
-                (item) => item.id !== id
-              )
+              this.workFlows = this.proposals.filter((item) => item.id !== id)
               this.$bvToast.toast('Proposal deleted successfully', {
                 title: 'Success',
                 autoHideDelay: 5000,
                 appendToast: false,
-                variant: 'success'
+                variant: 'success',
               })
             }
           } catch (error) {
@@ -189,7 +183,7 @@ export default {
               title: 'Error',
               autoHideDelay: 5000,
               appendToast: false,
-              variant: 'danger'
+              variant: 'danger',
             })
           }
         }
@@ -207,12 +201,14 @@ export default {
     </div>
     <div v-else class="row">
       <div class="col-lg-12">
-        <div class="card">
-          <div class="card-body">
+        <div class="">
+          <div class="">
             <div class="d-flex justify-content-between">
               <div>
                 <h4 class="header-title mt-0 mb-1">View Proposals</h4>
-                <p class="sub-header">view, add and edit details of all proposals</p>
+                <p class="sub-header"
+                  >view, add and edit details of all proposals</p
+                >
               </div>
               <div>
                 <button
@@ -226,7 +222,7 @@ export default {
             </div>
 
             <div v-if="proposals.length > 0" class="table-responsive">
-              <table class="table mb-0">
+              <!-- <table class="table mb-0">
                 <thead class="thead-light">
                   <tr>
                     <th scope="col">#</th>
@@ -286,11 +282,77 @@ export default {
                     </td>
                   </tr>
                 </tbody>
-              </table>
+              </table> -->
+              <div class="row">
+                <div
+                  v-for="vProposal in proposals"
+                  :key="vProposal.id"
+                  class="col-xl-4 col-lg-6"
+                >
+                  <div class="card border">
+                    <div class="card-body">
+                      <div
+                        class="d-flex justify-content-between align-items-center"
+                      >
+                        <div
+                          class="text-uppercase font-size-12 mb-2 text-primary"
+                          >{{ vProposal.client }}</div
+                        >
+
+                        <b-dropdown
+                          variant="link"
+                          toggle-class="p-0 text-muted arrow-none"
+                        >
+                          <template v-slot:button-content>
+                            <i class="uil uil-ellipsis-v font-size-14"></i>
+                          </template>
+                          <b-dropdown-item
+                            :to="`/proposals/details/${vProposal.id}`"
+                            variant="secondary"
+                          >
+                            <i class="uil uil-exit mr-2"></i>View
+                          </b-dropdown-item>
+                          <b-dropdown-divider></b-dropdown-divider>
+                          <b-dropdown-item
+                            href="javascript: void(0);"
+                            variant="secondary"
+                            @click="openModal(vProposal)"
+                          >
+                            <i class="uil uil-edit mr-2"></i>Edit
+                          </b-dropdown-item>
+                          <b-dropdown-item
+                            href="javascript: void(0);"
+                            variant="danger"
+                            @click="deleteProposal(vProposal.id)"
+                          >
+                            <i class="uil uil-trash-alt mr-2"></i>Delete
+                          </b-dropdown-item>
+                        </b-dropdown>
+                      </div>
+                      <router-link :to="`/proposals/details/${vProposal.id}`" >
+                      <div style="height: 280px">
+                        <h5>
+                          <a href="javascript: void(0)" class="text-dark">{{
+                            vProposal.title
+                          }}</a>
+                        </h5>
+                        <p class="text-muted mb-4 description_text">{{
+                          vProposal.description
+                        }}</p>
+                      </div>
+                      </router-link>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div v-else class="w-100 d-flex justify-content-center">
-              <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
+              <img
+                :src="require('@assets/svgs/empty.svg')"
+                alt="no projects"
+                style="width:30%"
+              />
             </div>
           </div>
         </div>

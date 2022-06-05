@@ -62,7 +62,7 @@ export default {
       <div class="col-md-3 col-xl-6">
         <h4 class="mb-1 mt-0">Projects</h4>
       </div>
-      <div class="col-md-9 col-xl-6 text-md-right">
+      <!-- <div class="col-md-9 col-xl-6 text-md-right">
         <div class="mt-4 mt-md-0">
           <div class="btn-group mb-3 mb-sm-0">
             <button type="button" class="btn btn-primary">All</button>
@@ -72,7 +72,7 @@ export default {
             <button type="button" class="btn btn-white">Finished</button>
           </div>
         </div>
-      </div>
+      </div> -->
     </div>
 
     <div v-if="loading" class=" d-flex justify-content-center">

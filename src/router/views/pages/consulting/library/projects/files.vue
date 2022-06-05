@@ -150,6 +150,7 @@ export default {
                   file.project_type_deliverable &&
                   file.project_type_deliverable.deliverable_name,
                 file: file.document_path,
+                document_path: file.document_path,
               })
             })
           }
@@ -281,10 +282,11 @@ export default {
           <div class="card-body">
             <div v-if="library.length > 0" class="mt-5">
               <div class="row mt-4">
-                <router-link
+                <a
                   v-for="n in library"
                   :key="n.id"
-                  to=""
+                  :href="n.document_path"
+                  target="_blank"
                   class="col-md-3"
                 >
                   <div class="p-2 border rounded mb-4">
@@ -301,12 +303,12 @@ export default {
                       </div>
                       <div class="float-right mt-1">
                         <div class="p-2">
-                          <i class="uil-download-alt font-size-18"></i>
+                          <feather type="log-in" class="icons-xs"></feather>
                         </div>
                       </div>
                     </div>
                   </div>
-                </router-link>
+                </a>
               </div>
               <div v-if="invoice.length > 0" class=" mt-4">
                 <h6 class="mt-0">Deliverable Invoice</h6>

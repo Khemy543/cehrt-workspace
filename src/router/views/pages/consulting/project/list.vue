@@ -1,6 +1,5 @@
 <script>
 import appConfig from '@src/app.config'
-import graph from '@/src/msalConfig/graph'
 import Layout from '@layouts/main'
 import CreateProjectModal from '@components/CreateProjectModal.vue'
 import ProjectCard from '@components/project-card.vue'
@@ -77,13 +76,9 @@ export default {
         if (response) {
           this.form = {}
 
-          this.projectData = [response.data.project, ...this.projectData]
-
-          // this.projectData.push(response.data.project)
+          this.projectData = [{...response.data.project, assignees: []}, ...this.projectData]
 
           this.closeModal()
-
-          await graph.createFolder({ name: response.data.project.name, folder: {} });
 
           this.$bvToast.toast('New project added successfully', {
             title: 'Success',

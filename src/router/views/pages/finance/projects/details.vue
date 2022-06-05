@@ -30,11 +30,116 @@ export default {
         },
       ],
       invoice: [],
+      amount_paid: 0,
       timeSheet: [],
       contractFile: null,
       insuranceFile: null,
       timeSheetFiles: [],
       deliverables: [],
+      expenditure: {
+        chartOptions: {
+          colors: ['#5369f8', '#43d39e', '#f77e53', '#ffbe0b'],
+          chart: {
+            type: 'bar',
+            stacked: true,
+            toolbar: {
+              show: false,
+            },
+          },
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '45%',
+            },
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent'],
+          },
+          xaxis: {
+            categories: ['Amount Paid', 'Expenditure', 'Income'],
+            axisBorder: {
+              show: false,
+            },
+          },
+          legend: {
+            show: false,
+          },
+          grid: {
+            row: {
+              colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+              opacity: 0.2,
+            },
+            borderColor: '#f3f4f7',
+          },
+          tooltip: {
+            y: {
+              formatter: function(val) {
+                return 'GHS ' + val
+              },
+            },
+          },
+        },
+        series: [],
+      },
+      income: {
+        chartOptions: {
+          colors: ['#5369f8', '#43d39e', '#f77e53'],
+          chart: {
+            type: 'bar',
+            toolbar: {
+              show: false,
+            },
+          },
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '45%',
+            },
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent'],
+          },
+          xaxis: {
+            categories: ['Amount Paid', 'Expenditure', 'Income'],
+            axisBorder: {
+              show: false,
+            },
+          },
+          legend: {
+            show: false,
+          },
+          grid: {
+            row: {
+              colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+              opacity: 0.2,
+            },
+            borderColor: '#f3f4f7',
+          },
+          tooltip: {
+            y: {
+              formatter: function(val) {
+                return  val + '%'
+              },
+            },
+          },
+        },
+        series: [
+          {
+            name: 'Percentage',
+            data: [100, 0, 0],
+          },
+        ],
+      },
     }
   },
   computed: {
@@ -62,13 +167,17 @@ export default {
       const { project_tax_amount: amt } = this.contractForm
       return Number(amt).toFixed(2)
     },
+    getWithHoldingTax() {
+      const { withholding_tax: amt } = this.contractForm
+      return Number(amt).toFixed(2)
+    },
   },
   created() {
     this.getProjectDetials()
   },
   methods: {
     formateAmount(amount) {
-      return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      return amount && amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     },
     getExpenditure() {
       const {
@@ -83,7 +192,8 @@ export default {
           total = total + Number(n.deliverable_professional_fees)
         }
       }
-
+      this.income.series[0].data[1] = Math.round((total / this.getAmountPaid()) * 100);
+      this.income.series[0].data[2] = Math.round(((this.getAmountPaid() - total) / this.getAmountPaid()) * 100);
       return total.toFixed(2)
     },
     getAmountPaid() {
@@ -93,23 +203,26 @@ export default {
           total = total + Number(n.deliverable_fee_amount_paid)
         }
       }
-
+      // this.amount_paid = total.toFixed(2)
+      // this.income.series[0].data[0] = total.toFixed(2)
       return total.toFixed(2)
     },
-    async saveProjectData() {
+    async saveProjectData(show = false) {
       try {
         const response = await this.$http.patch(
           `/finance/update/${this.$route.params.id}/project`,
           this.contractForm
         )
         if (response) {
-          this.$bvToast.toast('Changes saved successfully', {
-            title: 'Success',
-            autoHideDelay: 5000,
-            appendToast: false,
-            variant: 'success',
-            toastClass: 'text-white',
-          })
+          if (show) {
+            this.$bvToast.toast('Changes saved successfully', {
+              title: 'Success',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'success',
+              toastClass: 'text-white',
+            })
+          }
         }
       } catch (error) {
         if (error.response) {
@@ -311,6 +424,7 @@ export default {
             expenditure_reimbursable:
               response.data.expenditure_reimbursable || 0,
             project_tax_amount: response.data.project_tax_amount || 0,
+            withholding_tax: response.data.withholding_tax || 0,
           }
           response.data.deliverables.forEach((item) => {
             this.invoice.push({
@@ -418,11 +532,46 @@ export default {
                   <button
                     type="button"
                     class="btn btn-primary"
-                    @click="saveProjectData"
+                    @click="saveProjectData(true)"
                     >Save Changes</button
                   >
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title mt-0 pb-2 header-title">Income Graph</h5>
+              <!-- Sales donut chart -->
+              <apexchart
+                type="bar"
+                height="304"
+                :series="income.series"
+                :options="income.chartOptions"
+              ></apexchart>
+              <!-- end sales chart -->
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title mt-0 pb-2 header-title"
+                >Expenditure Graph</h5
+              >
+              <!-- Sales donut chart -->
+              <apexchart
+                type="bar"
+                height="304"
+                :series="expenditure.series"
+                :options="expenditure.chartOptions"
+              ></apexchart>
+              <!-- end sales chart -->
             </div>
           </div>
         </div>
@@ -462,11 +611,6 @@ export default {
                                   >Contract.docx</div
                                 >
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -594,11 +738,6 @@ export default {
                                   >{{ deliverable.name }}-Timesheet.docx</div
                                 >
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -764,6 +903,7 @@ export default {
                         type="number"
                         required
                         placeholder="Professional Fees"
+                        @blur="saveProjectData(false)"
                       ></b-form-input>
                     </b-form-group>
                   </div>
@@ -780,6 +920,7 @@ export default {
                           type="number"
                           required
                           placeholder="Reimbursable"
+                          @blur="saveProjectData(false)"
                         ></b-form-input>
                       </b-form-group>
                     </div>
@@ -796,6 +937,7 @@ export default {
                           type="number"
                           required
                           placeholder="Tax"
+                          @blur="saveProjectData(false)"
                         ></b-form-input>
                       </b-form-group>
                     </div>
@@ -808,7 +950,7 @@ export default {
                   <div class="media d-flex justify-content-between">
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
-                        Expenditure (GH {{ getExpenditure() }})
+                        Expenditure (GH {{ formateAmount(getExpenditure()) }})
                       </h5>
                     </div>
                   </div>
@@ -856,6 +998,7 @@ export default {
                           type="number"
                           required
                           placeholder="Reimbursable"
+                          @blur="saveProjectData(false)"
                         ></b-form-input>
                       </b-form-group>
                     </div>
@@ -872,6 +1015,7 @@ export default {
                           type="number"
                           required
                           placeholder="Finder's Fee"
+                          @blur="saveProjectData(false)"
                         ></b-form-input>
                       </b-form-group>
                     </div>
@@ -887,6 +1031,7 @@ export default {
                           type="number"
                           required
                           placeholder="Miscellaneous"
+                          @blur="saveProjectData(false)"
                         ></b-form-input>
                       </b-form-group>
                     </div>
@@ -899,7 +1044,7 @@ export default {
                   <div class="media d-flex justify-content-between">
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
-                        Tax (GH {{ getTaxAmount }})
+                        Tax (GH {{ formateAmount(getTaxAmount) }})
                       </h5>
                     </div>
                   </div>
@@ -915,6 +1060,7 @@ export default {
                         type="number"
                         required
                         placeholder="Tax amount"
+                        @blur="saveProjectData(false)"
                       ></b-form-input>
                     </b-form-group>
                   </div>
@@ -926,7 +1072,7 @@ export default {
                   <div class="media d-flex justify-content-between">
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
-                        Amount Paid (GH {{ getAmountPaid() }})
+                        Amount Paid (GH {{ formateAmount(getAmountPaid()) }})
                       </h5>
                     </div>
                   </div>
@@ -958,6 +1104,33 @@ export default {
                         </b-form-input>
                       </b-form-group>
                     </div>
+                  </div>
+
+                  <div class=" mt-4">
+                    <div class="media d-flex justify-content-between">
+                      <div class="media-body overflow-hidden">
+                        <h5 class="font-size-15 mt-2 mb-1">
+                          Withholding Tax (GH
+                          {{ formateAmount(getWithHoldingTax) }})
+                        </h5>
+                      </div>
+                    </div>
+                    <b-form-group
+                      id="input-group-1"
+                      label="Withholding Tax"
+                      label-for="input-1"
+                      class="mt-4"
+                    >
+                      <b-form-input
+                        id="input-1"
+                        v-model="contractForm.withholding_tax"
+                        type="number"
+                        required
+                        placeholder="Withholding Tax"
+                        @blur="saveProjectData(false)"
+                      >
+                      </b-form-input>
+                    </b-form-group>
                   </div>
                   <!-- <div class="row mt-2">
                                         <div v-for="deliverable in getProjectTypesDeliverables" :key="deliverable.id"
