@@ -1,11 +1,13 @@
-import axios from 'axios';
-import router from '../../router';
+import axios from 'axios'
+import router from '../../router'
+import auth from './msalConfig/auth'
 
 export const state = {
   currentUser: null,
-  userInitials:null,
+  userInitials: null,
   userToken: getSavedState('auth.token'),
   userDepartment: getSavedState('user.department'),
+  user: null,
   msalConfig: {
     auth: {
       clientId: '86fdb55a-cbfe-42f8-810a-191bf9a000b4',
@@ -16,27 +18,34 @@ export const state = {
       cacheLocation: 'localStorage',
     },
   },
-  accessToken: ''
+  accessToken: '',
 }
 
 export const mutations = {
   SET_CURRENT_USER(state, newValue) {
-    const initials = `${newValue && newValue.firstname} ${newValue && newValue.lastname}`.match(/\b(\w)/g).join('').toUpperCase();
+    const initials = `${newValue && newValue.firstname} ${newValue &&
+      newValue.lastname}`
+      .match(/\b(\w)/g)
+      .join('')
+      .toUpperCase()
     state.userInitials = initials
     state.currentUser = newValue
   },
   SET_USER_TOKEN(state, token) {
-    state.userToken = token;
+    state.userToken = token
     saveState('auth.token', token)
     setDefaultAuthHeaders(state)
   },
   SET_USER_DEPARTMENT(state, department) {
-    state.userDepartment = department;
+    state.userDepartment = department
     saveState('user.department', department)
   },
-  setAccessToken(state, token){
-    state.accessToken = token;
-  }
+  setAccessToken(state, token) {
+    state.accessToken = token
+  },
+  GRAPH_USER(state, user) {
+    state.user = user
+  },
 }
 
 export const getters = {
@@ -58,64 +67,84 @@ export const actions = {
   logIn({ commit, dispatch, getters }, { email, password } = {}) {
     if (getters.loggedIn) return dispatch('validate')
 
-    return axios
-      .post('/auth/login', { email, password })
-      .then((response) => {
-        const {user, access_token:accessToken } = response.data
-        commit('SET_CURRENT_USER', user)
-        commit('SET_USER_TOKEN', accessToken)
-        return user
-      })
+    return axios.post('/auth/login', { email, password }).then((response) => {
+      const { user, access_token: accessToken } = response.data
+      commit('SET_CURRENT_USER', user)
+      commit('SET_USER_TOKEN', accessToken)
+      auth.configure('3082b7e9-5aca-4942-a4a3-1a796b8bf037', false)
+      // Restore any cached or saved local user
+      commit('GRAPH_USER', auth.user())
+
+      console.log(`configured ${auth.isConfigured()}`)
+      return user
+    })
   },
 
   // set user department
   setDepartment({ commit }, department) {
-    commit('SET_USER_DEPARTMENT', department) ;
+    commit('SET_USER_DEPARTMENT', department)
   },
 
-  async changePassword({ commit, getters }, { password, newPassword, firstTime } = {}) {
+  async changePassword(
+    { commit, getters },
+    { password, newPassword, firstTime } = {}
+  ) {
     const response = await axios.post('/auth/change/password', {
       new_password: newPassword,
       first_time: firstTime,
-      ...(firstTime ? {} : { password })
-    });
-    if(response){
-      commit('SET_CURRENT_USER', { ...getters.currentUser, must_change_password: 0 });
-      return true;
+      ...(firstTime ? {} : { password }),
+    })
+    if (response) {
+      commit('SET_CURRENT_USER', {
+        ...getters.currentUser,
+        must_change_password: 0,
+      })
+      return true
     }
-  }, 
+  },
 
   // Logs out the current user.
   async logOut({ commit }) {
-    await axios.post('/auth/logout');
-    commit('SET_CURRENT_USER', null);
-    commit('SET_USER_TOKEN', null);
+    await axios.post('/auth/logout')
+    commit('SET_CURRENT_USER', null)
+    commit('SET_USER_TOKEN', null)
   },
 
   // clear user token
   clearToken({ commit }) {
-    router.push({ name:'login' })
-    commit('SET_CURRENT_USER', null);
+    router.push({ name: 'login' })
+    commit('SET_CURRENT_USER', null)
     commit('SET_USER_TOKEN', null)
   },
 
   // request the user
-  resetPassword({ commit, dispatch, getters }, { password, confirm_password:confirmPassword, token } = {}) {
+  resetPassword(
+    { commit, dispatch, getters },
+    { password, confirm_password: confirmPassword, token } = {}
+  ) {
     if (getters.loggedIn) return dispatch('validate')
 
-    return axios.post('/auth/reset/password', { password, confirm_password:confirmPassword, token }).then((response) => {
-      const message = response.data
-      return message
-    })
+    return axios
+      .post('/auth/reset/password', {
+        password,
+        confirm_password: confirmPassword,
+        token,
+      })
+      .then((response) => {
+        const message = response.data
+        return message
+      })
   },
 
   requestResetPassword({ commit, dispatch, getters }, { email } = {}) {
-    if(getters.loggedIn) return dispatch('validate');
-    
-    return axios.post('/auth/send/password-reset/request', { email }).then((response) => {
-      const message = response.data;
-      return message;
-    })
+    if (getters.loggedIn) return dispatch('validate')
+
+    return axios
+      .post('/auth/send/password-reset/request', { email })
+      .then((response) => {
+        const message = response.data
+        return message
+      })
   },
 
   // Validates the current user's token and refreshes it
@@ -124,16 +153,22 @@ export const actions = {
     if (state.currentUser) return Promise.resolve(state.currentUser)
 
     try {
-      const response = await axios.get(`https://backend-api.cehrtghana.com/api/auth/user`);
-      const user = response.data;
-      commit('SET_CURRENT_USER', user);
-      return user;
+      const response = await axios.get(
+        `https://backend-api.cehrtghana.com/api/auth/user`
+      )
+      const user = response.data
+      commit('SET_CURRENT_USER', user)
+      auth.configure('3082b7e9-5aca-4942-a4a3-1a796b8bf037', false)
+      // Restore any cached or saved local user
+      commit('GRAPH_USER', auth.user())
+
+      console.log(`configured ${auth.isConfigured()}`)
+      return user
     } catch (error) {
-      console.log(error.response.status);
       if (error.response && error.response.status === 401) {
-        commit('SET_USER_TOKEN', null);
+        commit('SET_USER_TOKEN', null)
       }
-      return null;
+      return null
     }
   },
 }
