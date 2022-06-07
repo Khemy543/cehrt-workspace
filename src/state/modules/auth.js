@@ -1,6 +1,6 @@
 import axios from 'axios'
 import router from '../../router'
-import auth from './msalConfig/auth'
+import auth from '@/src/msalConfig/auth'
 
 export const state = {
   currentUser: null,
