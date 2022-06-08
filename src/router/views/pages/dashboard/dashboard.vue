@@ -95,12 +95,16 @@ export default {
       proposalData: []
     }
   },
+  computed: {
+    department() {
+      return this.$store ? this.$store.state.auth.userDepartment : {} || {}
+    },
+  },
 
   created() {
     this.getCompanyEvents();
     this.getDashData()
   },
-
   methods: {
     dateClicked(info) {
       if(this.$store.state.auth.userDepartment.name !== 'Administration') {
@@ -333,6 +337,18 @@ export default {
       this.showModal = false
       this.event = {}
     },
+
+    createProjectUrl(id){
+      if(this.department.name === 'Administration') {
+        return `/admin/project/${id}/details`;
+      }
+
+      if(this.department.name === 'Finance') {
+        return `/finance/project/${id}/details`;
+      }
+
+      return `/project/details/${id}`;
+    }
   },
 }
 </script>
@@ -445,8 +461,8 @@ export default {
                       >
                     </b-td>
                     <b-td class="text-primary">
-                      <router-link :to="`project/details/${project.id}`"
-                        >View</router-link
+                      <router-link :to="createProjectUrl(project.id)">
+                        View</router-link
                       >
                     </b-td>
                   </b-tr>
