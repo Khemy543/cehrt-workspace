@@ -36,6 +36,11 @@ export default {
       insuranceFile: null,
       timeSheetFiles: [],
       deliverables: [],
+      incomeObject: {
+        amount: 0,
+        expenditure: 0,
+        income: 0
+      },
       expenditure: {
         chartOptions: {
           colors: ['#5369f8', '#43d39e', '#f77e53', '#ffbe0b'],
@@ -136,7 +141,7 @@ export default {
         series: [
           {
             name: 'Percentage',
-            data: [100, 0, 0],
+            data: [0, 0, 0],
           },
         ],
       },
@@ -172,6 +177,16 @@ export default {
       return Number(amt).toFixed(2)
     },
   },
+  watch: {
+    incomeObject(newValue) {
+      if(this.$refs.incomeChart) {
+        this.$refs.incomeChart.updateSeries([{
+          name: 'Percentage',
+          data: [newValue.amount, newValue.expenditure, newValue.income],
+        }], false, true)
+      }
+    }
+  },
   created() {
     this.getProjectDetials()
   },
@@ -192,8 +207,11 @@ export default {
           total = total + Number(n.deliverable_professional_fees)
         }
       }
-      this.income.series[0].data[1] = Math.round((total / this.getAmountPaid()) * 100);
-      this.income.series[0].data[2] = Math.round(((this.getAmountPaid() - total) / this.getAmountPaid()) * 100);
+      this.incomeObject = {
+        amount: (Number(this.getAmountPaid()) / Number(this.getAmountPaid())) * 100,
+        expenditure: Math.round((total / this.getAmountPaid()) * 100),
+        income: Math.round(((this.getAmountPaid() - total) / this.getAmountPaid()) * 100)
+      }
       return total.toFixed(2)
     },
     getAmountPaid() {
@@ -204,7 +222,7 @@ export default {
         }
       }
       // this.amount_paid = total.toFixed(2)
-      // this.income.series[0].data[0] = total.toFixed(2)
+      this.income.series[0].data[0] = (total.toFixed(2) / total.toFixed(2)) * 100
       return total.toFixed(2)
     },
     async saveProjectData(show = false) {
@@ -477,7 +495,7 @@ export default {
       }
 
       if (file && typeof file === 'string') {
-        return `${process.env.API_BASE_URL}${file.replace('/', '')}`
+        return `https://backend-api.cehrtghana.com/${file}`
       }
       return null
     },
@@ -548,6 +566,7 @@ export default {
               <h5 class="card-title mt-0 pb-2 header-title">Income Graph</h5>
               <!-- Sales donut chart -->
               <apexchart
+                ref="incomeChart"
                 type="bar"
                 height="304"
                 :series="income.series"

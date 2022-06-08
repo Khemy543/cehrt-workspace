@@ -183,7 +183,7 @@ const libraryRoutes = [
   },
 ]
 
-const projectPlanRoutes = [
+/* const projectPlanRoutes = [
   {
     path: '/project-plans',
     name: 'Project Plans',
@@ -192,7 +192,7 @@ const projectPlanRoutes = [
     department: 'Consultancy',
     component: () => lazyLoadView(import('@views/pages/consulting/project-plan/index.vue'))
   }
-]
+] */
 
 // finance routes
 
@@ -466,7 +466,7 @@ const appsRoutes = [
   ...libraryRoutes,
   ...adminProjectRoutes,
   ...recycleRoutes,
-  ...projectPlanRoutes,
+  // ...projectPlanRoutes,
   // ...trainingRouts,
   ...financeRoutes
 ]
