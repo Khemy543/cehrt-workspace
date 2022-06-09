@@ -39,11 +39,10 @@ export default {
       incomeObject: {
         amount: 0,
         expenditure: 0,
-        income: 0
+        income: 0,
       },
       expenditure: {
         chartOptions: {
-          colors: ['#5369f8', '#43d39e', '#f77e53', '#ffbe0b'],
           chart: {
             type: 'bar',
             stacked: true,
@@ -65,12 +64,6 @@ export default {
             width: 2,
             colors: ['transparent'],
           },
-          xaxis: {
-            categories: ['Amount Paid', 'Expenditure', 'Income'],
-            axisBorder: {
-              show: false,
-            },
-          },
           legend: {
             show: false,
           },
@@ -89,11 +82,41 @@ export default {
             },
           },
         },
-        series: [],
+        series: [
+          {
+            name: 'Amount',
+            data: [
+              {
+                y: 100,
+                x: 'Amount Paid',
+                fillColor: '#5369f8',
+              },
+              {
+                y: 100,
+                x: 'Professional Fee',
+                fillColor: '#43d39e',
+              },
+              {
+                y: 100,
+                x: 'Reimbursables',
+                fillColor: '#f77e53',
+              },
+              {
+                y: 100,
+                x: "Finder's Fee",
+                fillColor: '#FF4560',
+              },
+              {
+                y: 100,
+                x: 'Miscellaneous',
+                fillColor: '#FF4560',
+              },
+            ],
+          },
+        ],
       },
       income: {
         chartOptions: {
-          colors: ['#5369f8', '#43d39e', '#f77e53'],
           chart: {
             type: 'bar',
             toolbar: {
@@ -114,12 +137,6 @@ export default {
             width: 2,
             colors: ['transparent'],
           },
-          xaxis: {
-            categories: ['Amount Paid', 'Expenditure', 'Income'],
-            axisBorder: {
-              show: false,
-            },
-          },
           legend: {
             show: false,
           },
@@ -133,24 +150,37 @@ export default {
           tooltip: {
             y: {
               formatter: function(val) {
-                return  val + '%'
+                return 'GHS' + val
               },
             },
           },
         },
         series: [
           {
-            name: 'Percentage',
-            data: [0, 0, 0],
+            name: 'Amount',
+            data: [
+              {
+                y: 100,
+                x: 'Amount Paid',
+                fillColor: '#5369f8',
+              },
+              {
+                y: 100,
+                x: 'Expenditure',
+                fillColor: '#43d39e',
+              },
+              {
+                y: 100,
+                x: 'Income',
+                fillColor: '#f77e53',
+              },
+            ],
           },
         ],
       },
     }
   },
   computed: {
-    initials() {
-      return 'AB'
-    },
     getProjectTypesDeliverables() {
       return (
         (this.project.project_type &&
@@ -178,19 +208,71 @@ export default {
     },
   },
   watch: {
-    incomeObject(newValue) {
-      if(this.$refs.incomeChart) {
-        this.$refs.incomeChart.updateSeries([{
-          name: 'Percentage',
-          data: [newValue.amount, newValue.expenditure, newValue.income],
-        }], false, true)
-      }
-    }
+    getAmountPaid(newValue) {
+      console.log(newValue)
+    },
   },
   created() {
     this.getProjectDetials()
   },
   methods: {
+    updateChart() {
+      this.expenditure.series = [
+        {
+          name: 'Amount',
+          data: [
+            {
+              y: this.getAmountPaid(),
+              x: 'Amount Paid',
+              fillColor: '#5369f8',
+            },
+            {
+              y: this.getSumOfProfessionalFees(),
+              x: 'Professional Fee',
+              fillColor: '#43d39e',
+            },
+            {
+              y: this.contractForm.expenditure_reimbursable || 0,
+              x: 'Reimbursables',
+              fillColor: '#f77e53',
+            },
+            {
+              y: this.contractForm.expenditure_finders_fee || 0,
+              x: "Finder's Fee",
+              fillColor: '#FF4560',
+            },
+            {
+              y: this.contractForm.expenditure_miscellaneous || 0,
+              x: 'Miscellaneous',
+              fillColor: '#FF4560',
+            },
+          ],
+        },
+      ]
+
+      this.income.series = [
+        {
+          name: 'Amount',
+          data: [
+            {
+              y: this.getAmountPaid(),
+              x: 'Amount Paid',
+              fillColor: '#5369f8',
+            },
+            {
+              y: this.getExpenditure(),
+              x: 'Expenditure',
+              fillColor: '#43d39e',
+            },
+            {
+              y: this.getAmountPaid() - this.getExpenditure(),
+              x: 'Income',
+              fillColor: '#f77e53',
+            },
+          ],
+        },
+      ]
+    },
     formateAmount(amount) {
       return amount && amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     },
@@ -207,11 +289,6 @@ export default {
           total = total + Number(n.deliverable_professional_fees)
         }
       }
-      this.incomeObject = {
-        amount: (Number(this.getAmountPaid()) / Number(this.getAmountPaid())) * 100,
-        expenditure: Math.round((total / this.getAmountPaid()) * 100),
-        income: Math.round(((this.getAmountPaid() - total) / this.getAmountPaid()) * 100)
-      }
       return total.toFixed(2)
     },
     getAmountPaid() {
@@ -221,8 +298,16 @@ export default {
           total = total + Number(n.deliverable_fee_amount_paid)
         }
       }
-      // this.amount_paid = total.toFixed(2)
-      this.income.series[0].data[0] = (total.toFixed(2) / total.toFixed(2)) * 100
+      return total.toFixed(2)
+    },
+
+    getSumOfProfessionalFees() {
+      let total = 0
+      for (const n of this.deliverables) {
+        if (n.deliverable_professional_fees) {
+          total = total + Number(n.deliverable_professional_fees)
+        }
+      }
       return total.toFixed(2)
     },
     async saveProjectData(show = false) {
@@ -241,6 +326,7 @@ export default {
               toastClass: 'text-white',
             })
           }
+          this.updateChart()
         }
       } catch (error) {
         if (error.response) {
@@ -468,6 +554,62 @@ export default {
           })
           this.items[2].text = response.data.name
           this.loading = false
+
+          this.expenditure.series = [
+            {
+              name: 'Amount',
+              data: [
+                {
+                  y: this.getAmountPaid(),
+                  x: 'Amount Paid',
+                  fillColor: '#5369f8',
+                },
+                {
+                  y: this.getSumOfProfessionalFees(),
+                  x: 'Professional Fee',
+                  fillColor: '#43d39e',
+                },
+                {
+                  y: response.data.expenditure_reimbursable || 0,
+                  x: 'Reimbursables',
+                  fillColor: '#f77e53',
+                },
+                {
+                  y: response.data.expenditure_finders_fee || 0,
+                  x: "Finder's Fee",
+                  fillColor: '#FF4560',
+                },
+                {
+                  y: response.data.expenditure_miscellaneous || 0,
+                  x: 'Miscellaneous',
+                  fillColor: '#FF4560',
+                },
+              ],
+            },
+          ]
+
+          this.income.series = [
+            {
+              name: 'Amount',
+              data: [
+                {
+                  y: this.getAmountPaid(),
+                  x: 'Amount Paid',
+                  fillColor: '#5369f8',
+                },
+                {
+                  y: this.getExpenditure(),
+                  x: 'Expenditure',
+                  fillColor: '#43d39e',
+                },
+                {
+                  y: this.getAmountPaid() - this.getExpenditure(),
+                  x: 'Income',
+                  fillColor: '#f77e53',
+                },
+              ],
+            },
+          ]
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -478,14 +620,6 @@ export default {
         })
       }
     },
-
-    /* async deletProjectFile(id, key) {
-      try {
-        const response = await this.$http.delete(
-          `/admin/delete/project/{project}/files`
-        )
-      } catch (error) {}
-    }, */
     openContractUpload() {
       this.$refs['contract'].click()
     },
