@@ -120,7 +120,6 @@
               id="input-1"
               v-model="form.client_name"
               type="text"
-              required
               placeholder="Name of Client Contact Person"
             >
             </b-form-input>
@@ -136,7 +135,6 @@
               id="input-1"
               v-model="form.client_contact"
               type="text"
-              required
               placeholder="Phone number of contact person"
             >
             </b-form-input>
@@ -154,7 +152,6 @@
               id="input-1"
               v-model="form.client_address"
               type="text"
-              required
               placeholder="Address of client"
             >
             </b-form-input>
@@ -170,7 +167,7 @@
               id="input-1"
               v-model="form.contract"
               type="text"
-              required
+              disabled
               placeholder="Value of service"
             >
             </b-form-input>
@@ -265,7 +262,6 @@
               id="input-1"
               v-model="form.associated_consultants[index].name"
               type="text"
-              required
               placeholder="Name"
             >
             </b-form-input>
@@ -277,7 +273,6 @@
               id="input-1"
               v-model="form.associated_consultants[index].role"
               type="text"
-              required
               placeholder="Role"
             >
             </b-form-input>

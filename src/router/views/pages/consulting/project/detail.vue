@@ -381,18 +381,18 @@ export default {
         if (response) {
           const index = this.projectDeliverables.findIndex(
             (item) => item.id === form.id
-          );
+          )
 
-          this.$set(this.projectDeliverables, index, response.data.deliverable);
+          this.$set(this.projectDeliverables, index, response.data.deliverable)
 
           this.$bvToast.toast('Project deliverable updated successfully', {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
             variant: 'success',
-          });
+          })
 
-          this.showCreateDeliverable = false;
+          this.showCreateDeliverable = false
         }
       } catch (error) {
         this.showCreateDeliverable = false
@@ -480,12 +480,29 @@ export default {
         })
       }
     },
-
+    showExportToLibrary() {
+      if(this.project.no_of_completed_tasks !== this.project.tasks) {
+        return this.$bvToast.toast('Please complete all tasks before exporting to library', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger'
+        })
+      }
+      this.showExport = true
+    },
     async exportToLibrary(form) {
       try {
+        const { associated_consultants: consultants } = form;
+
+        let newFormData = {...form}
+
+        if(consultants[0].name === '') {
+          newFormData.associated_consultants = []
+        }
         const response = await this.$http.patch(
           `/export/${this.$route.params.id}/project`,
-          { ...form, regionIds: this.getIds(form.regionIds) }
+          { ...newFormData, regionIds: this.getIds(form.regionIds) }
         )
 
         if (response) {
@@ -587,7 +604,7 @@ export default {
                     <button
                       type="button"
                       class="btn btn-soft-success btn-sm"
-                      @click="showExport = true"
+                      @click="showExportToLibrary"
                     >
                       <i class="uil uil-edit mr-1"></i>Export to Library
                     </button>
@@ -826,7 +843,10 @@ export default {
                             </div>
                             <div class="float-right mt-1">
                               <a :href="dev.document_path" target="_blank">
-                                <feather type="log-in" class="icons-xs"></feather>
+                                <feather
+                                  type="log-in"
+                                  class="icons-xs"
+                                ></feather>
                               </a>
                             </div>
                           </div>

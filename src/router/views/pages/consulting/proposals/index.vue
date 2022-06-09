@@ -221,68 +221,7 @@ export default {
               </div>
             </div>
 
-            <div v-if="proposals.length > 0" class="table-responsive">
-              <!-- <table class="table mb-0">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Proposal</th>
-                    <th scope="col">Client</th>
-                    <th scope="col">Project Type</th>
-                    <th scope="col">Funding Option</th>
-                    <th scope="col">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr
-                    v-for="(vproposal, index) in proposals"
-                    :key="vproposal.id"
-                    :title="vproposal.description"
-                  >
-                    <th scope="row">{{ index + 1 }}</th>
-                    <td>{{ vproposal.title }}</td>
-                    <td>{{ vproposal.client }}</td>
-                    <td>
-                      {{
-                        vproposal.project_type && vproposal.project_type.name
-                      }}
-                    </td>
-                    <td>{{ vproposal.funding_option }}</td>
-                    <td>
-                      <b-dropdown
-                        variant="link"
-                        class="position-absolute"
-                        toggle-class="p-0 text-muted arrow-none"
-                      >
-                        <template v-slot:button-content>
-                          <i class="uil uil-ellipsis-v font-size-14"></i>
-                        </template>
-                        <b-dropdown-item
-                          :to="`/proposals/details/${vproposal.id}`"
-                          variant="secondary"
-                        >
-                          <i class="uil uil-exit mr-2"></i>View
-                        </b-dropdown-item>
-                        <b-dropdown-divider></b-dropdown-divider>
-                        <b-dropdown-item
-                          href="javascript: void(0);"
-                          variant="secondary"
-                          @click="openModal(vproposal)"
-                        >
-                          <i class="uil uil-edit mr-2"></i>Edit
-                        </b-dropdown-item>
-                        <b-dropdown-item
-                          href="javascript: void(0);"
-                          variant="danger"
-                          @click="deleteProposal(vproposal.id)"
-                        >
-                          <i class="uil uil-trash-alt mr-2"></i>Delete
-                        </b-dropdown-item>
-                      </b-dropdown>
-                    </td>
-                  </tr>
-                </tbody>
-              </table> -->
+            <div v-if="proposals.length > 0">
               <div class="row">
                 <div
                   v-for="vProposal in proposals"
@@ -294,10 +233,9 @@ export default {
                       <div
                         class="d-flex justify-content-between align-items-center"
                       >
-                        <div
-                          class="text-uppercase font-size-12 mb-2 text-primary"
-                          >{{ vProposal.client }}</div
-                        >
+                        <div>
+
+                        </div>
 
                         <b-dropdown
                           variant="link"
@@ -306,13 +244,6 @@ export default {
                           <template v-slot:button-content>
                             <i class="uil uil-ellipsis-v font-size-14"></i>
                           </template>
-                          <b-dropdown-item
-                            :to="`/proposals/details/${vProposal.id}`"
-                            variant="secondary"
-                          >
-                            <i class="uil uil-exit mr-2"></i>View
-                          </b-dropdown-item>
-                          <b-dropdown-divider></b-dropdown-divider>
                           <b-dropdown-item
                             href="javascript: void(0);"
                             variant="secondary"
@@ -330,15 +261,23 @@ export default {
                         </b-dropdown>
                       </div>
                       <router-link :to="`/proposals/details/${vProposal.id}`" >
-                      <div style="height: 280px">
+                      <div style="height: 250px">
                         <h5>
                           <a href="javascript: void(0)" class="text-dark">{{
                             vProposal.title
                           }}</a>
                         </h5>
+                        <div
+                          class="text-uppercase font-size-12 mb-2 text-primary"
+                          >{{ vProposal.client }}</div
+                        >
                         <p class="text-muted mb-4 description_text">{{
-                          vProposal.description
+                          vProposal.project_type.name
                         }}</p>
+
+                        <div class="badge badge-soft-primary font-size-13 font-weight-normal">{{
+                          vProposal.funding_option
+                        }}</div>
                       </div>
                       </router-link>
                     </div>

@@ -6,7 +6,7 @@ export default {
   props: {
     user: {
       type: Object,
-      default: () => { },
+      default: () => {},
     },
     initials: {
       type: String,
@@ -16,13 +16,14 @@ export default {
   data() {
     return {
       form: {},
+      titles: ['Mr', 'Mrs', 'Miss', 'Ing', 'Dr', 'Prof', 'other'],
     }
   },
   created() {
     this.form = { ...this.user }
   },
   methods: {
-    async updateProfile() { },
+    async updateProfile() {},
 
     browse() {
       this.$refs['file'].click()
@@ -36,17 +37,35 @@ export default {
         const formData = new FormData()
         for (const key in this.form) {
           formData.append(`${key}`, this.form[key])
-        };
+        }
 
         formData.append('_method', 'PUT')
 
-        const response = await this.$http.post(`auth/${this.form.id}/account/update`, formData);
+        const response = await this.$http.post(
+          `auth/${this.form.id}/account/update`,
+          formData
+        )
 
         if (response) {
-
         }
       } catch (error) {
-        console.log(error)
+        const { status, data } = error.response
+        if (status === 422) {
+          const { errors } = data
+          return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+            title: 'Error',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'danger',
+          })
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+          toastClass: 'text-white',
+        })
       }
     },
   },
@@ -64,7 +83,7 @@ export default {
             class="mr-2 d-flex align-items-center rounded-circle justify-content-center bg-primary text-white font-weight-bold position-relative"
           >
             {{ initials }}
-            <div
+           <!--  <div
               class="position-absolute bg-secondary rounded-circle d-flex justify-content-center align-items-center"
               style=" top:-2px; right:-2px;height:25px; width:25px; cursor:pointer;"
               @click="browse"
@@ -77,11 +96,21 @@ export default {
               class="d-none"
               accept=".jpeg, .jpg, .png"
               @change="handleInputChange"
-            />
+            /> -->
           </div>
         </div>
       </div>
       <div class="row mt-3">
+        <div class="col-md-6">
+          <b-form-group id="title" label="Title" label-for="title">
+            <b-form-select id="title" v-model="form.title" type="text" required>
+              <option value>Title</option>
+              <option v-for="title in titles" :key="title" :value="title">
+                {{ title }}
+              </option>
+            </b-form-select>
+          </b-form-group>
+        </div>
         <div class="col-md-6">
           <b-form-group id="firstname" label="First Name" label-for="firstname">
             <b-form-input
@@ -93,6 +122,8 @@ export default {
             ></b-form-input>
           </b-form-group>
         </div>
+      </div>
+      <div class=" row">
         <div class="col-md-6">
           <b-form-group id="lastname" label="Last name" label-for="lastname">
             <b-form-input
@@ -104,11 +135,12 @@ export default {
             ></b-form-input>
           </b-form-group>
         </div>
-      </div>
-
-      <div class="row">
         <div class="col-md-6">
-          <b-form-group id="other_names" label="Other names(Optional)" label-for="other_names">
+          <b-form-group
+            id="other_names"
+            label="Other names(Optional)"
+            label-for="other_names"
+          >
             <b-form-input
               id="other_names"
               v-model="form.other_names"
@@ -117,8 +149,15 @@ export default {
             ></b-form-input>
           </b-form-group>
         </div>
+      </div>
+
+      <div class="row">
         <div class="col-md-6">
-          <b-form-group id="preferred_name" label="Preferred name" label-for="preferred_name">
+          <b-form-group
+            id="preferred_name"
+            label="Preferred name"
+            label-for="preferred_name"
+          >
             <b-form-input
               id="preferred_name"
               v-model="form.preferred_name"
@@ -157,7 +196,11 @@ export default {
 
       <div class="row">
         <div class="col-md-6">
-          <b-form-group id="phone_number" label="Full phone number" label-for="phone_number">
+          <b-form-group
+            id="phone_number"
+            label="Phone number"
+            label-for="phone_number"
+          >
             <b-form-input
               id="phone_number"
               v-model="form.phone_number"
@@ -185,11 +228,20 @@ export default {
       <div class="row">
         <div class="col-md-6">
           <b-form-group id="dob" label="Date of birth" label-for="dob">
-            <b-form-input id="dob" v-model="form.dob" type="date" required></b-form-input>
+            <b-form-input
+              id="dob"
+              v-model="form.dob"
+              type="date"
+              required
+            ></b-form-input>
           </b-form-group>
         </div>
         <div class="col-md-6">
-          <b-form-group id="ghana_card_id" label="Ghana card ID" label-for="ghana_card_id">
+          <b-form-group
+            id="ghana_card_id"
+            label="Ghana card ID"
+            label-for="ghana_card_id"
+          >
             <b-form-input
               id="ghana_card_id"
               v-model="form.ghana_card_number"
@@ -207,14 +259,22 @@ export default {
               id="nhia"
               v-model="form.NHIA_number"
               type="text"
-              required
               placeholder="Enter NHIA number"
             ></b-form-input>
           </b-form-group>
         </div>
         <div class="col-md-6">
-          <b-form-group id="marital_status" label="Marital status" label-for="marital_status">
-            <b-form-select id="marital_status" v-model="form.marital_status" type="text" required>
+          <b-form-group
+            id="marital_status"
+            label="Marital status"
+            label-for="marital_status"
+          >
+            <b-form-select
+              id="marital_status"
+              v-model="form.marital_status"
+              type="text"
+              required
+            >
               <option value>Select marital status</option>
               <option value="single">single</option>
               <option value="married">married</option>
@@ -224,7 +284,11 @@ export default {
       </div>
       <div v-if="form.marital_status === 'married'" class="row">
         <div class="col-md-6">
-          <b-form-group id="spouse_name" label="Spouse's name" label-for="spouse_name">
+          <b-form-group
+            id="spouse_name"
+            label="Spouse's name"
+            label-for="spouse_name"
+          >
             <b-form-input
               id="spouse_name"
               v-model="form.spouse_name"
@@ -252,7 +316,11 @@ export default {
       </div>
       <div v-if="form.martial_status === 'married'" class="row">
         <div class="col-md-6">
-          <b-form-group id="spouse_employer" label="Spouse's employer" label-for="spouse_employer">
+          <b-form-group
+            id="spouse_employer"
+            label="Spouse's employer"
+            label-for="spouse_employer"
+          >
             <b-form-input
               id="spouse_employer"
               v-model="form.spouse_employer"
@@ -304,7 +372,6 @@ export default {
               id="next_of_king_email"
               v-model="form.next_of_king_email"
               type="text"
-              required
               placeholder="Email of next of kin"
             ></b-form-input>
           </b-form-group>
@@ -326,7 +393,11 @@ export default {
       </div>
       <div class="row">
         <div class="col-md-6">
-          <b-form-group id="next_of_king_postal_address" label="Postal address of next of kin" label-for="next_of_king_postal_address">
+          <b-form-group
+            id="next_of_king_postal_address"
+            label="Postal address of next of kin"
+            label-for="next_of_king_postal_address"
+          >
             <b-form-input
               id="next_of_king_postal_address"
               v-model="form.next_of_king_postal_address"
@@ -337,7 +408,11 @@ export default {
           </b-form-group>
         </div>
         <div class="col-md-6">
-          <b-form-group id="next_of_king_house_address" label="House address of next of kin" label-for="next_of_king_house_address">
+          <b-form-group
+            id="next_of_king_house_address"
+            label="House address of next of kin"
+            label-for="next_of_king_house_address"
+          >
             <b-form-input
               id="next_of_king_house_address"
               v-model="form.next_of_king_house_address"
