@@ -167,12 +167,12 @@ export default {
               {
                 y: 100,
                 x: 'Expenditure',
-                fillColor: '#43d39e',
+                fillColor: '#f77e53',
               },
               {
                 y: 100,
                 x: 'Income',
-                fillColor: '#f77e53',
+                fillColor: '#43d39e',
               },
             ],
           },
@@ -222,56 +222,126 @@ export default {
           name: 'Amount',
           data: [
             {
-              y: this.getAmountPaid(),
-              x: 'Amount Paid',
+              y: this.getExpenditure(),
+              x: 'Total',
               fillColor: '#5369f8',
             },
             {
               y: this.getSumOfProfessionalFees(),
-              x: 'Professional Fee',
+              x: `Prof. Fee - ${(
+                (this.getSumOfProfessionalFees() / this.getExpenditure()) *
+                100
+              ).toPrecision(4)}%`,
               fillColor: '#43d39e',
             },
             {
               y: this.contractForm.expenditure_reimbursable || 0,
-              x: 'Reimbursables',
+              x: `Reimb. - ${(
+                (this.contractForm.expenditure_reimbursable /
+                  this.getExpenditure()) *
+                100
+              ).toPrecision(4)}%`,
               fillColor: '#f77e53',
             },
             {
               y: this.contractForm.expenditure_finders_fee || 0,
-              x: "Finder's Fee",
+              x: `Finder's Fee - ${(
+                (this.contractForm.expenditure_finders_fee /
+                  this.getExpenditure()) *
+                100
+              ).toPrecision(4)}%`,
               fillColor: '#FF4560',
             },
             {
               y: this.contractForm.expenditure_miscellaneous || 0,
-              x: 'Miscellaneous',
-              fillColor: '#FF4560',
+              x: `Misc. - ${(
+                (this.contractForm.expenditure_miscellaneous /
+                  this.getExpenditure()) *
+                100
+              ).toPrecision(4)}%`,
+              fillColor: '#FFD700',
             },
           ],
         },
       ]
 
-      this.income.series = [
-        {
-          name: 'Amount',
-          data: [
-            {
-              y: this.getAmountPaid(),
-              x: 'Amount Paid',
-              fillColor: '#5369f8',
-            },
-            {
-              y: this.getExpenditure(),
-              x: 'Expenditure',
-              fillColor: '#43d39e',
-            },
-            {
-              y: this.getAmountPaid() - this.getExpenditure(),
-              x: 'Income',
-              fillColor: '#f77e53',
-            },
-          ],
-        },
-      ]
+      this.income.series =
+        this.getAmountPaid() !== '0.00' &&
+        Number(this.getAmountPaid()) > Number(this.getExpenditure())
+          ? [
+              {
+                name: 'Amount',
+                data: [
+                  {
+                    y: this.getAmountPaid(),
+                    x: 'Amount Paid',
+                    fillColor: '#5369f8',
+                  },
+                  {
+                    y: this.getExpenditure(),
+                    x: `Expenditure - ${(
+                      (this.getExpenditure() / this.getAmountPaid()) *
+                      100
+                    ).toPrecision(4)}%`,
+                    fillColor: '#f77e53',
+                  },
+                  {
+                    y: this.getAmountPaid() - this.getExpenditure(),
+                    x: `Income - ${(
+                      ((this.getAmountPaid() - this.getExpenditure()) /
+                        this.getAmountPaid()) *
+                      100
+                    ).toPrecision(4)}%`,
+                    fillColor: '#43d39e',
+                  },
+                ],
+              },
+            ]
+          : Number(this.getAmountPaid()) < Number(this.getExpenditure())
+          ? [
+              {
+                name: 'Amount',
+                data: [
+                  {
+                    y: this.getAmountPaid(),
+                    x: 'Amount Paid',
+                    fillColor: '#5369f8',
+                  },
+                  {
+                    y: this.getExpenditure(),
+                    x: 'Expenditure',
+                    fillColor: '#f77e53',
+                  },
+                  {
+                    y: 0,
+                    x: 'Income',
+                    fillColor: '#43d39e',
+                  },
+                ],
+              },
+            ]
+          : [
+              {
+                name: 'Amount',
+                data: [
+                  {
+                    y: 0,
+                    x: 'Amount Paid',
+                    fillColor: '#5369f8',
+                  },
+                  {
+                    y: this.getExpenditure(),
+                    x: 'Expenditure',
+                    fillColor: '#f77e53',
+                  },
+                  {
+                    y: 0,
+                    x: 'Income',
+                    fillColor: '#43d39e',
+                  },
+                ],
+              },
+            ]
     },
     formateAmount(amount) {
       return amount && amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
@@ -425,6 +495,7 @@ export default {
         )
 
         if (response) {
+          this.updateChart()
         }
       } catch (error) {
         if (error.response) {
@@ -554,62 +625,7 @@ export default {
           })
           this.items[2].text = response.data.name
           this.loading = false
-
-          this.expenditure.series = [
-            {
-              name: 'Amount',
-              data: [
-                {
-                  y: this.getAmountPaid(),
-                  x: 'Amount Paid',
-                  fillColor: '#5369f8',
-                },
-                {
-                  y: this.getSumOfProfessionalFees(),
-                  x: 'Professional Fee',
-                  fillColor: '#43d39e',
-                },
-                {
-                  y: response.data.expenditure_reimbursable || 0,
-                  x: 'Reimbursables',
-                  fillColor: '#f77e53',
-                },
-                {
-                  y: response.data.expenditure_finders_fee || 0,
-                  x: "Finder's Fee",
-                  fillColor: '#FF4560',
-                },
-                {
-                  y: response.data.expenditure_miscellaneous || 0,
-                  x: 'Miscellaneous',
-                  fillColor: '#FF4560',
-                },
-              ],
-            },
-          ]
-
-          this.income.series = [
-            {
-              name: 'Amount',
-              data: [
-                {
-                  y: this.getAmountPaid(),
-                  x: 'Amount Paid',
-                  fillColor: '#5369f8',
-                },
-                {
-                  y: this.getExpenditure(),
-                  x: 'Expenditure',
-                  fillColor: '#43d39e',
-                },
-                {
-                  y: this.getAmountPaid() - this.getExpenditure(),
-                  x: 'Income',
-                  fillColor: '#f77e53',
-                },
-              ],
-            },
-          ]
+          this.updateChart()
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {

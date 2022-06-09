@@ -104,14 +104,14 @@
               v-for="report in reports"
               :key="report.id"
               :to="`/proposal/${proposal.id}/report/${report.id}`"
-              class="col-md-4"
+              class="col-md-3"
             >
-              <div class="card" style="min-height: 300px;">
+              <div class="card" style="min-height: 180px;">
                 <div class="card-body position-relative">
-                  <div class="p-2 border rounded mb-3">
-                    <div class="media">
-                      <div class="media-body">
-                        <div class="d-inline-block mt-2">{{
+                  <div class="p-2  rounded mb-3">
+                    <div class="">
+                      <div class="">
+                        <div class="d-inline-block mt-2 font-size-15">{{
                           report.proposal_type &&
                             report.proposal_type.report_title
                         }}</div>
