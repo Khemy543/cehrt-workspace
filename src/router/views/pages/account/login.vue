@@ -63,17 +63,14 @@ export default {
 									<div class="col-md-6 p-5">
 										<div class="mx-auto mb-5">
 											<a routerLink="/">
-												<img src="@assets/images/logo.png" alt height="24" />
-												<h3 class="d-inline align-middle ml-1 text-logo"
-													>CEHRT WORKSPACE</h3
-												>
+												<img src="@assets/images/cehrt-small-logo.png" alt="logo" height="50"/>
+												<span class="d-inline h5 ml-2 text-logo" style="color:#009a44;">CEHRT WORKSPACE</span>
 											</a>
 										</div>
 
 										<h6 class="h5 mb-0 mt-4">Welcome back!</h6>
 										<p class="text-muted mt-1 mb-4">
-											Enter your email address and password to access admin
-											panel.
+											Enter your email address and password to access your workspace
 										</p>
 
 										<b-alert
@@ -162,12 +159,11 @@ export default {
 											<div class="overlay"></div>
 											<div class="auth-user-testimonial">
 												<p class="font-size-24 font-weight-bold text-white mb-1"
-													>I simply love it!</p
+													>Cerht Workspace</p
 												>
 												<p class="lead"
-													>"It's a elegent templete. I love it very much!"</p
+													>"Making things simple to use"</p
 												>
-												<p>- Admin User</p>
 											</div>
 										</div>
 									</div>
