@@ -23,7 +23,6 @@ export default {
     this.form = { ...this.user }
   },
   methods: {
-    async updateProfile() {},
 
     browse() {
       this.$refs['file'].click()
@@ -34,16 +33,19 @@ export default {
 
     async handleSubmitUpdateProfile() {
       try {
-        const formData = new FormData()
+        /* const formData = new FormData()
         for (const key in this.form) {
           formData.append(`${key}`, this.form[key])
         }
 
-        formData.append('_method', 'PUT')
+        formData.append('_method', 'PUT') */
 
-        const response = await this.$http.post(
+        const departmentIds = this.form.departments.map(department => department.id);
+        const postionsIds = this.form.position.map(post => post.id)
+
+        const response = await this.$http.put(
           `auth/${this.form.id}/account/update`,
-          formData
+          { ...this.form, department_ids: departmentIds, position_ids: postionsIds }
         )
 
         if (response) {
