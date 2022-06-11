@@ -315,9 +315,15 @@ export default {
     },
     async createDeliverable(form) {
       try {
+        const data = await graph.uploadProjectFile({
+          fileName: `${form.deliverable_name}.docx`,
+          fileContent: form.file,
+          folder: this.project.name,
+        });
+        
         const response = await this.$http.post(
           `/project/${this.$route.params.id}/create-deliverable`,
-          { ...form, project_type_deliverable_id: form.id }
+          { ...form, project_type_deliverable_id: form.id, document_path: data.webUrl }
         )
 
         if (response) {
@@ -331,18 +337,12 @@ export default {
 
           this.showCreateDeliverable = false
 
-          const data = await graph.uploadProjectFile({
-            fileName: `${form.deliverable_name}.docx`,
-            fileContent: form.file,
-            folder: this.project.name,
-          })
-
           this.vDeliverable = null
 
-          await this.updateDeliverableWithPathName({
+          /* await this.updateDeliverableWithPathName({
             ...response.data.deliverable,
             document_path: data.webUrl,
-          })
+          }) */
         }
       } catch (error) {
         if (error.response) {
@@ -481,23 +481,26 @@ export default {
       }
     },
     showExportToLibrary() {
-      if(this.project.no_of_completed_tasks !== this.project.tasks) {
-        return this.$bvToast.toast('Please complete all tasks before exporting to library', {
-          title: 'Error',
-          autoHideDelay: 5000,
-          appendToast: false,
-          variant: 'danger'
-        })
+      if (this.project.no_of_completed_tasks !== this.project.tasks) {
+        return this.$bvToast.toast(
+          'Please complete all tasks before exporting to library',
+          {
+            title: 'Error',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'danger',
+          }
+        )
       }
       this.showExport = true
     },
     async exportToLibrary(form) {
       try {
-        const { associated_consultants: consultants } = form;
+        const { associated_consultants: consultants } = form
 
-        let newFormData = {...form}
+        let newFormData = { ...form }
 
-        if(consultants[0].name === '') {
+        if (consultants[0].name === '') {
           newFormData.associated_consultants = []
         }
         const response = await this.$http.patch(
