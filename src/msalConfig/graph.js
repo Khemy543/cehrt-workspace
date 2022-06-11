@@ -24,8 +24,15 @@ let accessToken
 
 const driveId = 'eb3548181cf4dc64';
 const itemId = 'EB3548181CF4DC64!166';
+const libraryId = 'EB3548181CF4DC64!173';
 
-const libraryId = 'EB3548181CF4DC64!73';
+/* project and proposal in chert workspace */
+const projectFolderId = 'EB3548181CF4DC64!167';
+const proposalFolderId = 'EB3548181CF4DC64!174';
+
+/* project and proposal in library */
+const libraryProjectFolderId = 'EB3548181CF4DC64!166';
+const libraryProposalFolderId = 'EB3548181CF4DC64!166';
 
 export default {
   //
@@ -48,8 +55,35 @@ export default {
     }
   },
 
-  async createFolder(item) {
-    let resp = await postGraph(`/drives/${driveId}/items/${itemId}/children`, item);
+  async createProjectFolder(item) {
+    let resp = await postGraph(`/drives/${driveId}/items/${projectFolderId}/children`, item);
+
+    if(resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
+  async createProposalFolder(item) {
+    let resp = await postGraph(`/drives/${driveId}/items/${proposalFolderId}/children`, item);
+
+    if(resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
+  async createLibraryProjectFolder(item) {
+    let resp = await postGraph(`/drives/${driveId}/items/${libraryProjectFolderId}/children`, item);
+
+    if(resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
+  async createLibraryProposalFolder(item) {
+    let resp = await postGraph(`/drives/${driveId}/items/${libraryProposalFolderId}/children`, item);
 
     if(resp) {
       let data = await resp.json()

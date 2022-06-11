@@ -4,6 +4,7 @@ import Layout from '@layouts/main'
 import CreateProjectModal from '@components/CreateProjectModal.vue'
 import ProjectCard from '@components/project-card.vue'
 import ProjectTable from "@components/ProjectTable";
+import graph from '@/src/msalConfig/graph';
 
 export default {
   page: {
@@ -71,7 +72,13 @@ export default {
     },
     async addNewProject(form) {
       try {
-        const response = await this.$http.post('/create/project', form)
+
+        const data = await graph.createProjectFolder({
+          name: form.name,
+          folder: { },
+          '@microsoft.graph.conflictBehavior': 'rename'
+        });
+        const response = await this.$http.post('/create/project', {...form, onedrive_id: data.id});
 
         if (response) {
           this.form = {}
