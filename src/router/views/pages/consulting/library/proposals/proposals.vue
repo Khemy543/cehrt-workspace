@@ -85,11 +85,11 @@ export default {
                 <h4 class="header-title mt-0 mb-1">View Proposals</h4>
                 <p class="sub-header">view, add and edit details of all proposals</p>
               </div>
-              <div>
+              <!-- <div>
                 <button type="button" class="btn btn-danger mr-4 mb-3 mb-sm-0" @click="openCreateProposal">
                   <i class="uil-plus mr-1"></i> New Proposal
                 </button>
-              </div>
+              </div> -->
             </div>
 
             <div v-if="proposals.length > 0" class="table-responsive">

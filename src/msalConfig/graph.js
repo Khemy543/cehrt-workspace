@@ -25,6 +25,8 @@ let accessToken
 const driveId = 'eb3548181cf4dc64';
 const itemId = 'EB3548181CF4DC64!166';
 
+const libraryId = 'EB3548181CF4DC64!73';
+
 export default {
   //
   // Get details of user, and return as JSON
@@ -66,6 +68,14 @@ export default {
   async uploadProjectFile({ fileName, fileContent, folder }) {
     let resp = await putGraph(`/drives/${driveId}/items/${itemId}:/Projects/${folder}/${fileName}:/content`, fileContent);
     if (resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
+  async uploadProjectLibraryFile({ fileName, fileContent, folder }) {
+    let resp = await putGraph(`/drives/${driveId}/items/${libraryId}:/Projects/${folder}/${fileName}:/content`, fileContent);
+    if(resp) {
       let data = await resp.json()
       return data
     }

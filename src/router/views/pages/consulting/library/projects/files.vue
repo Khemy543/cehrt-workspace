@@ -2,6 +2,8 @@
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
+import AddFileToLibrary from '@/src/components/AddFileToLibrary.vue'
+import graph from '@/src/msalConfig/graph'
 
 export default {
   page: {
@@ -11,6 +13,7 @@ export default {
   components: {
     Layout,
     PageHeader,
+    AddFileToLibrary,
   },
   props: {
     id: {
@@ -33,18 +36,89 @@ export default {
         },
       ],
       loading: false,
-      project: null,
+      project: {},
       library: [],
       invoice: [],
-      timeSheet: []
+      timeSheet: [],
+      show: false,
     }
   },
-
+  computed: {
+    deliverables() {
+      return (
+        (this.project.project_type && this.project.project_type.deliverables) ||
+        []
+      )
+    },
+    formattedDeliverables() {
+      return this.deliverables.filter((item) =>
+        !this.library.some(
+          (library) => library.project_type_deliverable.id === item.id
+        )
+      )
+    },
+  },
   created() {
     this.getProjectsLibrary()
     this.getProjectDeliverables()
   },
   methods: {
+    async addFile(form) {
+      try {
+        const devliverable = this.project.deliverables.find(
+          (item) => item.id === item.project_type_deliverable_id
+        )
+
+        const data = await graph.uploadProjectLibraryFile({
+          fileName: `${devliverable.deliverable_name}.docx`,
+          fileContent: form.file,
+          folder: this.project.name,
+        })
+
+        const response = await this.$http.post(
+          `/project/${this.$route.params.id}/create-deliverable`,
+          { ...form, document_path: data.file.webUrl }
+        )
+
+        if (response) {
+          this.library.push(response.data.deliverable)
+          this.$bvToast.toast('Project deliverable created successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
+
+          this.show = false
+
+          /* await this.updateDeliverableWithPathName({
+            ...response.data.deliverable,
+            document_path: data.webUrl,
+          }) */
+        }
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.showCreateDeliverable = false
+        this.vDeliverable = null
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
     async getProjectDeliverables() {
       try {
         const rawDepartment = window.localStorage.getItem('user.department')
@@ -149,8 +223,9 @@ export default {
                 name:
                   file.project_type_deliverable &&
                   file.project_type_deliverable.deliverable_name,
-                file: file.document_path,
-                document_path: file.document_path,
+                  file: file.document_path,
+                  project_type_deliverable: file.project_type_deliverable,
+                  document_path: file.document_path,
               })
             })
           }
@@ -177,7 +252,9 @@ export default {
         })
       }
     },
-    openModal() {},
+    openModal() {
+      this.show = true
+    },
   },
 }
 </script>
@@ -243,7 +320,9 @@ export default {
                     <p class="mb-2">
                       <i class="uil-user text-danger"></i> Coordinator
                     </p>
-                    <!--  <h5 class="font-size-16">{{ project.coordinator.name || 'N/A' }}</h5> -->
+                    <h5 class="font-size-16">{{
+                      (project.coordinator && project.coordinator.name) || 'N/A'
+                    }}</h5>
                   </div>
                 </div>
                 <div class="col-lg-3 col-md-6">
@@ -385,6 +464,12 @@ export default {
           </div>
         </div>
       </div>
+      <AddFileToLibrary
+        :action="addFile"
+        :deliverables="formattedDeliverables"
+        :value="show"
+        @input="show = $event"
+      />
     </div>
   </Layout>
 </template>
