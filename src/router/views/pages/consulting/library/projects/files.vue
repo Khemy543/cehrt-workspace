@@ -64,20 +64,21 @@ export default {
   },
   methods: {
     async addFile(form) {
+      console.log(form)
       try {
-        const devliverable = this.project.deliverables.find(
-          (item) => item.id === item.project_type_deliverable_id
+        const deliverable = this.formattedDeliverables.find(
+          (item) => item.id === form.project_type_deliverable_id
         )
 
         const data = await graph.uploadProjectLibraryFile({
-          fileName: `${devliverable.deliverable_name}.docx`,
+          fileName: `${deliverable.deliverable_name}.docx`,
           fileContent: form.file,
           folder: this.project.name,
         })
 
         const response = await this.$http.post(
           `/project/${this.$route.params.id}/create-deliverable`,
-          { ...form, document_path: data.file.webUrl }
+          { ...form, document_path: data.webUrl }
         )
 
         if (response) {
@@ -97,6 +98,7 @@ export default {
           }) */
         }
       } catch (error) {
+        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
