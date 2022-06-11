@@ -34,7 +34,7 @@
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-md-6">
+                      <div class="col-md-12">
                         <div class="mt-4">
                           <p class="mb-2">
                             <i class="uil-user text-danger"></i> Client
@@ -300,8 +300,24 @@ export default {
             )
 
             if (response) {
+              this.$bvToast.toast('Project exported to library successfully', {
+                title: 'Success',
+                autoHideDelay: 5000,
+                appendToast: false,
+                variant: 'success',
+              })
+              setTimeout(() => {
+                this.$router.push('/proposals/view-proposals')
+              }, 2000)
             }
-          } catch (error) {}
+          } catch (error) {
+            this.$bvToast.toast('Something happened, Please try again later', {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
         }
       })
     },

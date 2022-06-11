@@ -2,6 +2,7 @@
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
+import AddProjectToLibrary from '@components/AddProjectToLibrary.vue'
 
 export default {
   page: {
@@ -10,7 +11,8 @@ export default {
   },
   components: {
     Layout,
-    PageHeader
+    PageHeader,
+    AddProjectToLibrary,
   },
   props: {
     id: {
@@ -33,7 +35,8 @@ export default {
         },
       ],
       loading: false,
-      library: []
+      library: [],
+      show: false,
     }
   },
 
@@ -41,13 +44,53 @@ export default {
     this.getProjectsLibrary()
   },
   methods: {
-    async getProjectsLibrary() {
+    getIds(regions) {
+      return regions.map((items) => items.id)
+    },
+    async createProject(form) {
       try {
-        this.loading = true;
-        const response = await this.$http.get(`/fetch/library/projects`);
+        const response = await this.$http.post(`/save/old/project`, {
+          ...form,
+          regionIds: this.getIds(form.regionIds)
+        })
 
         if (response) {
-          this.library = response.data.data;
+          this.library.push(response.data.project)
+          this.$bvToast.toast("Project added to library successfully", {
+              title: 'Success',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'success',
+            })
+        }
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
+    async getProjectsLibrary() {
+      try {
+        this.loading = true
+        const response = await this.$http.get(`/fetch/library/projects`)
+
+        if (response) {
+          this.library = response.data.data
           this.loading = false
         }
       } catch (error) {
@@ -59,11 +102,13 @@ export default {
         })
       }
     },
-    openModal() { },
+    openModal() {
+      this.show = true
+    },
     goToFiles(id) {
       this.$router.push(`/library/projects/${id}/files`)
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -83,7 +128,11 @@ export default {
                 <p class="sub-header">view all project files</p>
               </div>
               <div>
-                <button type="button" class="btn btn-danger mr-4 mb-3 mb-sm-0" @click="openModal">
+                <button
+                  type="button"
+                  class="btn btn-danger mr-4 mb-3 mb-sm-0"
+                  @click="openModal"
+                >
                   <i class="uil-plus mr-1"></i> Add Directory
                 </button>
               </div>
@@ -104,12 +153,17 @@ export default {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(item, index) in library" :key="item.id" class="library-row" @click="goToFiles(item.id)">
+                  <tr
+                    v-for="(item, index) in library"
+                    :key="item.id"
+                    class="library-row"
+                    @click="goToFiles(item.id)"
+                  >
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ item.name }}</td>
-                    <td>{{ item.country }}</td>
+                    <td>{{ item.country || 'N/A'}}</td>
                     <td>Accra</td>
-                    <td>{{ item.district }}</td>
+                    <td>{{ item.district || 'N/A'}}</td>
                     <td>2016</td>
                     <td>{{ item.client }}</td>
                     <td>{{ item.project_type.name }}</td>
@@ -119,19 +173,30 @@ export default {
             </div>
 
             <div v-else class="w-100 d-flex justify-content-center">
-              <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
+              <img
+                :src="require('@assets/svgs/empty.svg')"
+                alt="no projects"
+                style="width:30%"
+              />
             </div>
           </div>
         </div>
       </div>
-    </div></Layout>
+      <AddProjectToLibrary
+        :action="createProject"
+        :value="show"
+        title="Add Project To Library"
+        @input="show = $event"
+      />
+    </div>
+  </Layout>
 </template>
 <style scoped>
-  .library-row:hover {
-    background-color: #f8f9fa;
-  }
+.library-row:hover {
+  background-color: #f8f9fa;
+}
 
-  .library-row {
-    cursor: pointer;
-  }
+.library-row {
+  cursor: pointer;
+}
 </style>

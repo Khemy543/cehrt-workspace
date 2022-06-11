@@ -25,6 +25,42 @@
         <div class="col-md-6">
           <b-form-group
             id="input-group-1"
+            label="Project Type"
+            label-for="input-1"
+          >
+            <b-form-select v-model="form.project_type_id" class="mb-2">
+              <option value="" disabled>Select project type</option>
+              <option
+                v-for="mytype in projectTypes"
+                :key="mytype.id"
+                :value="mytype.id"
+                >{{ mytype.name }}</option
+              >
+            </b-form-select>
+          </b-form-group>
+        </div>
+        <div class="col-md-6">
+          <b-form-group
+            id="input-group-1"
+            label="Project Sector"
+            label-for="input-1"
+          >
+            <b-form-select v-model="form.project_sector_id" class="mb-2">
+              <option value="" disabled>Select project sector</option>
+              <option
+                v-for="sector in sectors"
+                :key="sector.id"
+                :value="sector.id"
+                >{{ sector.name }}</option
+              >
+            </b-form-select>
+          </b-form-group>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <b-form-group
+            id="input-group-1"
             label="Project Country"
             label-for="input-1"
           >
@@ -113,6 +149,21 @@
         <div class="col-md-6">
           <b-form-group
             id="input-group-1"
+            label="Client Name"
+            label-for="input-1"
+          >
+            <b-form-input
+              id="input-1"
+              v-model="form.client"
+              type="text"
+              placeholder="Enter name of Client"
+            >
+            </b-form-input>
+          </b-form-group>
+        </div>
+        <div class="col-md-6">
+          <b-form-group
+            id="input-group-1"
             label="Name of Client Contact Person"
             label-for="input-1"
           >
@@ -121,21 +172,6 @@
               v-model="form.client_name"
               type="text"
               placeholder="Name of Client Contact Person"
-            >
-            </b-form-input>
-          </b-form-group>
-        </div>
-        <div class="col-md-6">
-          <b-form-group
-            id="input-group-1"
-            label="Phone number"
-            label-for="input-1"
-          >
-            <b-form-input
-              id="input-1"
-              v-model="form.client_contact"
-              type="text"
-              placeholder="Phone number of contact person"
             >
             </b-form-input>
           </b-form-group>
@@ -160,15 +196,14 @@
         <div class="col-md-6">
           <b-form-group
             id="input-group-1"
-            label="Value of Service / Contract Amount"
+            label="Phone number"
             label-for="input-1"
           >
             <b-form-input
               id="input-1"
-              v-model="form.contract"
+              v-model="form.client_contact"
               type="text"
-              disabled
-              placeholder="Value of service"
+              placeholder="Phone number of contact person"
             >
             </b-form-input>
           </b-form-group>
@@ -299,18 +334,16 @@ export default {
       type: Function,
       required: true,
     },
-    project: {
-      type: Object,
-      default: () => ({}),
-    },
     title: {
       type: String,
       default: 'Export Project To Library',
-    }
+    },
   },
   data() {
     return {
       form: {
+        project_type_id: '',
+        project_sector_id: '',
         regionIds: [],
         professional_expects: [
           {
@@ -327,6 +360,8 @@ export default {
           },
         ],
       },
+      sectors: [],
+      projectTypes: [],
       regionOptions: [],
       tempRegions: [
         {
@@ -364,56 +399,56 @@ export default {
           name: 'Central Region',
           districts: [
             {
-                id: 1,
-                name: "Abura/Asebu/Kwamankese District"
+              id: 1,
+              name: 'Abura/Asebu/Kwamankese District',
             },
             {
-                id: 2,
-                name: "Agona East District"
+              id: 2,
+              name: 'Agona East District',
             },
             {
-                id: 3,
-                name: "Agona West Municipal "
+              id: 3,
+              name: 'Agona West Municipal ',
             },
             {
-                id: 4,
-                name: "Ajumako/Enyan/Essiam District"
+              id: 4,
+              name: 'Ajumako/Enyan/Essiam District',
             },
             {
-                id: 5,
-                name: "Asikuma Odoben Brakwa District"
+              id: 5,
+              name: 'Asikuma Odoben Brakwa District',
             },
             {
-                id: 6,
-                name: "Assin Central Municipal"
+              id: 6,
+              name: 'Assin Central Municipal',
             },
             {
-                id: 7,
-                name: "Assin North District"
+              id: 7,
+              name: 'Assin North District',
             },
             {
-                id: 8,
-                name: "Assin South District"
+              id: 8,
+              name: 'Assin South District',
             },
             {
-                id: 9,
-                name: "Awutu Senya East Municipal"
+              id: 9,
+              name: 'Awutu Senya East Municipal',
             },
             {
-                id: 10,
-                name: "Awutu Senya West District"
+              id: 10,
+              name: 'Awutu Senya West District',
             },
             {
-                id: 11,
-                name: "Cape Coast Metropolitan "
+              id: 11,
+              name: 'Cape Coast Metropolitan ',
             },
             {
-                id: 12,
-                name: "Effutu Municipal"
+              id: 12,
+              name: 'Effutu Municipal',
             },
             {
-                id: 13,
-            }
+              id: 13,
+            },
           ],
         },
         {
@@ -485,19 +520,10 @@ export default {
       },
     },
   },
-  watch: {
-    project(newValue) {
-      this.form = {
-        ...this.form,
-        name: newValue.name,
-        start_date: newValue.raw_start_date || '',
-        end_date: newValue.raw_end_date || '',
-        description: newValue.description,
-      }
-    },
-  },
   created() {
     this.getRegions()
+    this.getSectors()
+    this.getProjectTypes()
   },
   methods: {
     addProfessionalExpert() {
@@ -519,6 +545,24 @@ export default {
         name: '',
         role: '',
       })
+    },
+    async getSectors() {
+      try {
+        const response = await this.$http.get('/fetch/project/sectors')
+
+        if (response) {
+          this.sectors = response.data
+        }
+      } catch (error) {}
+    },
+    async getProjectTypes() {
+      try {
+        const response = await this.$http.get('/fetch/project/types')
+
+        if (response) {
+          this.projectTypes = response.data
+        }
+      } catch (error) {}
     },
     async getRegions() {
       try {
