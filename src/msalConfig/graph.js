@@ -139,6 +139,15 @@ export default {
     }
   },
 
+
+  async deleteFolder({ onedriveId }) {
+    let resp = await deleteGraph(`/drives/${driveId}/items/${onedriveId}`);
+    if (resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
   //
   // Get user's photo and return as a blob object URL
   // https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
@@ -241,6 +250,27 @@ async function patchGraph(apiPath, data) {
 
   let resp = await fetch(`${GRAPH_BASE}${apiPath}`, {
     method: 'PATCH',
+    headers: {
+      authorization: `bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
+  })
+
+  if (!resp.ok) {
+    throw new Error(
+      `Call to ${GRAPH_BASE}${apiPath} failed: ${resp.statusText}`
+    )
+  }
+
+  return resp
+}
+
+async function deleteGraph(apiPath, data) {
+  accessToken = await auth.acquireToken(GRAPH_SCOPES)
+
+  let resp = await fetch(`${GRAPH_BASE}${apiPath}`, {
+    method: 'DELETE',
     headers: {
       authorization: `bearer ${accessToken}`,
       'Content-Type': 'application/json',

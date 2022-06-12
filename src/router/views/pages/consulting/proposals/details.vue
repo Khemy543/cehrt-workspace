@@ -295,6 +295,10 @@ export default {
       }).then(async ({ isConfirmed, isDenied }) => {
         if (isConfirmed) {
           try {
+            await graph.moveProposalToLibrary({
+              onedrive_id: this.proposal.onedrive_id,
+              name: this.proposal.title,
+            })
             const response = await this.$http.patch(
               `/export/${this.$route.params.id}}/proposal`
             )
