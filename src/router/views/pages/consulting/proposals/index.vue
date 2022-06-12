@@ -3,6 +3,7 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import CreateProposalModal from '@components/CreateProposalModal.vue'
+import graph from '@/src/msalConfig/graph'
 
 export default {
   page: {
@@ -73,7 +74,13 @@ export default {
 
     async createProposal(form) {
       try {
-        const response = await this.$http.post('/create/proposal', form)
+        const data = await graph.createProposalFolder({
+          name: form.title,
+          folder: { },
+          '@microsoft.graph.conflictBehavior': 'rename'
+        });
+
+        const response = await this.$http.post('/create/proposal', {...form, onedrive_id: data.id })
 
         if (response && response.data) {
           this.proposals.push(response.data.proposal)
