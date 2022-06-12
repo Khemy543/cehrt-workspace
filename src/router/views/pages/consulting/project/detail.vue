@@ -508,7 +508,7 @@ export default {
     async exportToLibrary(form) {
       try {
         await graph.moveProposalToLibrary({
-          onedrive_id: this.project.onedrive_id,
+          onedriveId: this.project.onedrive_id,
           name: this.project.name,
         })
         const { associated_consultants: consultants } = form

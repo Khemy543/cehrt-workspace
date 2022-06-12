@@ -175,6 +175,7 @@ export default {
     },
 
     async deleteProposal(vItem) {
+      console.log(vItem)
       this.$swal({
         title: 'Do you want to delete this proposal?',
         showDenyButton: true,
@@ -184,8 +185,8 @@ export default {
         denyButtonColor: '#4b4b5a',
       }).then(async ({ isConfirmed, isDenied }) => {
         if (isConfirmed) {
-          await graph.deleteFolder(vItem.onedrive_id);
-          
+          await graph.deleteFolder({ onedriveId: vItem.onedrive_id});
+
           try {
             const response = await this.$http.delete(`/delete/${vItem.id}/proposal`)
 
