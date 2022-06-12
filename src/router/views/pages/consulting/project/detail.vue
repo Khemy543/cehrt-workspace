@@ -507,7 +507,7 @@ export default {
     },
     async exportToLibrary(form) {
       try {
-        await graph.moveProposalToLibrary({
+        await graph.moveProjectToLibrary({
           onedriveId: this.project.onedrive_id,
           name: this.project.name,
         })
