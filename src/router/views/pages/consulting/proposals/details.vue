@@ -296,7 +296,7 @@ export default {
         if (isConfirmed) {
           try {
             await graph.moveProposalToLibrary({
-              onedrive_id: this.proposal.onedrive_id,
+              onedriveId: this.proposal.onedrive_id,
               name: this.proposal.title,
             })
             const response = await this.$http.patch(
