@@ -449,7 +449,6 @@ export default {
                     class="text-muted font-weight-bold"
                     >{{ task.deliverable.name }}</a
                   >
-                  <p class="mb-0">2kb</p>
                 </div>
                 <div class="col-auto">
                   <!-- Button -->

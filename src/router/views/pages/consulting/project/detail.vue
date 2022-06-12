@@ -233,13 +233,21 @@ export default {
     },
     async editProject(form) {
       try {
+        
+        const data = await graph.updateProjectName({
+          name: form.name,
+          onedriveId: form.onedriveId
+        });
+
+        console.log(data)
+
         const response = await this.$http.put(
           `/update/${this.project.id}/project`,
           form
         )
 
         if (response) {
-          this.project = response.data.project
+          this.project = response.data.project;
 
           this.show = false
 
