@@ -143,8 +143,7 @@ export default {
   async deleteFolder({ onedriveId }) {
     let resp = await deleteGraph(`/drives/${driveId}/items/${onedriveId}`);
     if (resp) {
-      let data = await resp.json()
-      return data
+      return resp
     }
   },
 
@@ -266,7 +265,7 @@ async function patchGraph(apiPath, data) {
   return resp
 }
 
-async function deleteGraph(apiPath, data) {
+async function deleteGraph(apiPath) {
   accessToken = await auth.acquireToken(GRAPH_SCOPES)
 
   let resp = await fetch(`${GRAPH_BASE}${apiPath}`, {
@@ -274,8 +273,7 @@ async function deleteGraph(apiPath, data) {
     headers: {
       authorization: `bearer ${accessToken}`,
       'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data)
+    }
   })
 
   if (!resp.ok) {
