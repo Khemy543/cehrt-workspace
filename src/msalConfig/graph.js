@@ -115,6 +115,14 @@ export default {
     }
   },
 
+  async updateProjectName({ name, onedriveId }) {
+    let resp = await patchGraph(`/drives/${driveId}/items/${onedriveId}`, { name });
+    if (resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
   //
   // Get user's photo and return as a blob object URL
   // https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
@@ -201,6 +209,27 @@ async function putGraph(apiPath, data) {
       'Content-Type': 'application/json',
     },
     body: data
+  })
+
+  if (!resp.ok) {
+    throw new Error(
+      `Call to ${GRAPH_BASE}${apiPath} failed: ${resp.statusText}`
+    )
+  }
+
+  return resp
+}
+
+async function patchGraph(apiPath, data) {
+  accessToken = await auth.acquireToken(GRAPH_SCOPES)
+
+  let resp = await fetch(`${GRAPH_BASE}${apiPath}`, {
+    method: 'PATCH',
+    headers: {
+      authorization: `bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data)
   })
 
   if (!resp.ok) {
