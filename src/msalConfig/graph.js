@@ -31,8 +31,8 @@ const projectFolderId = 'EB3548181CF4DC64!167';
 const proposalFolderId = 'EB3548181CF4DC64!174';
 
 /* project and proposal in library */
-const libraryProjectFolderId = 'EB3548181CF4DC64!166';
-const libraryProposalFolderId = 'EB3548181CF4DC64!166';
+const libraryProjectFolderId = 'EB3548181CF4DC64!191';
+const libraryProposalFolderId = 'EB3548181CF4DC64!200';
 
 export default {
   //
