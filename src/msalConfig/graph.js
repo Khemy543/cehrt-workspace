@@ -123,6 +123,22 @@ export default {
     }
   },
 
+  async moveProjectToLibrary({ onedriveId, name }) {
+    let resp = await patchGraph(`/drives/${driveId}/items/${onedriveId}`, { parentReference: { id: libraryProjectFolderId }, name });
+    if (resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
+  async moveProposalToLibrary({ onedriveId, name }) {
+    let resp = await patchGraph(`/drives/${driveId}/items/${onedriveId}`, { parentReference: { id: libraryProposalFolderId }, name });
+    if (resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
   //
   // Get user's photo and return as a blob object URL
   // https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL
