@@ -18,9 +18,3 @@ jobs:
           script: |
             echo "Login succesfull"
             git clone git@github.com:Khemy543/chert-workspace.git
-            cd chert-workspace
-            git checkout develop
-            yarn install
-            sudo cp -R dist/* /var/www/html/workspace.cehrtghana.com 
-            cd ~
-            sudo rm -rf chert-workspace
