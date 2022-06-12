@@ -175,7 +175,6 @@ export default {
     },
 
     async deleteProposal(vItem) {
-      console.log(vItem)
       this.$swal({
         title: 'Do you want to delete this proposal?',
         showDenyButton: true,
@@ -191,7 +190,7 @@ export default {
             const response = await this.$http.delete(`/delete/${vItem.id}/proposal`)
 
             if (response) {
-              this.workFlows = this.proposals.filter((item) => item.id !== vItem.id)
+              this.proposals = this.proposals.filter((item) => item.id !== vItem.id)
               this.$bvToast.toast('Proposal deleted successfully', {
                 title: 'Success',
                 autoHideDelay: 5000,
