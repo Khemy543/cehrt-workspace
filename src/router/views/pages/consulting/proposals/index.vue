@@ -76,11 +76,14 @@ export default {
       try {
         const data = await graph.createProposalFolder({
           name: form.title,
-          folder: { },
-          '@microsoft.graph.conflictBehavior': 'rename'
-        });
+          folder: {},
+          '@microsoft.graph.conflictBehavior': 'rename',
+        })
 
-        const response = await this.$http.post('/create/proposal', {...form, onedrive_id: data.id })
+        const response = await this.$http.post('/create/proposal', {
+          ...form,
+          onedrive_id: data.id,
+        })
 
         if (response && response.data) {
           this.proposals.push(response.data.proposal)
@@ -112,9 +115,17 @@ export default {
     },
 
     async updateProposal(form) {
-      const fakeForm = { ...form }
-      delete fakeForm['submission_date']
       try {
+
+        const data = await graph.updateProjectName({
+          name: form.title,
+          onedriveId: form.onedrive_id
+        });
+
+        console.log(data)
+
+        const fakeForm = { ...form }
+        delete fakeForm['submission_date']
         const response = await this.$http.put(
           `/update/${form.id}/proposal`,
           fakeForm
@@ -163,7 +174,7 @@ export default {
       this.show = true
     },
 
-    async deleteProposal(id) {
+    async deleteProposal(vItem) {
       this.$swal({
         title: 'Do you want to delete this proposal?',
         showDenyButton: true,
@@ -173,11 +184,13 @@ export default {
         denyButtonColor: '#4b4b5a',
       }).then(async ({ isConfirmed, isDenied }) => {
         if (isConfirmed) {
+          await graph.deleteFolder(vItem.onedrive_id);
+          
           try {
-            const response = await this.$http.delete(`/delete/${id}/proposal`)
+            const response = await this.$http.delete(`/delete/${vItem.id}/proposal`)
 
             if (response) {
-              this.workFlows = this.proposals.filter((item) => item.id !== id)
+              this.workFlows = this.proposals.filter((item) => item.id !== vItem.id)
               this.$bvToast.toast('Proposal deleted successfully', {
                 title: 'Success',
                 autoHideDelay: 5000,
@@ -240,9 +253,7 @@ export default {
                       <div
                         class="d-flex justify-content-between align-items-center"
                       >
-                        <div>
-
-                        </div>
+                        <div> </div>
 
                         <b-dropdown
                           variant="link"
@@ -261,31 +272,32 @@ export default {
                           <b-dropdown-item
                             href="javascript: void(0);"
                             variant="danger"
-                            @click="deleteProposal(vProposal.id)"
+                            @click="deleteProposal(vProposal)"
                           >
                             <i class="uil uil-trash-alt mr-2"></i>Delete
                           </b-dropdown-item>
                         </b-dropdown>
                       </div>
-                      <router-link :to="`/proposals/details/${vProposal.id}`" >
-                      <div style="height: 250px">
-                        <h5>
-                          <a href="javascript: void(0)" class="text-dark">{{
-                            vProposal.title
-                          }}</a>
-                        </h5>
-                        <div
-                          class="text-uppercase font-size-12 mb-2 text-primary"
-                          >{{ vProposal.client }}</div
-                        >
-                        <p class="text-muted mb-4 description_text">{{
-                          vProposal.project_type.name
-                        }}</p>
+                      <router-link :to="`/proposals/details/${vProposal.id}`">
+                        <div style="height: 250px">
+                          <h5>
+                            <a href="javascript: void(0)" class="text-dark">{{
+                              vProposal.title
+                            }}</a>
+                          </h5>
+                          <div
+                            class="text-uppercase font-size-12 mb-2 text-primary"
+                            >{{ vProposal.client }}</div
+                          >
+                          <p class="text-muted mb-4 description_text">{{
+                            vProposal.project_type.name
+                          }}</p>
 
-                        <div class="badge badge-soft-primary font-size-13 font-weight-normal">{{
-                          vProposal.funding_option
-                        }}</div>
-                      </div>
+                          <div
+                            class="badge badge-soft-primary font-size-13 font-weight-normal"
+                            >{{ vProposal.funding_option }}</div
+                          >
+                        </div>
                       </router-link>
                     </div>
                   </div>
