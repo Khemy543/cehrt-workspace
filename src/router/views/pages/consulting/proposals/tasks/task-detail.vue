@@ -429,7 +429,7 @@ export default {
           <!-- end sub tasks/checklists -->
 
           <!-- start attachments -->
-          <h5 class="mt-4 mb-2 font-size-16">Attachments</h5>
+          <!-- <h5 class="mt-4 mb-2 font-size-16">Attachments</h5>
 
           <div class="card mb-2 shadow-none border">
             <div class="p-1 px-2">
@@ -452,7 +452,6 @@ export default {
                   <p class="mb-0">2kb</p>
                 </div>
                 <div class="col-auto">
-                  <!-- Button -->
                   <a
                     v-b-tooltip.hover
                     title="open"
@@ -464,7 +463,7 @@ export default {
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
           <!-- end attachments -->
 
           <div v-if="task.hasSubTask">
