@@ -116,14 +116,6 @@ export default {
 
     async updateProposal(form) {
       try {
-
-        const data = await graph.updateProjectName({
-          name: form.title,
-          onedriveId: form.onedrive_id
-        });
-
-        console.log(data)
-
         const fakeForm = { ...form }
         delete fakeForm['submission_date']
         const response = await this.$http.put(
@@ -132,6 +124,10 @@ export default {
         )
 
         if (response) {
+          await graph.updateProjectName({
+            name: form.title,
+            onedriveId: form.onedrive_id,
+          })
           const index = this.proposals.findIndex((item) => item.id === form.id)
           this.proposals[index] = response.data.proposal
           this.show = false
@@ -184,13 +180,16 @@ export default {
         denyButtonColor: '#4b4b5a',
       }).then(async ({ isConfirmed, isDenied }) => {
         if (isConfirmed) {
-          await graph.deleteFolder({ onedriveId: vItem.onedrive_id});
-
           try {
-            const response = await this.$http.delete(`/delete/${vItem.id}/proposal`)
+            const response = await this.$http.delete(
+              `/delete/${vItem.id}/proposal`
+            )
 
             if (response) {
-              this.proposals = this.proposals.filter((item) => item.id !== vItem.id)
+              await graph.deleteFolder({ onedriveId: vItem.onedrive_id })
+              this.proposals = this.proposals.filter(
+                (item) => item.id !== vItem.id
+              )
               this.$bvToast.toast('Proposal deleted successfully', {
                 title: 'Success',
                 autoHideDelay: 5000,

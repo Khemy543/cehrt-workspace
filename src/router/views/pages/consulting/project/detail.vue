@@ -233,19 +233,16 @@ export default {
     },
     async editProject(form) {
       try {
-        const data = await graph.updateProjectName({
-          name: form.name,
-          onedriveId: form.onedrive_id,
-        })
-
-        console.log(data)
-
         const response = await this.$http.put(
           `/update/${this.project.id}/project`,
           form
         )
 
         if (response) {
+          await graph.updateProjectName({
+            name: form.name,
+            onedriveId: form.onedrive_id,
+          })
           this.project = response.data.project
 
           this.show = false
@@ -507,10 +504,6 @@ export default {
     },
     async exportToLibrary(form) {
       try {
-        await graph.moveProjectToLibrary({
-          onedriveId: this.project.onedrive_id,
-          name: this.project.name,
-        })
         const { associated_consultants: consultants } = form
 
         let newFormData = { ...form }
@@ -524,6 +517,10 @@ export default {
         )
 
         if (response) {
+          await graph.moveProjectToLibrary({
+            onedriveId: this.project.onedrive_id,
+            name: this.project.name,
+          })
           this.$bvToast.toast('Project export successfully', {
             title: 'Success',
             autoHideDelay: 5000,

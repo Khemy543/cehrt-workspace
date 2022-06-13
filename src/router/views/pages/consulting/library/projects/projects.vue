@@ -39,7 +39,11 @@ export default {
       show: false,
     }
   },
-
+  computed: {
+    department() {
+      return this.$store ? this.$store.state.auth.userDepartment : {} || {}
+    },
+  },
   created() {
     this.getProjectsLibrary()
   },
@@ -129,6 +133,7 @@ export default {
               </div>
               <div>
                 <button
+                  v-if="department.name === 'Consultancy'"
                   type="button"
                   class="btn btn-danger mr-4 mb-3 mb-sm-0"
                   @click="openModal"

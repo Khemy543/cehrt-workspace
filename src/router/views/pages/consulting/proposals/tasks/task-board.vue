@@ -34,7 +34,7 @@ export default {
         {
           text: 'Proposal Name',
           href: '/',
-          active: true
+          active: true,
         },
       ],
       tasks: [],
@@ -50,6 +50,7 @@ export default {
       reviewTasks: [],
       selectedTask: null,
       formTitle: 'Create Task',
+      reportDetails: {}
     }
   },
   computed: {
@@ -62,8 +63,25 @@ export default {
   created() {
     this.getProposal()
     this.getTasks()
+    this.getReportDetails()
   },
   methods: {
+    async getReportDetails() {
+      try {
+        const response = await this.$http.get(`/fetch/report-details`)
+
+        if (response) {
+          this.reportDetails = response.data
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
     async getProposal() {
       try {
         this.loading = true
@@ -321,9 +339,10 @@ export default {
                   </div>
                   <div class="col pl-0">
                     <a
-                      href="javascript:void(0);"
+                      :href="reportDetails.report_path"
+                      target="_blank"
                       class="text-muted font-weight-bold"
-                      >{{ proposal }}</a
+                      >{{ reportDetails.report_name }}</a
                     >
                   </div>
                   <div class="col-auto">
@@ -339,7 +358,7 @@ export default {
                   </div>
                 </a>
               </div>
-              
+
               <div class="col text-right">
                 <button
                   id="btn-new-event"
