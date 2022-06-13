@@ -50,7 +50,7 @@ export default {
       reviewTasks: [],
       selectedTask: null,
       formTitle: 'Create Task',
-      reportDetails: {}
+      reportDetails: {},
     }
   },
   computed: {
@@ -66,9 +66,14 @@ export default {
     this.getReportDetails()
   },
   methods: {
+    openFile() {
+     window.open(this.reportDetails.report_path,'_blank');
+    },
     async getReportDetails() {
       try {
-        const response = await this.$http.get(`/fetch/report-details`)
+        const response = await this.$http.get(
+          `/fetch/proposal/report/${this.$route.params.report_id}/details`
+        )
 
         if (response) {
           this.reportDetails = response.data
@@ -322,41 +327,31 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="row align-items-center">
-              <div class="p-1 px-2">
-                <a
-                  target="_blank"
-                  :href="proposal"
-                  class="row align-items-center"
-                >
-                  <div class="col-auto">
-                    <div class="avatar-sm font-weight-bold mr-3">
-                      <span
-                        class="avatar-title rounded bg-soft-primary text-primary"
+              <div class="mb-2 shadow-none border">
+                <div class="p-1 px-2" style="cursor: pointer;" @click="openFile">
+                  <div
+                    class="row align-items-center"
+                  >
+                    <div class="col-auto">
+                      <div class="avatar-sm font-weight-bold mr-3">
+                        <span
+                          class="avatar-title rounded bg-soft-primary text-primary"
+                        >
+                          <i class="uil-file-plus-alt font-size-18"></i>
+                        </span>
+                      </div>
+                    </div>
+                    <div class="col pl-0">
+                      <div
+                        class="text-muted font-weight-bold"
+                        >{{
+                          reportDetails.proposal_type &&
+                            reportDetails.proposal_type.report_title
+                        }}</div
                       >
-                        <i class="uil-file-plus-alt font-size-18"></i>
-                      </span>
                     </div>
                   </div>
-                  <div class="col pl-0">
-                    <a
-                      :href="reportDetails.report_path"
-                      target="_blank"
-                      class="text-muted font-weight-bold"
-                      >{{ reportDetails.report_name }}</a
-                    >
-                  </div>
-                  <div class="col-auto">
-                    <!-- Button -->
-                    <a
-                      v-b-tooltip.hover
-                      title="open"
-                      href="javascript:void(0);"
-                      class="btn btn-link text-muted btn-lg p-0"
-                    >
-                      <feather type="log-in" class="icons-xs"></feather>
-                    </a>
-                  </div>
-                </a>
+                </div>
               </div>
 
               <div class="col text-right">
