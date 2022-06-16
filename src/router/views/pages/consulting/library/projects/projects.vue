@@ -65,7 +65,9 @@ export default {
               autoHideDelay: 5000,
               appendToast: false,
               variant: 'success',
-            })
+            });
+
+          this.show = false
         }
       } catch (error) {
         if (error.response) {

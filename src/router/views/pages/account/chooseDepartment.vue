@@ -4,7 +4,7 @@ import appConfig from '@src/app.config'
 import { authMethods } from '@state/helpers'
 import DepartmentCard from '@components/department-card.vue'
 import admin from '@assets/images/department/admin.jpeg'
-import consulting from '@assets/images/department/consulting.jpeg'
+import consulting from '@assets/images/consulting-picture.jpeg'
 import finance from '@assets/images/department/finance.jpeg'
 
 export default {
@@ -89,7 +89,7 @@ export default {
               <div
                 v-for="department of vDepartments"
                 :key="department.id"
-                class="col-md-6 col-xl-3"
+                class="col-md-6 col-xl-4"
               >
                 <DepartmentCard
                   :department="department"

@@ -6,30 +6,37 @@ export default {
   props: {
     department: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
-  methods : {
-      selectDepartment(){
-          this.$emit('select-department', this.department)
-      }
-  }
+  methods: {
+    selectDepartment() {
+      this.$emit('select-department', this.department)
+    },
+  },
 }
 </script>
 
 <template>
-  <div class="card" style="cursor:pointer;" @click="selectDepartment">
+  <div
+    class="card"
+    style="cursor:pointer; height: 200px; padding:10px;"
+    @click="selectDepartment"
+  >
+    <div class="align-self-center">
+      <img
+        :src="department.icon"
+        alt=""
+        style="height:120px; border-radius:100px;"
+      />
+    </div>
     <div class="card-body p-0">
-      <div class="media py-4 px-3">
-        <div class="media-body d-flex align-items-center">
-          <span
-            class="text-muted text-uppercase font-size-12 font-weight-bold"
-            >{{ department.name }}</span
-          >
-        </div>
-        <div class="align-self-center">
-            <img :src="department.icon" alt="" style="height:60px; border-radius:100px;" />
-        </div>
+      <div class="py-4 px-3">
+        <h4
+          class="text-muted text-uppercase font-size-12 font-weight-bold"
+          style="text-align: center;"
+          >{{ department.name }}</h4
+        >
       </div>
     </div>
   </div>

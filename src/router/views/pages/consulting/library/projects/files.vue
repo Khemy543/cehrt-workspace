@@ -51,10 +51,11 @@ export default {
       )
     },
     formattedDeliverables() {
-      return this.deliverables.filter((item) =>
-        !this.library.some(
-          (library) => library.project_type_deliverable.id === item.id
-        )
+      return this.deliverables.filter(
+        (item) =>
+          !this.library.some(
+            (library) => library.project_type_deliverable.id === item.id
+          )
       )
     },
     department() {
@@ -85,7 +86,16 @@ export default {
         )
 
         if (response) {
-          this.library.push(response.data.deliverable)
+          const file = response.data.deliverable
+          this.library.push({
+            id: file.id,
+            name:
+              file.project_type_deliverable &&
+              file.project_type_deliverable.deliverable_name,
+            file: file.document_path,
+            project_type_deliverable: file.project_type_deliverable,
+            document_path: file.document_path,
+          })
           this.$bvToast.toast('Project deliverable created successfully', {
             title: 'Success',
             autoHideDelay: 5000,
@@ -227,9 +237,9 @@ export default {
                 name:
                   file.project_type_deliverable &&
                   file.project_type_deliverable.deliverable_name,
-                  file: file.document_path,
-                  project_type_deliverable: file.project_type_deliverable,
-                  document_path: file.document_path,
+                file: file.document_path,
+                project_type_deliverable: file.project_type_deliverable,
+                document_path: file.document_path,
               })
             })
           }
