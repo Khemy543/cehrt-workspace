@@ -6,7 +6,7 @@ import AddProjectToLibrary from '@components/AddProjectToLibrary.vue'
 
 export default {
   page: {
-    title: 'Proposal Library',
+    title: 'Project Library',
     meta: [{ name: 'description', content: appConfig.description }],
   },
   components: {
@@ -59,7 +59,7 @@ export default {
         })
 
         if (response) {
-          this.library.push(response.data.project)
+          this.library.unshift(response.data.project)
           this.$bvToast.toast("Project added to library successfully", {
               title: 'Success',
               autoHideDelay: 5000,
