@@ -7,7 +7,7 @@ import graph from '@/src/msalConfig/graph'
 
 export default {
   page: {
-    title: 'Proposal Library',
+    title: 'Project Library',
     meta: [{ name: 'description', content: appConfig.description }],
   },
   components: {
