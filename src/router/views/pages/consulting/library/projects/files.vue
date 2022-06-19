@@ -36,6 +36,7 @@ export default {
         },
       ],
       loading: false,
+      uploading: false,
       project: {},
       library: [],
       invoice: [],
@@ -68,21 +69,30 @@ export default {
   },
   methods: {
     async addFile(form) {
-      console.log(form)
       try {
+        this.uploading = true
         const deliverable = this.formattedDeliverables.find(
           (item) => item.id === form.project_type_deliverable_id
         )
 
-        const data = await graph.uploadProjectLibraryFile({
-          fileName: `${deliverable.deliverable_name}.docx`,
+        const extension = form.file.name.split('.').pop()
+
+        const data = await graph.createUploadSession({
+          fileName: `${deliverable.deliverable_name}.${extension}`,
           fileContent: form.file,
           folder: this.project.name,
         })
+        const uploadData = await graph.uploadProjectLibraryFile({
+          fileName: `${deliverable.deliverable_name}.${extension}`,
+          fileContent: form.file,
+          uploadUrl: data.uploadUrl,
+        })
+
+        console.log(uploadData)
 
         const response = await this.$http.post(
           `/project/${this.$route.params.id}/create-deliverable`,
-          { ...form, document_path: data.webUrl }
+          { ...form, document_path: uploadData.webUrl }
         )
 
         if (response) {
@@ -104,13 +114,9 @@ export default {
           })
 
           this.show = false
-
-          /* await this.updateDeliverableWithPathName({
-            ...response.data.deliverable,
-            document_path: data.webUrl,
-          }) */
         }
       } catch (error) {
+        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -131,6 +137,9 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
+      }
+      finally {
+        this.uploading = false;
       }
     },
     async getProjectDeliverables() {
@@ -483,6 +492,7 @@ export default {
         :action="addFile"
         :deliverables="formattedDeliverables"
         :value="show"
+        :loading="uploading"
         @input="show = $event"
       />
     </div>
