@@ -1,5 +1,9 @@
 <template>
-  <b-modal v-model="show" :title="title" title-class="font-18" hide-footer>
+  <b-modal v-model="show" :title="title" title-class="font-18" hide-footer
+      :cancel-disabled="loading"
+      :hide-header-close="loading"
+      :no-close-on-backdrop="loading"
+      :no-close-on-esc="loading">
     <form @submit.prevent="action({ ...form, file, filename })">
       <b-form-group id="input-group-1" label="Project File Name" label-for="input-1">
         <b-form-select v-model="form.project_type_deliverable_id" class="mb-2">
@@ -16,7 +20,8 @@
       >
         <input id="input-1" type="file" @change="onFileChange" />
       </b-form-group>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button v-if="!loading" type="submit" class="btn btn-primary">Submit</button>
+      <button v-else  class="btn btn-primary" disabled><b-spinner small variant="white"></b-spinner> uploading</button>
     </form>
   </b-modal>
 </template>
@@ -40,6 +45,10 @@ export default {
       type: String,
       default: 'Add Project File',
     },
+    loading: {
+      type: Boolean,
+      default: false,
+    }
   },
   data() {
     return {

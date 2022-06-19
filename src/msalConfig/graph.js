@@ -22,17 +22,17 @@ const GRAPH_SCOPES = [
 
 let accessToken
 
-const driveId = 'eb3548181cf4dc64';
-const itemId = 'EB3548181CF4DC64!166';
-const libraryId = 'EB3548181CF4DC64!173';
+const driveId = 'eb3548181cf4dc64'
+const itemId = 'EB3548181CF4DC64!166'
+const libraryId = 'EB3548181CF4DC64!173'
 
 /* project and proposal in chert workspace */
-const projectFolderId = 'EB3548181CF4DC64!167';
-const proposalFolderId = 'EB3548181CF4DC64!174';
+const projectFolderId = 'EB3548181CF4DC64!167'
+const proposalFolderId = 'EB3548181CF4DC64!174'
 
 /* project and proposal in library */
-const libraryProjectFolderId = 'EB3548181CF4DC64!191';
-const libraryProposalFolderId = 'EB3548181CF4DC64!200';
+const libraryProjectFolderId = 'EB3548181CF4DC64!191'
+const libraryProposalFolderId = 'EB3548181CF4DC64!200'
 
 export default {
   //
@@ -56,43 +56,58 @@ export default {
   },
 
   async createProjectFolder(item) {
-    let resp = await postGraph(`/drives/${driveId}/items/${projectFolderId}/children`, item);
+    let resp = await postGraph(
+      `/drives/${driveId}/items/${projectFolderId}/children`,
+      item
+    )
 
-    if(resp) {
+    if (resp) {
       let data = await resp.json()
       return data
     }
   },
 
   async createProposalFolder(item) {
-    let resp = await postGraph(`/drives/${driveId}/items/${proposalFolderId}/children`, item);
+    let resp = await postGraph(
+      `/drives/${driveId}/items/${proposalFolderId}/children`,
+      item
+    )
 
-    if(resp) {
+    if (resp) {
       let data = await resp.json()
       return data
     }
   },
 
   async createLibraryProjectFolder(item) {
-    let resp = await postGraph(`/drives/${driveId}/items/${libraryProjectFolderId}/children`, item);
+    let resp = await postGraph(
+      `/drives/${driveId}/items/${libraryProjectFolderId}/children`,
+      item
+    )
 
-    if(resp) {
+    if (resp) {
       let data = await resp.json()
       return data
     }
   },
 
   async createLibraryProposalFolder(item) {
-    let resp = await postGraph(`/drives/${driveId}/items/${libraryProposalFolderId}/children`, item);
+    let resp = await postGraph(
+      `/drives/${driveId}/items/${libraryProposalFolderId}/children`,
+      item
+    )
 
-    if(resp) {
+    if (resp) {
       let data = await resp.json()
       return data
     }
   },
 
   async uploadProposalFile({ fileName, fileContent, folder }) {
-    let resp = await putGraph(`/drives/${driveId}/items/${itemId}:/Proposals/${folder}/${fileName}:/content`, fileContent);
+    let resp = await putGraph(
+      `/drives/${driveId}/items/${itemId}:/Proposals/${folder}/${fileName}:/content`,
+      fileContent
+    )
     if (resp) {
       let data = await resp.json()
       return data
@@ -100,23 +115,68 @@ export default {
   },
 
   async uploadProjectFile({ fileName, fileContent, folder }) {
-    let resp = await putGraph(`/drives/${driveId}/items/${itemId}:/Projects/${folder}/${fileName}:/content`, fileContent);
+    let resp = await putGraph(
+      `/drives/${driveId}/items/${itemId}:/Projects/${folder}/${fileName}:/content`,
+      fileContent
+    )
     if (resp) {
       let data = await resp.json()
       return data
     }
   },
 
-  async uploadProjectLibraryFile({ fileName, fileContent, folder }) {
-    let resp = await putGraph(`/drives/${driveId}/items/${libraryId}:/Projects/${folder}/${fileName}:/content`, fileContent);
-    if(resp) {
+  async createUploadSession({ fileName, fileContent, folder }) {
+    let resp = await postGraph(
+      `/drives/${driveId}/items/${libraryId}:/Projects/${folder}/${fileName}:/createUploadSession`,
+      {
+        item: {
+          '@microsoft.graph.conflictBehavior': 'rename',
+          name: fileName,
+        },
+        deferCommit: false,
+      }
+    )
+
+    if (resp) {
       let data = await resp.json()
       return data
     }
   },
 
+
+  async uploadProjectLibraryFile({ fileName, fileContent, uploadUrl }) {
+    let nextChunkRange = '0-10000000' // 60MB
+    let startChunk = Number(nextChunkRange.split('-')[0])
+    let endChunk = (startChunk + 10000000) > fileContent.size ? fileContent.size : startChunk + 10000000 // 60MB
+    let tempEndChunk = endChunk;
+    let data = null;
+    do{
+      const headers = {
+        'Content-Range': `bytes ${startChunk}-${endChunk === fileContent.size - 1 ? fileContent.size : endChunk-1}/${fileContent.size}`,
+      }
+      const fileChunk = fileContent.slice(startChunk, endChunk)
+      let resp = await customPutGraph(uploadUrl, fileChunk, headers)
+      if (resp) {
+        data = await resp.json()
+        nextChunkRange = data.nextExpectedRanges && data.nextExpectedRanges[0]
+
+        if(nextChunkRange) {
+          startChunk = Number(nextChunkRange.split('-')[0])
+          tempEndChunk = startChunk + 10000000 // 60MB - 1 byte
+          endChunk = tempEndChunk > fileContent.size ? fileContent.size : tempEndChunk
+        }else {
+          return data;
+        }
+      }
+    } while(endChunk <= fileContent.size)
+
+    return data;
+  },
+
   async updateProjectName({ name, onedriveId }) {
-    let resp = await patchGraph(`/drives/${driveId}/items/${onedriveId}`, { name });
+    let resp = await patchGraph(`/drives/${driveId}/items/${onedriveId}`, {
+      name,
+    })
     if (resp) {
       let data = await resp.json()
       return data
@@ -124,7 +184,10 @@ export default {
   },
 
   async moveProjectToLibrary({ onedriveId, name }) {
-    let resp = await patchGraph(`/drives/${driveId}/items/${onedriveId}`, { parentReference: { id: libraryProjectFolderId }, name });
+    let resp = await patchGraph(`/drives/${driveId}/items/${onedriveId}`, {
+      parentReference: { id: libraryProjectFolderId },
+      name,
+    })
     if (resp) {
       let data = await resp.json()
       return data
@@ -132,16 +195,18 @@ export default {
   },
 
   async moveProposalToLibrary({ onedriveId, name }) {
-    let resp = await patchGraph(`/drives/${driveId}/items/${onedriveId}`, { parentReference: { id: libraryProposalFolderId }, name });
+    let resp = await patchGraph(`/drives/${driveId}/items/${onedriveId}`, {
+      parentReference: { id: libraryProposalFolderId },
+      name,
+    })
     if (resp) {
       let data = await resp.json()
       return data
     }
   },
 
-
   async deleteFolder({ onedriveId }) {
-    let resp = await deleteGraph(`/drives/${driveId}/items/${onedriveId}`);
+    let resp = await deleteGraph(`/drives/${driveId}/items/${onedriveId}`)
     if (resp) {
       return resp
     }
@@ -211,7 +276,7 @@ async function postGraph(apiPath, data) {
       authorization: `bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
-    body:JSON.stringify(data)
+    body: JSON.stringify(data),
   })
 
   if (!resp.ok) {
@@ -232,7 +297,7 @@ async function putGraph(apiPath, data) {
       authorization: `bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
-    body: data
+    body: data,
   })
 
   if (!resp.ok) {
@@ -241,6 +306,27 @@ async function putGraph(apiPath, data) {
     )
   }
 
+  return resp
+}
+
+async function customPutGraph(apiPath, data, headers) {
+  accessToken = await auth.acquireToken(GRAPH_SCOPES)
+
+  console.log(data, data.size)
+
+  let resp = await fetch(apiPath, {
+    method: 'PUT',
+    headers: {
+      authorization: `bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    body: data,
+  })
+
+  if (!resp.ok) {
+    throw new Error(`Call to ${apiPath} failed: ${resp.statusText}`)
+  }
   return resp
 }
 
@@ -253,7 +339,7 @@ async function patchGraph(apiPath, data) {
       authorization: `bearer ${accessToken}`,
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(data),
   })
 
   if (!resp.ok) {
@@ -273,7 +359,7 @@ async function deleteGraph(apiPath) {
     headers: {
       authorization: `bearer ${accessToken}`,
       'Content-Type': 'application/json',
-    }
+    },
   })
 
   if (!resp.ok) {
