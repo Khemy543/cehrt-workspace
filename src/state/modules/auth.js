@@ -154,7 +154,7 @@ export const actions = {
 
     try {
       const response = await axios.get(
-        `https://backend-api.cehrtghana.com/api/auth/user`
+        `${process.env.API_BASE_URL}auth/user`
       )
       const user = response.data
       commit('SET_CURRENT_USER', user)
