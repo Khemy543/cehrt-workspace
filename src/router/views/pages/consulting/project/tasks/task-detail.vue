@@ -37,13 +37,13 @@ export default {
         },
         {
           id: 3,
-          name: 'Completed',
-          api: 'completed',
+          name: 'In Review',
+          api: 'in-review',
         },
         {
           id: 4,
-          name: 'In Review',
-          api: 'in-review',
+          name: 'Completed',
+          api: 'completed',
         },
       ],
     }
@@ -175,7 +175,7 @@ export default {
       this.show = true
     },
 
-    async changeWorkFlow(status) {
+    async changeStatus(status) {
       try {
         const response = await this.$http.patch(
           `/update/${this.$route.params.id}/task-status`,
@@ -199,6 +199,15 @@ export default {
           toastClass: 'text-white',
         })
       }
+    },
+
+    findPostiveNumberNotInArray(array) {
+      const postiveNumbers = array.filter((item) => item > 0);
+      let number = 1
+      while (postiveNumbers.includes(number)) {
+        number++
+      }
+      return number
     },
 
     deleteTask() {
@@ -339,7 +348,7 @@ export default {
                 :key="status.id"
                 href="javascript: void(0);"
                 variant="seconday"
-                @click="changeWorkFlow(status)"
+                @click="changeStatus(status)"
               >
                 {{ status.name }}
               </b-dropdown-item>

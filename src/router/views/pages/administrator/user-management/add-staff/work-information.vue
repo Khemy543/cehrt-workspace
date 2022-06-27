@@ -166,7 +166,7 @@ export default {
       </div>
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.departments.$error }">
-          <label class="col-md-12 col-form-label">Deparatments <span class=" text-danger">*</span></label>
+          <label class="col-md-12 col-form-label">Departments <span class=" text-danger">*</span></label>
           <div class="col-md-12">
             <multiselect
               v-model="departments"
