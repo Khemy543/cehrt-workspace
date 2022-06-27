@@ -173,6 +173,20 @@ export default {
     return data;
   },
 
+  async createFile({ fileName, folder }) {
+    let resp = await putGraph(
+      `/drives/${driveId}/items/${itemId}:/Proposals/${folder}:/workbook/`,
+      {
+        name: fileName,
+        file: {}
+      }
+    )
+    if (resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
   async updateProjectName({ name, onedriveId }) {
     let resp = await patchGraph(`/drives/${driveId}/items/${onedriveId}`, {
       name,

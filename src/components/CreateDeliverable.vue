@@ -21,7 +21,7 @@
       <b-form-group
         v-if="!editting"
         id="input-group-1"
-        label="Upload Delivrable File"
+        label="Upload Deliverable File"
         label-for="input-1"
       >
         <input

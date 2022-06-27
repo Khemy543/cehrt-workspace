@@ -526,7 +526,7 @@ export default {
                     <div class="media-body overflow-hidden">
                       <div class=" d-flex">
                         <h5 class="font-size-16 mt-2 mb-1">
-                          Correspondent
+                          Correspondence
                         </h5>
                         <button
                           type="button"
@@ -571,7 +571,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >correspondent.docx
+                                  >correspondence.docx
                                 </div>
                               </div>
                               <!-- <div class="float-right mt-1">

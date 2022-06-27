@@ -387,7 +387,7 @@ export default {
               </div>
               <div class="col-md-6">
                 <div class="form-group mb-3">
-                  <label class="col-md-12 col-form-label">Deparatents</label>
+                  <label class="col-md-12 col-form-label">Departments</label>
                   <div class="col-md-12">
                     <multiselect v-model="form.department" :options="departmentsOptions" :multiple="true" label="name"
                       track-by="id"></multiselect>
