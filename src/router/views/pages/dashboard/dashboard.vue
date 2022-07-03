@@ -134,9 +134,9 @@ export default {
         const response = await this.$http.get(`/fetch/dashboard-stats`);
 
         if(response) {
-          const { assignedTask, projects, tasks, project_list: projectList, proposal_list: proposalList, deliverable } = response.data
+          const { assignedTask, projects, tasks, project_list: projectList, proposal_list: proposalList, deliverable, total_task_assigned: totalTaskAssigned } = response.data
           this.statChart[0].value = projects;
-          this.statChart[1].value = assignedTask;
+          this.statChart[1].value = totalTaskAssigned;
           this.statChart[2].value = tasks.find(item => item.status === 'completed') && tasks.find(item => item.status === 'completed').count || 0;
           this.statChart[3].value = tasks.find(item => item.status === 'pending') && tasks.find(item => item.status === 'pending').count || 0;
           this.projectData = projectList;

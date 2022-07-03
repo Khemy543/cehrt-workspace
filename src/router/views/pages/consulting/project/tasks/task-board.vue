@@ -71,6 +71,9 @@ export default {
     this.getDeliverableDetails()
   },
   methods: {
+    isReviewer(id) {
+      return this.$store.state.auth.currentUser.id === id;
+    },
     async getworkFlows() {
       try {
         const response = await this.$http.get('/fetch/workflows')
@@ -343,7 +346,7 @@ export default {
     },
 
     async moveTask(event) {
-      const { $event, status } = event
+      const { $event, status } = event;
 
       if ($event.added) {
         const task = $event.added.element
@@ -433,7 +436,7 @@ export default {
           <!-- todo tasks -->
           <div class="tasks border">
             <h5 class="mt-0 task-header header-title">
-              Todo
+              Pending
               <span class="font-size-13">({{ todoTasks.length }})</span>
             </h5>
 
@@ -457,7 +460,7 @@ export default {
           <!-- in progress tasks -->
           <div class="tasks border">
             <h5 class="mt-0 task-header header-title">
-              In Progress
+              On going
               <span class="font-size-13">({{ inProgressTasks.length }})</span>
             </h5>
 
@@ -481,7 +484,7 @@ export default {
           <!-- review tasks -->
           <div class="tasks border">
             <h5 class="mt-0 task-header header-title">
-              Review
+              In Review
               <span class="font-size-13">({{ reviewTasks.length }})</span>
             </h5>
 
@@ -505,7 +508,7 @@ export default {
           <!-- done tasks -->
           <div class="tasks border">
             <h5 class="mt-0 task-header header-title">
-              Done
+              Completed
               <span class="font-size-13">({{ doneTasks.length }})</span>
             </h5>
 

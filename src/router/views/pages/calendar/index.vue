@@ -89,7 +89,7 @@ export default {
       try {
         const response = await this.$http.get(
           `/fetch/${this.selectedUser.id ||
-            this.$store.state.auth.currentUser.id}/all/leave/requests`
+          this.$store.state.auth.currentUser.id}/all/leave/requests`
         )
 
         if (response) {
@@ -118,12 +118,12 @@ export default {
                   item.type === 'Sick'
                     ? `${color}-danger`
                     : item.type === 'Annual'
-                    ? `${color}-primary`
-                    : item.type === 'Maternity'
-                    ? `${color}-success`
-                    : item.type === 'Compassionate'
-                    ? `${color}-warning`
-                    : `${color}-secondary`,
+                      ? `${color}-primary`
+                      : item.type === 'Maternity'
+                        ? `${color}-success`
+                        : item.type === 'Compassionate'
+                          ? `${color}-warning`
+                          : `${color}-secondary`,
               }
             })
           this.calendarEvents = [...this.calendarEvents, ...requestedLeaves]
@@ -142,7 +142,7 @@ export default {
       try {
         const response = await this.$http.get(
           `/fetch/${this.selectedUser.id ||
-            this.$store.state.auth.currentUser.id}/events`
+          this.$store.state.auth.currentUser.id}/events`
         )
 
         if (response) {
@@ -171,12 +171,38 @@ export default {
       try {
         const response = await this.$http.get(
           `/fetch/${this.selectedUser.id ||
-            this.$store.state.auth.currentUser.id}/personal/dashboard-data`
+          this.$store.state.auth.currentUser.id}/personal/dashboard-data`
         )
 
         if (response) {
-          const { subtasks, tasks } = response.data
+          const { subtasks, tasks, reviewing_tasks: reviewTask, reviewing_subtasks: reviewSubTask } = response.data
+          const vReviewTasks = reviewTask.map((item) => {
+            return {
+              id: `review-task-${item.id}`,
+              title: item.name,
+              url: `/project/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
+              start:
+                item.start_date ||
+                (item.created_at && item.created_at.split('T')[0]),
+              end: item.end_date,
+              editable: true,
+              className: 'bg-info text-white',
+            }
+          })
 
+          const vSubTaskReview = reviewSubTask.map((item) => {
+            return {
+              id: `review-subtask-${item.id}`,
+              title: item.name,
+              url: `/project/task/${item.id}/details?hasSubTask=false&subtask=true`,
+              start:
+                item.start_date ||
+                (item.created_at && item.created_at.split('T')[0]),
+              end: item.end_date,
+              editable: true,
+              className: 'bg-info text-white',
+            }
+          })
           const vSubtasks =
             subtasks &&
             subtasks.map((item) => {
@@ -215,6 +241,8 @@ export default {
             ...this.calendarEvents,
             ...vSubtasks,
             ...vTasks,
+            ...vReviewTasks,
+            ...vSubTaskReview
           ]
         }
       } catch (error) {
@@ -302,7 +330,7 @@ export default {
 
         if (response) {
           const index = this.calendarEvents.findIndex(event => event.id === `event-${this.editableEvent.id}`);
-          this.$set(this.calendarEvents, index,  {
+          this.$set(this.calendarEvents, index, {
             id: `event-${this.editableEvent.id}`,
             title: this.editableEvent.name,
             start: this.editableEvent.start_date,
@@ -391,8 +419,8 @@ export default {
      */
     dateClicked(info) {
       this.newEventData = info
-      this.showmodal = true
-      this.event.start_date = info.dateStr
+      this.showmodal = true;
+      this.event.start_date = calendarFormat(info.dateStr)
     },
     /**
      * Modal open for edit event
@@ -435,54 +463,29 @@ export default {
           <div class="card-body">
             <div class="row align-items-center">
               <div class="col-xl-2 col-lg-3 col-6">
-                <img
-                  src="@assets/images/cal.png"
-                  class="mr-4 align-self-center img-fluid"
-                  alt="cal"
-                />
+                <img src="@assets/images/cal.png" class="mr-4 align-self-center img-fluid" alt="cal" />
               </div>
               <div class="col-xl-10 col-lg-9">
                 <div class="mt-4 mt-lg-0">
-                  <h5 class="mt-0 mb-1 font-weight-bold"
-                    >Welcome to Your Calendar</h5
-                  >
+                  <h5 class="mt-0 mb-1 font-weight-bold">Welcome to Your Calendar</h5>
                   <p class="text-muted mb-2">
                     Click on event to see or edit the details. You can create
                     new event by clicking on "Create New event" button or any
                     cell available in calendar below.
                   </p>
                   <div class="d-flex justify-content-between">
-                    <b-dropdown
-                      class="d-inline"
-                      variant="link"
-                      toggle-class="font-weight-bold p-0 align-middle"
-                    >
+                    <b-dropdown class="d-inline" variant="link" toggle-class="font-weight-bold p-0 align-middle">
                       <template v-slot:button-content>
-                        <button
-                          id="btn-new-event"
-                          class="btn btn-primary mt-2 mr-1"
-                        >
+                        <button id="btn-new-event" class="btn btn-primary mt-2 mr-1">
                           {{ selectedUser.name }}
-                          <i
-                            class="uil uil-angle-down font-size-16 align-middle"
-                          ></i>
+                          <i class="uil uil-angle-down font-size-16 align-middle"></i>
                         </button>
                       </template>
-                      <b-dropdown-item
-                        v-for="user in users"
-                        :key="user.id"
-                        href="javascript: void(0);"
-                        variant="seconday"
-                        @click="selectUser(user)"
-                        >{{ user.name }}</b-dropdown-item
-                      >
+                      <b-dropdown-item v-for="user in users" :key="user.id" href="javascript: void(0);"
+                        variant="seconday" @click="selectUser(user)">{{ user.name }}</b-dropdown-item>
                     </b-dropdown>
 
-                    <button
-                      id="btn-new-event"
-                      class="btn btn-danger mt-2 mr-1"
-                      @click="showmodal = true"
-                    >
+                    <button id="btn-new-event" class="btn btn-danger mt-2 mr-1" @click="showmodal = true">
                       <i class="uil-plus-circle"></i> Create New Event
                     </button>
                   </div>
@@ -503,56 +506,34 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="app-calendar">
-              <FullCalendar
-                ref="fullCalendar"
-                default-view="dayGridMonth"
-                :header="{
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                }"
-                :button-text="{
-                  today: 'Today',
-                  month: 'Month',
-                  week: 'Week',
-                  day: 'Day',
-                  list: 'List',
-                  prev: 'Prev',
-                  next: 'Next',
-                }"
-                :bootstrap-font-awesome="false"
-                :droppable="true"
-                :plugins="calendarPlugins"
-                :events="calendarEvents"
-                :theme-system="themeSystem"
-                :weekends="calendarWeekends"
-                @dateClick="dateClicked"
-                @eventClick="editEvent"
-              />
+              <FullCalendar ref="fullCalendar" default-view="dayGridMonth" :header="{
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+              }" :button-text="{
+  today: 'Today',
+  month: 'Month',
+  week: 'Week',
+  day: 'Day',
+  list: 'List',
+  prev: 'Prev',
+  next: 'Next',
+}" :bootstrap-font-awesome="false" :droppable="true" :plugins="calendarPlugins" :events="calendarEvents"
+                :theme-system="themeSystem" :weekends="calendarWeekends" @dateClick="dateClicked"
+                @eventClick="editEvent" />
             </div>
           </div>
         </div>
       </div>
     </div>
-    <b-modal
-      v-model="showmodal"
-      title="Add New Event"
-      title-class="text-black font-18"
-      hide-footer
-    >
+    <b-modal v-model="showmodal" title="Add New Event" title-class="text-black font-18" hide-footer>
       <form @submit.prevent="handleSubmit">
         <div class="row">
           <div class="col-12">
             <div class="form-group">
               <label for="name">Event Name</label>
-              <input
-                id="name"
-                v-model="event.name"
-                type="text"
-                class="form-control"
-                placeholder="Enter name"
-                required
-              />
+              <input id="name" v-model="event.name" type="text" class="form-control" placeholder="Enter name"
+                required />
             </div>
           </div>
           <div class="col-12">
@@ -560,26 +541,15 @@ export default {
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="name">Start Date</label>
-                  <input
-                    id="name"
-                    v-model="event.start_date"
-                    type="datetime-local"
-                    class="form-control"
-                    placeholder="Enter start date"
-                    required
-                  />
+                  <input id="name" v-model="event.start_date" type="datetime-local" class="form-control"
+                    placeholder="Enter start date" required />
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="name">End Date</label>
-                  <input
-                    id="name"
-                    v-model="event.end_date"
-                    type="datetime-local"
-                    class="form-control"
-                    placeholder="Enter end date"
-                  />
+                  <input id="name" v-model="event.end_date" type="datetime-local" class="form-control"
+                    placeholder="Enter end date" />
                 </div>
               </div>
             </div>
@@ -588,33 +558,20 @@ export default {
 
         <div class="text-right">
           <button type="submit" class="btn btn-success">Save</button>
-          <b-button class="ml-1" variant="light" @click="hideModal"
-            >Close</b-button
-          >
+          <b-button class="ml-1" variant="light" @click="hideModal">Close</b-button>
         </div>
       </form>
     </b-modal>
 
     <!-- Edit Modal -->
-    <b-modal
-      v-model="eventModal"
-      title="Edit Event"
-      title-class="text-black font-18"
-      hide-footer
-    >
+    <b-modal v-model="eventModal" title="Edit Event" title-class="text-black font-18" hide-footer>
       <form @submit.prevent="editSubmit">
         <div class="row">
           <div class="col-12">
             <div class="form-group">
               <label for="name">Event Name</label>
-              <input
-                id="name"
-                v-model="editableEvent.name"
-                type="text"
-                class="form-control"
-                placeholder="Enter name"
-                required
-              />
+              <input id="name" v-model="editableEvent.name" type="text" class="form-control" placeholder="Enter name"
+                required />
             </div>
           </div>
           <div class="col-12">
@@ -622,35 +579,22 @@ export default {
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="name">Start Date</label>
-                  <input
-                    id="name"
-                    v-model="editableEvent.start_date"
-                    type="datetime-local"
-                    class="form-control"
-                    placeholder="Enter start date"
-                    required
-                  />
+                  <input id="name" v-model="editableEvent.start_date" type="datetime-local" class="form-control"
+                    placeholder="Enter start date" required />
                 </div>
               </div>
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="name">End Date</label>
-                  <input
-                    id="name"
-                    v-model="editableEvent.end_date"
-                    type="datetime-local"
-                    class="form-control"
-                    placeholder="Enter end date"
-                  />
+                  <input id="name" v-model="editableEvent.end_date" type="datetime-local" class="form-control"
+                    placeholder="Enter end date" />
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div class="d-flex justify-content-between">
-          <b-button type="button" variant="danger" @click="deleteEvent"
-            >Delete Event</b-button
-          >
+          <b-button type="button" variant="danger" @click="deleteEvent">Delete Event</b-button>
           <button type="submit" class="btn btn-success">Save</button>
         </div>
       </form>

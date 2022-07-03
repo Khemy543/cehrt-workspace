@@ -159,7 +159,7 @@ export default {
 											<div class="overlay"></div>
 											<div class="auth-user-testimonial">
 												<p class="font-size-24 font-weight-bold text-white mb-1"
-													>Cerht Workspace</p
+													>Cehrt Workspace</p
 												>
 												<p class="lead"
 													>"Making things simple to use"</p

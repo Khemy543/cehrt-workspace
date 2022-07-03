@@ -97,6 +97,9 @@ export default {
     assigneesCount() {
       return this.assignees.length
     },
+    isCoordinator() {
+      return this.project.coordinator.id === this.$store.state.auth.currentUser.id;
+    },
   },
   created() {
     this.getProjectDetials()
@@ -580,7 +583,7 @@ export default {
                     <h4 class="mt-0">
                       {{ project.name }}
                     </h4>
-                    <div class=" mx-4">
+                    <div v-if="isCoordinator" class=" mx-4">
                       <b-dropdown
                         class="d-inline"
                         variant="link"
@@ -606,7 +609,7 @@ export default {
                   </div>
                 </div>
 
-                <div class="col-sm-4 col-xl-6 text-sm-right">
+                <div v-if="isCoordinator" class="col-sm-4 col-xl-6 text-sm-right">
                   <router-link
                     :to="`/project/${project.id}/project-plan`"
                     class="btn-group ml-2 d-none d-sm-inline-block"
