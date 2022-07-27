@@ -2,20 +2,20 @@
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
-import CreateWorkFlowModal from '@components/CreateWorkFlowModal.vue'
-import ViewWorkFlowModal from '@components/ViewWorkFlowModal.vue'
+import CreateProjectTypeModal from '@components/CreateProjectTypeModal.vue'
+import ViewProjectTypesModal from '@/src/components/ViewProjectTypesModal.vue'
 
 export default {
   page: {
-    title: 'Work Flows',
+    title: 'Departments & Positions',
     meta: [{ name: 'description', content: appConfig.description }],
   },
   components: {
     Layout,
     PageHeader,
-    CreateWorkFlowModal,
-    ViewWorkFlowModal
-  },
+    CreateProjectTypeModal,
+    ViewProjectTypesModal
+},
   props: {
     id: {
       type: String,
@@ -24,42 +24,42 @@ export default {
   },
   data() {
     return {
-      title: 'Work Flows',
+      title: 'Departments & Positions',
       items: [
         {
           text: 'Cehrt',
           to: '/',
         },
         {
-          text: 'Work Flows',
+          text: 'Project Types',
           to: '',
           active: true,
         },
       ],
-      workFlows: [],
-      workflow: null,
+      projectTypes: [],
+      projectType: null,
       loading: false,
       show: false,
-      formTitle: 'Create Work Flow',
-      viewShow: false
+      formTitle: 'Add New Project Type',
+      viewShow: false,
     }
   },
   created() {
-    this.fetchWorkFlows()
+    this.fetchDepartments()
   },
   methods: {
     openCreateWorkFlow() {
-      this.workflow = null;
-      this.formTitle = "Create Work Flow"
+      this.projectType = null
+      this.formTitle = 'Add New Project Type'
       this.show = true
     },
-    async fetchWorkFlows() {
+    async fetchDepartments() {
       this.loading = true
       try {
-        const response = await this.$http.get(`/fetch/workflows`)
+        const response = await this.$http.get(`/admin/fetch/department/positions`)
 
         if (response && response.data) {
-          this.workFlows = response.data.workflow || []
+          this.projectTypes = response.data || []
           this.loading = false
         }
       } catch (error) {
@@ -72,9 +72,14 @@ export default {
       }
     },
 
-    async createWorkFlow(form) {
+    async createProjectType(form) {
       try {
-        const respoonse = await this.$http.post('/add/workflow', form)
+        const respoonse = await this.$http.post('/create/project/type', {
+          ...form,
+          deliverable_names: form.deliverables.map((dev) => ({
+            name: dev.deliverable_name
+          }))
+        })
 
         if (respoonse) {
           this.workFlows.push(respoonse.data.workflow)
@@ -105,28 +110,31 @@ export default {
       }
     },
 
-    editWorkFlow(workflow) {
-      this.workflow = workflow
-      this.formTitle = 'Edit Work Flow'
+    editProjectType(pType) {
+      this.projectType = pType
+      this.formTitle = 'Edit Project Type'
       this.show = true
     },
 
-    action(workflow) {
-      if (this.workflow) {
-        return this.updateWorkflow(workflow)
+    action(pType) {
+      if (this.projectType) {
+        return this.updateProjectType(pType)
       }
-      return this.createWorkFlow(workflow)
+      return this.createProjectType(pType)
     },
 
-    async updateWorkflow(workflow) {
+    async updateProjectType(workflow) {
       try {
-        const response = await this.$http.put(`/update/${this.workflow.id}/workflow`, workflow)
+        const response = await this.$http.put(
+          `/update/${this.workflow.id}/workflow`,
+          workflow
+        )
 
         if (response) {
           const index = this.workFlows.findIndex(
-            (item) => item.id === this.workflow.id
+            (item) => item.id === workflow.id
           )
-          this.$set(this.workFlows, index,  response.data.workflow)
+          this.workFlows[index] = response.data.workflow
           this.workflow = null
           this.formTitle = 'Create Work Flow'
           this.show = false
@@ -157,8 +165,8 @@ export default {
       }
     },
 
-    viewWorkFlow(workflow) {
-      this.workflow = workflow;
+    viewProjectType(pType) {
+      this.projectType = pType
       this.viewShow = true
     },
 
@@ -217,9 +225,9 @@ export default {
           <div class="card-body">
             <div class=" d-flex justify-content-between">
               <div>
-                <h4 class="header-title mt-0 mb-1">Work Flows</h4>
+                <h4 class="header-title mt-0 mb-1">Departments & Positions</h4>
                 <p class="sub-header">
-                  view, add and edit details of all work flows
+                  view, add and edit details of all departments and positions
                 </p>
               </div>
               <div>
@@ -228,7 +236,7 @@ export default {
                   class="btn btn-danger mr-4 mb-3 mb-sm-0"
                   @click="openCreateWorkFlow"
                 >
-                  <i class="uil-plus mr-1"></i> Add Work Flow
+                  <i class="uil-plus mr-1"></i> Add Project Type
                 </button>
               </div>
             </div>
@@ -239,21 +247,15 @@ export default {
                   <tr>
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
-                    <th scope="col">Number of Tasks</th>
+                    <th scope="col">Number of Deliverables</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(work, index) in workFlows"
-                    :key="work.id"
-                    :title="work.description"
-                  >
+                  <tr v-for="(pType, index) in projectTypes" :key="pType.id">
                     <th scope="row">{{ index + 1 }}</th>
-                    <td>{{ work.name }}</td>
-                    <td>{{
-                      work.work_flow_tasks && work.work_flow_tasks.length
-                    }}</td>
+                    <td>{{ pType.name }}</td>
+                    <td>{{ pType.deliverables.length || 'N/A' }}</td>
                     <td class=" d-flex">
                       <b-dropdown
                         variant="link"
@@ -266,7 +268,7 @@ export default {
                         <b-dropdown-item
                           href="javascript: void(0);"
                           variant="secondary"
-                          @click="viewWorkFlow(work)"
+                          @click="viewProjectType(pType)"
                           ><i class="uil uil-exit mr-2"></i
                           >View</b-dropdown-item
                         >
@@ -274,14 +276,14 @@ export default {
                         <b-dropdown-item
                           href="javascript: void(0);"
                           variant="secondary"
-                          @click="editWorkFlow(work)"
+                          @click="editProjectType(pType)"
                         >
                           <i class="uil uil-edit mr-2"></i>Edit
                         </b-dropdown-item>
                         <b-dropdown-item
                           href="javascript: void(0);"
                           variant="danger"
-                          @click="deleteWorkFlow(work)"
+                          @click="deleteWorkFlow(pType)"
                         >
                           <i class="uil uil-trash-alt mr-2"></i>Delete
                         </b-dropdown-item>
@@ -297,7 +299,7 @@ export default {
     </div>
 
     <div
-      v-if="!loading && workFlows.length <= 0"
+      v-if="!loading && projectTypes.length <= 0"
       class=" w-100 d-flex justify-content-center"
     >
       <img
@@ -306,17 +308,17 @@ export default {
         style="width:50%"
       />
     </div>
-    <CreateWorkFlowModal
+    <CreateProjectTypeModal
       :action="action"
       :value="show"
-      :workflow="workflow"
+      :project-type="projectType"
       :form-title="formTitle"
       @input="show = $event"
     />
 
-    <ViewWorkFlowModal 
+    <ViewProjectTypesModal
       :value="viewShow"
-      :work-flow="workflow"
+      :project-type="projectType"
       @input="viewShow = $event"
     />
   </Layout>

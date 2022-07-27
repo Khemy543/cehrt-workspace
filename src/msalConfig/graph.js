@@ -35,7 +35,6 @@ const libraryProjectFolderId = 'EB3548181CF4DC64!191'
 const libraryProposalFolderId = 'EB3548181CF4DC64!200'
 
 export default {
-  //
   // Get details of user, and return as JSON
   // https://docs.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#response-1
   //

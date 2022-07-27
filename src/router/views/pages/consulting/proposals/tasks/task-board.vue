@@ -91,7 +91,7 @@ export default {
       try {
         this.loading = true
         const response = await this.$http.get(
-          `/fetch/${this.$route.params.report_id}/proposal`
+          `/fetch/${this.$route.params.proposal_id}/proposal`
         )
 
         if (response) {

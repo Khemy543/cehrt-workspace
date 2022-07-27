@@ -3,7 +3,7 @@
     <form @submit.prevent="action(form)">
       <b-form-group
         id="input-group-1"
-        label="Work flow title"
+        label="Title"
         label-for="input-1"
       >
         <b-form-input
@@ -11,12 +11,12 @@
           v-model="form.name"
           type="text"
           required
-          placeholder="Enter title of work flow"
+          placeholder="Enter title of project type"
         ></b-form-input>
       </b-form-group>
 
       <div class=" d-flex justify-content-between align-items-center mb-4">
-        <h5 style="font-size:14px;">Add work flow tasks</h5>
+        <h5 style="font-size:14px;">Add Project Deliverables</h5>
 
         <button
           type="button"
@@ -27,17 +27,17 @@
         </button>
       </div>
       <div
-        v-for="(task, key) in form.tasks"
-        :key="task.id || task.fake_id"
+        v-for="(deliverable, key) in form.deliverables"
+        :key="deliverable.id || deliverable.fake_id"
         class=" row"
       >
         <div class="col-10">
           <b-form-group>
             <b-form-input
-              v-model="form.tasks[key].task_name"
+              v-model="form.deliverables[key].deliverable_name"
               type="text"
               required
-              placeholder="Task name"
+              placeholder="Deliverable name"
             ></b-form-input>
           </b-form-group>
         </div>
@@ -46,7 +46,7 @@
             type="button"
             variant="danger"
             class="btn btn-soft-danger btn-sm"
-            @click="tryDeleteTask(task)"
+            @click="tryDeleteDeliverable(deliverable)"
           >
             <i class="uil uil-trash-alt"></i>
           </button>
@@ -68,7 +68,7 @@ export default {
       type: Boolean,
       default: false,
     },
-    workflow: {
+    projectType: {
       type: Object,
       default: () => {},
     },
@@ -81,10 +81,10 @@ export default {
     return {
       form: {
         name: '',
-        tasks: [
+        deliverables: [
           {
             fake_id: 1,
-            task_name: '',
+            deliverable_name: '',
           },
         ],
       },
@@ -101,23 +101,27 @@ export default {
     },
   },
   watch: {
-    workflow(newValue) {
+    projectType(newValue) {
       this.form.name = (newValue && newValue.name) || ''
-      this.form.tasks = (newValue && newValue.work_flow_tasks) || [
-        {
-          fake_id: 1,
-          task_name: '',
-        },
-      ]
+      if(newValue.deliverables && newValue.deliverables.length > 0) {
+        this.form.deliverables = newValue.deliverables
+      } else {
+        this.form.deliverables = [
+          {
+            id: `#1`,
+            deliverable_name: '',
+          },
+        ]
+      }
     },
   },
   methods: {
     addNewRow() {
-      const lastIndex = this.form.tasks.length - 1
-      if (this.form.tasks[lastIndex].task_name !== '') {
-        this.form.tasks.push({
+      const lastIndex = this.form.deliverables.length - 1
+      if (this.form.deliverables[lastIndex].deliverable_name !== '') {
+        this.form.deliverables.push({
           id: `#${lastIndex + 1}`,
-          task_name: '',
+          deliverable_name: '',
         })
       } else {
         this.$bvToast.toast('Please fill current field', {
@@ -129,15 +133,27 @@ export default {
       }
     },
 
-    async deleteTask(task) {
+    async deleteDeliverable(deliverable) {
       try {
         const response = await this.$http.delete(
-          `/delete/${task.id}/workflow/task`
+          `delete/${deliverable.id}/project/type/deliverable`
         )
 
         if (response) {
-          const { tasks } = this.form
-          this.form.tasks = tasks.filter((item) => item.id !== task.id)
+          const { deliverables } = this.form;
+
+          if(deliverables.length <= 1) {
+            this.form.deliverables = [
+              {
+                fake_id: 1,
+                deliverable_name: '',
+              },
+            ];
+          } else {
+            this.form.deliverables = deliverables.filter(
+              (item) => item.id !== deliverable.id
+            )
+          }
         }
       } catch (error) {
         if (error.response) {
@@ -162,12 +178,12 @@ export default {
       }
     },
 
-    tryDeleteTask(task) {
-      if (task.id) {
-        return this.deleteTask(task)
+    tryDeleteDeliverable(deliverable) {
+      if (deliverable.id) {
+        return this.deleteDeliverable(deliverable)
       } else {
-        const { tasks } = this.form
-        this.form.tasks = tasks.filter((item) => item !== task)
+        const { deliverables } = this.form
+        this.form.tadeliverablessks = deliverables.filter((item) => item !== deliverable)
       }
     },
   },

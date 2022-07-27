@@ -213,6 +213,36 @@ const workFlowRoutes = [
   },
 ]
 
+
+const projectTypes = [
+  {
+    path: '/project-types',
+    name: 'Project Types',
+    icon: 'activity',
+    department: 'Consultancy',
+    meta: { authRequired: true },
+    // create a container component
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/project-types/index.vue')),
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+  },
+]
+
+const roles = [
+  {
+    path: '/departments-positions',
+    name: 'Departments & Positions',
+    icon: 'activity',
+    department: 'Administration',
+    header: 'Setups',
+    meta: { authRequired: true },
+    // create a container component
+    component: () =>
+      lazyLoadView(import('@views/pages/consulting/roles.vue')),
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
+  },
+]
+
 // const exchangeRateRoute = [
 //   {
 //     path: '/exchange-rate',
@@ -659,6 +689,8 @@ const authProtectedRoutes = [
   ...dashboardRoutes,
   ...appsRoutes,
   ...workFlowRoutes,
+  ...projectTypes,
+  ...roles
   /* ...pagesRoutes, */
   // ...uiRoutes,
   /* ...formsRoutes,
