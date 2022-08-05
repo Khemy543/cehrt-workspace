@@ -56,7 +56,7 @@ export default {
     async fetchDepartments() {
       this.loading = true
       try {
-        const response = await this.$http.get(`/admin/fetch/department/positions`)
+        const response = await this.$http.get(`/admin/fetch/departments`)
 
         if (response && response.data) {
           this.projectTypes = response.data || []
