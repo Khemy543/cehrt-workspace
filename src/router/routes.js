@@ -231,7 +231,7 @@ const projectTypes = [
 const roles = [
   {
     path: '/departments-positions',
-    name: 'Departments & Positions',
+    name: 'Depts. & Positions',
     icon: 'activity',
     department: 'Administration',
     header: 'Setups',

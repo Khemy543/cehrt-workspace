@@ -82,13 +82,11 @@ export default {
           fileContent: form.file,
           folder: this.project.name,
         })
-        const uploadData = await graph.uploadProjectLibraryFile({
+        const uploadData = await graph.uploadFileInChunk({
           fileName: `${deliverable.deliverable_name}.${extension}`,
           fileContent: form.file,
           uploadUrl: data.uploadUrl,
         })
-
-        console.log(uploadData)
 
         const response = await this.$http.post(
           `/project/${this.$route.params.id}/create-deliverable`,

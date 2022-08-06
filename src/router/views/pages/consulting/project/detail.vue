@@ -328,12 +328,18 @@ export default {
           folder: this.project.name,
         })
 
+        const uploadData = await graph.uploadFileInChunk({
+          fileName: `${form.deliverable_name}.docx`,
+          fileContent: form.file,
+          uploadUrl: data.uploadUrl,
+        })
+
         const response = await this.$http.post(
           `/project/${this.$route.params.id}/create-deliverable`,
           {
             ...form,
             project_type_deliverable_id: form.id,
-            document_path: data.webUrl,
+            document_path: uploadData.webUrl,
           }
         )
 
@@ -985,6 +991,18 @@ export default {
               </ul>
             </div>
           </div>
+
+          <div  class="card">
+            <div class="card-body">
+              <h6 class="mt-0 header-title">View and Upload Project Media</h6>
+
+              <div class="wrapper">
+                <a target="_blank" :href="project.images_path" class="image-wrapper">
+                  <img src="@assets/images/photos.png" alt="" class="image"/>
+                </a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -1012,6 +1030,20 @@ export default {
   </Layout>
 </template>
 <style scoped>
+.wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.image-wrapper {
+  cursor: pointer;
+  width: 80%;
+  margin-top: 10px;
+}
+.image {
+  width: 100%;
+  height: auto;
+}
 #grid_groups_wrapper {
   max-width: 800px;
 }

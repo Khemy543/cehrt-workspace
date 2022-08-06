@@ -2,8 +2,8 @@
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
-import CreateProjectTypeModal from '@components/CreateProjectTypeModal.vue'
-import ViewProjectTypesModal from '@/src/components/ViewProjectTypesModal.vue'
+import UpdateDepartment from '@components/UpdateDepartment.vue'
+import ViewPositions from '@/src/components/ViewPositions.vue'
 
 export default {
   page: {
@@ -13,8 +13,8 @@ export default {
   components: {
     Layout,
     PageHeader,
-    CreateProjectTypeModal,
-    ViewProjectTypesModal
+    UpdateDepartment,
+    ViewPositions
 },
   props: {
     id: {
@@ -36,8 +36,8 @@ export default {
           active: true,
         },
       ],
-      projectTypes: [],
-      projectType: null,
+      departments: [],
+      department: null,
       loading: false,
       show: false,
       formTitle: 'Add New Project Type',
@@ -49,7 +49,7 @@ export default {
   },
   methods: {
     openCreateWorkFlow() {
-      this.projectType = null
+      this.department = null
       this.formTitle = 'Add New Project Type'
       this.show = true
     },
@@ -59,7 +59,7 @@ export default {
         const response = await this.$http.get(`/admin/fetch/departments`)
 
         if (response && response.data) {
-          this.projectTypes = response.data || []
+          this.departments = response.data || []
           this.loading = false
         }
       } catch (error) {
@@ -110,36 +110,38 @@ export default {
       }
     },
 
-    editProjectType(pType) {
-      this.projectType = pType
-      this.formTitle = 'Edit Project Type'
+    editDepartment(department) {
+      this.department = department;
+      this.formTitle = 'Edit Department'
       this.show = true
     },
 
-    action(pType) {
+    /* action(pType) {
       if (this.projectType) {
-        return this.updateProjectType(pType)
+        return this.updatePosition(pType)
       }
       return this.createProjectType(pType)
-    },
+    }, */
 
-    async updateProjectType(workflow) {
+    async updatePosition(department) {
       try {
         const response = await this.$http.put(
-          `/update/${this.workflow.id}/workflow`,
-          workflow
+          `/admin/update/${this.department.id}/department`,
+          department
         )
 
         if (response) {
-          const index = this.workFlows.findIndex(
-            (item) => item.id === workflow.id
-          )
-          this.workFlows[index] = response.data.workflow
-          this.workflow = null
-          this.formTitle = 'Create Work Flow'
+          const index = this.departments.findIndex(
+            (item) => item.id === response.data.id
+          );
+
+          this.$set(this.departments, index, response.data)
+          // this.departments[index] = response.data
+          this.department = null
+          this.formTitle = 'Create Department'
           this.show = false
 
-          this.$bvToast.toast('Work flow updated successfully', {
+          this.$bvToast.toast('Department updated successfully', {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
@@ -165,12 +167,12 @@ export default {
       }
     },
 
-    viewProjectType(pType) {
-      this.projectType = pType
+    viewPositioin(department) {
+      this.department = department
       this.viewShow = true
     },
 
-    deleteWorkFlow(workflow) {
+    /* deleteWorkFlow(workflow) {
       this.$swal({
         title: 'Do you want to delete this work flow?',
         showDenyButton: true,
@@ -208,7 +210,7 @@ export default {
           }
         }
       })
-    },
+    }, */
   },
 }
 </script>
@@ -230,15 +232,15 @@ export default {
                   view, add and edit details of all departments and positions
                 </p>
               </div>
-              <div>
+              <!-- <div>
                 <button
                   type="button"
                   class="btn btn-danger mr-4 mb-3 mb-sm-0"
                   @click="openCreateWorkFlow"
                 >
-                  <i class="uil-plus mr-1"></i> Add Project Type
+                  <i class="uil-plus mr-1"></i> Add  Type
                 </button>
-              </div>
+              </div> -->
             </div>
 
             <div class="table-responsive">
@@ -247,15 +249,15 @@ export default {
                   <tr>
                     <th scope="col">#</th>
                     <th scope="col">Name</th>
-                    <th scope="col">Number of Deliverables</th>
+                    <th scope="col">Number of Positions</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(pType, index) in projectTypes" :key="pType.id">
+                  <tr v-for="(depart, index) in departments" :key="depart.id">
                     <th scope="row">{{ index + 1 }}</th>
-                    <td>{{ pType.name }}</td>
-                    <td>{{ pType.deliverables.length || 'N/A' }}</td>
+                    <td>{{ depart.name }}</td>
+                    <td>{{ depart.positions.length || 'N/A' }}</td>
                     <td class=" d-flex">
                       <b-dropdown
                         variant="link"
@@ -268,7 +270,7 @@ export default {
                         <b-dropdown-item
                           href="javascript: void(0);"
                           variant="secondary"
-                          @click="viewProjectType(pType)"
+                          @click="viewPositioin(depart)"
                           ><i class="uil uil-exit mr-2"></i
                           >View</b-dropdown-item
                         >
@@ -276,14 +278,14 @@ export default {
                         <b-dropdown-item
                           href="javascript: void(0);"
                           variant="secondary"
-                          @click="editProjectType(pType)"
+                          @click="editDepartment(depart)"
                         >
                           <i class="uil uil-edit mr-2"></i>Edit
                         </b-dropdown-item>
                         <b-dropdown-item
                           href="javascript: void(0);"
                           variant="danger"
-                          @click="deleteWorkFlow(pType)"
+                          @click="deleteWorkFlow(depart)"
                         >
                           <i class="uil uil-trash-alt mr-2"></i>Delete
                         </b-dropdown-item>
@@ -299,7 +301,7 @@ export default {
     </div>
 
     <div
-      v-if="!loading && projectTypes.length <= 0"
+      v-if="!loading && departments.length <= 0"
       class=" w-100 d-flex justify-content-center"
     >
       <img
@@ -308,17 +310,17 @@ export default {
         style="width:50%"
       />
     </div>
-    <CreateProjectTypeModal
-      :action="action"
+    <UpdateDepartment
+      :action="updatePosition"
       :value="show"
-      :project-type="projectType"
+      :department="department"
       :form-title="formTitle"
       @input="show = $event"
     />
 
-    <ViewProjectTypesModal
+    <ViewPositions
       :value="viewShow"
-      :project-type="projectType"
+      :department="department"
       @input="viewShow = $event"
     />
   </Layout>

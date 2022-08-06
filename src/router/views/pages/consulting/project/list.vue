@@ -78,7 +78,14 @@ export default {
           folder: { },
           '@microsoft.graph.conflictBehavior': 'rename'
         });
-        const response = await this.$http.post('/create/project', {...form, onedrive_id: data.id});
+
+        const subData = await graph.createProjectMediaFolder({
+          name: 'Media',
+          folder: { },
+          '@microsoft.graph.conflictBehavior': 'rename'
+        }, data.id);
+        
+        const response = await this.$http.post('/create/project', {...form, onedrive_id: data.id, images_path: subData.webUrl});
 
         if (response) {
           this.form = {}

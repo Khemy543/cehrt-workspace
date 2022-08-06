@@ -431,10 +431,18 @@ export default {
           folder: this.proposal.title,
         })
 
+        const uploadData = await graph.uploadFileInChunk({
+          fileName: `${report.report_title}.docx`,
+          fileContent: report.file,
+          uploadUrl: data.uploadUrl,
+        });
+
+        console.log(uploadData);
+
         const response = await this.$http.post(
           `/create/${this.$route.params.id}/proposal-report`,
           {
-            report_path: data.webUrl,
+            report_path: uploadData.webUrl,
             proposal_report_type_id: report.id,
             deadline: report.deadline,
           }

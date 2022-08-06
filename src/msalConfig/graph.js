@@ -15,6 +15,7 @@ const GRAPH_SCOPES = [
   'files.read.all',
   'files.readwrite',
   'files.readwrite.all',
+  'sites.readwrite.all',
   'openid',
   'profile',
   'email',
@@ -33,6 +34,8 @@ const proposalFolderId = 'EB3548181CF4DC64!174'
 /* project and proposal in library */
 const libraryProjectFolderId = 'EB3548181CF4DC64!191'
 const libraryProposalFolderId = 'EB3548181CF4DC64!200'
+
+const excelFileId = 'EB3548181CF4DC64!275'
 
 export default {
   // Get details of user, and return as JSON
@@ -90,6 +93,30 @@ export default {
     }
   },
 
+  async createProjectMediaFolder(item, onedriveId) {
+    let resp = await postGraph(
+      `/drives/${driveId}/items/${onedriveId}/children`,
+      item
+    )
+
+    if (resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
+  async copyRenumirationFileToProposal(item) {
+    let resp = await postGraph(
+      `/drives/${driveId}/items/${excelFileId}/copy`,
+      item
+    );
+
+    if(resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
   async createLibraryProposalFolder(item) {
     let resp = await postGraph(
       `/drives/${driveId}/items/${libraryProposalFolderId}/children`,
@@ -103,9 +130,15 @@ export default {
   },
 
   async uploadProposalFile({ fileName, fileContent, folder }) {
-    let resp = await putGraph(
-      `/drives/${driveId}/items/${itemId}:/Proposals/${folder}/${fileName}:/content`,
-      fileContent
+    let resp = await postGraph(
+      `/drives/${driveId}/items/${itemId}:/Proposals/${folder}/${fileName}:/createUploadSession`,
+      {
+        item: {
+          "@microsoft.graph.conflictBehavior": "rename",
+          name: fileName,
+        },
+        deferCommit: false
+      }
     )
     if (resp) {
       let data = await resp.json()
@@ -114,9 +147,15 @@ export default {
   },
 
   async uploadProjectFile({ fileName, fileContent, folder }) {
-    let resp = await putGraph(
-      `/drives/${driveId}/items/${itemId}:/Projects/${folder}/${fileName}:/content`,
-      fileContent
+    let resp = await postGraph(
+      `/drives/${driveId}/items/${itemId}:/Projects/${folder}/${fileName}:/createUploadSession`,
+      {
+        item: {
+          "@microsoft.graph.conflictBehavior": "rename",
+          name: fileName,
+        },
+        deferCommit: false
+      }
     )
     if (resp) {
       let data = await resp.json()
@@ -143,7 +182,7 @@ export default {
   },
 
 
-  async uploadProjectLibraryFile({ fileName, fileContent, uploadUrl }) {
+  async uploadFileInChunk({ fileName, fileContent, uploadUrl }) {
     let nextChunkRange = '0-10000000' // 60MB
     let startChunk = Number(nextChunkRange.split('-')[0])
     let endChunk = (startChunk + 10000000) > fileContent.size ? fileContent.size : startChunk + 10000000 // 60MB

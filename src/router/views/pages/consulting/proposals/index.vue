@@ -80,9 +80,15 @@ export default {
           '@microsoft.graph.conflictBehavior': 'rename',
         })
 
+        const fileData = await graph.copyRenumirationFileToProposal({
+          parentReference: { id: data.id },
+          name: 'World bank renumeration calculator'
+        })
+
         const response = await this.$http.post('/create/proposal', {
           ...form,
           onedrive_id: data.id,
+          proposal_path: fileData.webUrl,
         })
 
         if (response && response.data) {
