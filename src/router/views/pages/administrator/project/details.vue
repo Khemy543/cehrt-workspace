@@ -2,6 +2,7 @@
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
+import graph from '@/src/msalConfig/graph'
 
 export default {
   page: {
@@ -72,61 +73,59 @@ export default {
         corespondent_path: e.target.files[0],
       })
     },
-    async saveProjectData() {
-      try {
-        const formData = new FormData()
-        if (this.contractFile && typeof this.contractFile !== 'string') {
-          formData.append('contract', this.contractFile)
-        }
-        if (this.insuranceFile && typeof this.insuranceFile !== 'string') {
-          formData.append('insurance', this.insuranceFile)
-        }
-        if (this.permitFile && typeof this.permitFile !== 'string') {
-          formData.append('permit', this.permitFile)
-        }
-        if (this.reviewFile && typeof this.reviewFile !== 'string') {
-          formData.append('review_comment', this.reviewFile)
-        }
-        this.correspondents.forEach((file) => {
-          if (
-            file.corespondent_path &&
-            typeof file.corespondent_path !== 'string'
-          ) {
-            formData.append('corespondents[]', file.corespondent_path)
-          }
-        })
-        formData.append('_method', 'PATCH')
 
-        const response = await this.$http.post(
+    async handleFileUpload({ fileName, file, key }) {
+      const data = await graph.uploadProjectFile({
+        fileName,
+        fileContent: file,
+        folder: this.project.name,
+      })
+
+      const uploadData = await graph.uploadFileInChunk({
+        fileName,
+        fileContent: file,
+        uploadUrl: data.uploadUrl,
+      })
+
+      await this.saveProjectData({
+        apiKey: key,
+        value: uploadData.webUrl,
+      })
+    },
+    async saveProjectData({ apiKey, value }) {
+      let requestData = {}
+      if (apiKey === 'corespondents') {
+        requestData[apiKey] = [value]
+      } else {
+        requestData[apiKey] = value
+      }
+      try {
+        const response = await this.$http.patch(
           `/admin/add/project/${this.$route.params.id}/corespondents`,
-          formData
+          requestData
         )
 
         if (response) {
-          const { corespondent } = response.data
-          this.contractFile = corespondent.contract
-          this.insuranceFile = corespondent.insurance
-          this.permitFile = corespondent.permit
-          this.reviewFile = corespondent.review_comment
-          this.correspondents =
-            corespondent.corespondents.length > 0
-              ? corespondent.corespondents
-              : [
-                  {
-                    id: 1,
-                    corespondent_path: null,
-                  },
-                ]
-          this.$bvToast.toast('File saved successfully', {
+          const {
+            contract,
+            insurance,
+            permit,
+            review_comment: reviewComment,
+            corespondents,
+          } = response.data.corespondent
+          this.contractFile = contract
+          this.insuranceFile = insurance
+          this.permitFile = permit
+          this.reviewFile = reviewComment
+          this.correspondents = corespondents
+          this.$bvToast.toast('File uploaded successful', {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
             variant: 'success',
-            toastClass: 'text-white',
           })
         }
       } catch (error) {
-        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -269,12 +268,10 @@ export default {
     },
     async deletProjectFile(key) {
       try {
-        const response = await this.$http.post(
-          `/admin/delete/project/${this.$route.params.id}/files`,
-          {
-            file_to_delete: key,
-            _method: 'DELETE',
-          }
+        let requestData = {};
+        requestData[key] = null
+        const response = await this.$http.patch(
+          `/admin/add/project/${this.$route.params.id}/corespondents`,requestData
         )
 
         if (response) {
@@ -295,7 +292,7 @@ export default {
       }
 
       if (file && typeof file === 'string') {
-        return `${process.env.API_BASE_URL}${file.replace('/', '')}`
+        return file
       }
       return null
     },
@@ -307,13 +304,8 @@ export default {
     },
     async deleteCorrespondent(id) {
       try {
-        const response = await this.$http.post(
-          `/admin/delete/project/${this.$route.params.id}/files`,
-          {
-            correspondent_id: id,
-            _method: 'DELETE',
-          }
-        )
+        const response = await this.$http.delete(
+          `/admin/delete/project/${id}/files`)
         if (response) {
           return response
         }
@@ -321,7 +313,7 @@ export default {
     },
     async removeCorrespondent(correspondent) {
       try {
-        const length = this.correspondents.length;
+        const length = this.correspondents.length
         if (typeof correspondent.corespondent_path === 'string') {
           const response = await this.deleteCorrespondent(correspondent.id)
 
@@ -386,14 +378,6 @@ export default {
                   </h4>
                   <p>{{ project.description }}</p>
                 </div>
-                <div>
-                  <button
-                    type="button"
-                    class="btn btn-primary"
-                    @click="saveProjectData"
-                    >Save Changes</button
-                  >
-                </div>
               </div>
             </div>
           </div>
@@ -434,11 +418,6 @@ export default {
                                   >Contract.docx</div
                                 >
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -454,12 +433,25 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="contractFile && typeof contractFile === 'object'"
+                        type="button"
+                        class="btn btn-soft-primary btn-sm mx-2"
+                        @click="
+                          handleFileUpload({
+                            fileName: 'Contract.docx',
+                            file: contractFile,
+                            key: 'contract',
+                          })
+                        "
+                        >Save</button
+                      >
+                      <button
                         v-if="contractFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
                         @click="removeContractFile"
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -493,11 +485,6 @@ export default {
                                   >Insurance.docx</div
                                 >
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -508,12 +495,27 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="
+                          insuranceFile && typeof insuranceFile === 'object'
+                        "
+                        type="button"
+                        class="btn btn-soft-primary btn-sm mx-2"
+                        @click="
+                          handleFileUpload({
+                            fileName: 'Insurance.docx',
+                            file: insuranceFile,
+                            key: 'insurance',
+                          })
+                        "
+                        >Save</button
+                      >
+                      <button
                         v-if="insuranceFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
                         @click="removeInsuranceFile"
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -574,11 +576,6 @@ export default {
                                   >correspondence.docx
                                 </div>
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -599,11 +596,29 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="
+                          correspondents[index] &&
+                            typeof correspondents[index].corespondent_path ===
+                              'object'
+                        "
+                        type="button"
+                        class="btn btn-soft-primary btn-sm mx-2"
+                        @click="
+                          handleFileUpload({
+                            fileName: `Correspondent${index + 1}.docx`,
+                            file: correspondents[index].corespondent_path,
+                            key: 'corespondents',
+                          })
+                        "
+                        >Save</button
+                      >
+                      <button
+                        v-if="correspondents[index].corespondent_path"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
                         @click="removeCorrespondent(deliverable)"
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -636,11 +651,6 @@ export default {
                                   >Permit.docx</div
                                 >
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -651,12 +661,25 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="permitFile && typeof permitFile === 'object'"
+                        type="button"
+                        class="btn btn-soft-primary btn-sm mx-2"
+                        @click="
+                          handleFileUpload({
+                            fileName: 'Permit.docx',
+                            file: permitFile,
+                            key: 'permit',
+                          })
+                        "
+                        >Save</button
+                      >
+                      <button
                         v-if="permitFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
                         @click="removePermitFile"
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -690,11 +713,6 @@ export default {
                                   >Review-comment.docx
                                 </div>
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -708,12 +726,25 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="reviewFile && typeof reviewFile === 'object'"
+                        type="button"
+                        class="btn btn-soft-primary btn-sm mx-2"
+                        @click="
+                          handleFileUpload({
+                            fileName: 'Review Comments.docx',
+                            file: reviewFile,
+                            key: 'review_comment',
+                          })
+                        "
+                        >Save</button
+                      >
+                      <button
                         v-if="reviewFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
                         @click="removeReviewComment"
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>

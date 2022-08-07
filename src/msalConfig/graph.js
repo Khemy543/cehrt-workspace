@@ -16,6 +16,7 @@ const GRAPH_SCOPES = [
   'files.readwrite',
   'files.readwrite.all',
   'sites.readwrite.all',
+  'sites.read.all',
   'openid',
   'profile',
   'email',
@@ -134,7 +135,7 @@ export default {
       `/drives/${driveId}/items/${itemId}:/Proposals/${folder}/${fileName}:/createUploadSession`,
       {
         item: {
-          "@microsoft.graph.conflictBehavior": "rename",
+          "@microsoft.graph.conflictBehavior": "replace",
           name: fileName,
         },
         deferCommit: false
@@ -151,7 +152,7 @@ export default {
       `/drives/${driveId}/items/${itemId}:/Projects/${folder}/${fileName}:/createUploadSession`,
       {
         item: {
-          "@microsoft.graph.conflictBehavior": "rename",
+          "@microsoft.graph.conflictBehavior": "replace",
           name: fileName,
         },
         deferCommit: false
@@ -168,7 +169,7 @@ export default {
       `/drives/${driveId}/items/${libraryId}:/Projects/${folder}/${fileName}:/createUploadSession`,
       {
         item: {
-          '@microsoft.graph.conflictBehavior': 'rename',
+          '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
         },
         deferCommit: false,

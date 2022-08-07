@@ -1,7 +1,9 @@
+<!-- eslint-disable vue/camelcase -->
 <script>
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
+import graph from '@/src/msalConfig/graph'
 
 export default {
   page: {
@@ -34,7 +36,6 @@ export default {
       timeSheet: [],
       contractFile: null,
       insuranceFile: null,
-      timeSheetFiles: [],
       deliverables: [],
       incomeObject: {
         amount: 0,
@@ -380,6 +381,54 @@ export default {
       }
       return total.toFixed(2)
     },
+    async handleFileUpload({ fileName, file, key }) {
+      const data = await graph.uploadProjectFile({
+        fileName,
+        fileContent: file,
+        folder: this.project.name,
+      })
+
+      const uploadData = await graph.uploadFileInChunk({
+        fileName,
+        fileContent: file,
+        uploadUrl: data.uploadUrl,
+      })
+
+      await this.saveContractFile({
+        apiKey: key,
+        value: uploadData.webUrl,
+      })
+    },
+
+    async handleDeliverableFileUpload({
+      fileName,
+      file,
+      key,
+      id,
+      extra = null,
+    }) {
+      let uploadData = {}
+      if (file && typeof file === 'object') {
+        const data = await graph.uploadProjectFile({
+          fileName,
+          fileContent: file,
+          folder: this.project.name,
+        })
+
+        uploadData = await graph.uploadFileInChunk({
+          fileName,
+          fileContent: file,
+          uploadUrl: data.uploadUrl,
+        })
+      }
+
+      await this.saveDelivarableFile({
+        apiKey: key,
+        value: uploadData.webUrl || file,
+        id,
+        extra,
+      })
+    },
     async saveProjectData(show = false) {
       try {
         const response = await this.$http.patch(
@@ -441,18 +490,19 @@ export default {
 
       this.$set(this.invoice, index, { ...single, invoice: e.target.files[0] })
     },
-    async saveContractFile(name, file) {
+    async saveContractFile({ apiKey, value }) {
       try {
-        const formData = new FormData()
-        formData.append(name, file, file.name)
-        formData.append('_method', 'PATCH')
-
-        const response = await this.$http.post(
+        let requestData = {}
+        requestData[apiKey] = value
+        const response = await this.$http.patch(
           `/finance/update/${this.$route.params.id}/project`,
-          formData
+          requestData
         )
 
         if (response) {
+          const { insurance, contract } = response.data.project
+          this.insuranceFile = insurance
+          this.contractFile = contract
           this.$bvToast.toast('File saved successfully', {
             title: 'Success',
             autoHideDelay: 5000,
@@ -520,31 +570,47 @@ export default {
       }
     },
 
-    async saveDelivarableFile(item) {
+    async saveDelivarableFile({ apiKey, value, id, extra }) {
       try {
-        const formData = new FormData()
-        for (const key in item) {
-          console.log(`${key}` === 'id')
-          if (`${key}` !== 'id' && `${key}` !== 'name') {
-            formData.append(`${key}`, item[key])
+        let requestData = {}
+        if (apiKey === 'timesheet') {
+          requestData[apiKey] = value
+        } else {
+          requestData[apiKey] = value
+          if (extra) {
+            requestData['invoice_days'] = extra.invoice_days
+            requestData['invoice_status'] = extra.invoice_status
           }
         }
-        formData.append('_method', 'PATCH')
-
-        if (typeof item['invoice'] === 'string') {
-          formData.delete('invoice')
-        }
-
-        if (typeof item['timesheet'] === 'string') {
-          formData.delete('timesheet')
-        }
-
-        const response = await this.$http.post(
-          `finance/update/${item.id}/deliverable`,
-          formData
+        const response = await this.$http.patch(
+          `finance/update/${id}/deliverable`,
+          requestData
         )
 
         if (response) {
+          const {
+            timesheet,
+            invoice,
+            invoice_days: invoiceDays,
+            invoice_status: invoiceStatus,
+            id,
+            name,
+          } = response.data.project
+          const index = this.timeSheet.findIndex((item) => item.id === id)
+
+          this.$set(this.timeSheet, index, {
+            timesheet,
+            name,
+            id,
+          })
+
+          this.$set(this.invoice, index, {
+            invoice,
+            invoice_status: invoiceStatus || 'unpaid',
+            invoice_days: invoiceDays,
+            name,
+            id,
+          })
           this.$bvToast.toast('File saved successfully', {
             title: 'Success',
             autoHideDelay: 5000,
@@ -636,18 +702,45 @@ export default {
         })
       }
     },
-    openContractUpload() {
-      this.$refs['contract'].click()
-    },
     createUrl(file) {
       if (file && typeof file === 'object') {
         return window.URL.createObjectURL(file)
       }
 
       if (file && typeof file === 'string') {
-        return `https://backend-api.cehrtghana.com/${file}`
+        return file
       }
       return null
+    },
+    async removeFile(key) {
+      try {
+        let requestData = {}
+        requestData[key] = null
+        const response = await this.$http.patch(
+          `/finance/update/${this.project.id}/project`,
+          requestData
+        )
+
+        if (response) {
+          const { insurance, contract } = response.data.project
+          this.insuranceFile = insurance
+          this.contractFile = contract
+          this.$bvToast.toast('File deleted successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+            toastClass: 'text-white',
+          })
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
     },
     removeTimeSheet(timesheetItem) {
       const index = this.timeSheet.findIndex(
@@ -795,18 +888,26 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="contractFile && typeof contractFile === 'object'"
                         type="button"
                         class="btn btn-soft-primary btn-sm"
-                        @click="saveContractFile('contract', contractFile)"
+                        @click="
+                          handleFileUpload({
+                            fileName: 'Contract.docx',
+                            file: contractFile,
+                            key: 'contract',
+                          })
+                        "
                       >
                         save
                       </button>
                       <button
+                        v-if="contractFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="contractFile = null"
+                        @click="removeFile('contract')"
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -840,11 +941,6 @@ export default {
                                   >Insurance.docx</div
                                 >
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -855,18 +951,28 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="
+                          insuranceFile && typeof insuranceFile === 'object'
+                        "
                         type="button"
                         class="btn btn-soft-primary btn-sm"
-                        @click="saveContractFile('insurance', insuranceFile)"
+                        @click="
+                          handleFileUpload({
+                            fileName: 'Insurance.docx',
+                            file: insuranceFile,
+                            key: 'insurance',
+                          })
+                        "
                       >
                         save
                       </button>
                       <button
+                        v-if="insuranceFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="insuranceFile = null"
+                        @click="removeFile('insurance')"
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -891,10 +997,9 @@ export default {
                         <a
                           :href="createUrl(timeSheet[index].timesheet)"
                           target="_blank"
-                          class="col-6"
                         >
                           <div class="p-2 border rounded mb-4">
-                            <div class="media">
+                            <div class="media p-1">
                               <div class="avatar-sm font-weight-bold mr-3">
                                 <span
                                   class="avatar-title rounded bg-soft-primary text-primary"
@@ -923,18 +1028,37 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="
+                          timeSheet[index].timesheet &&
+                            typeof timeSheet[index].timesheet === 'object'
+                        "
                         type="button"
                         class="btn btn-soft-primary btn-sm"
-                        @click="saveDelivarableFile(timeSheet[index])"
+                        @click="
+                          handleDeliverableFileUpload({
+                            fileName: `${deliverable.name}-Timesheet.docx`,
+                            file: timeSheet[index].timesheet,
+                            key: 'timesheet',
+                            id: deliverable.id,
+                          })
+                        "
                       >
                         save
                       </button>
                       <button
+                        v-if="timeSheet[index].timesheet"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="removeTimeSheet(timeSheet[index])"
+                        @click="
+                          handleDeliverableFileUpload({
+                            fileName: `${deliverable.name}-Timesheet.docx`,
+                            file: null,
+                            key: 'timesheet',
+                            id: deliverable.id,
+                          })
+                        "
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -956,10 +1080,9 @@ export default {
                         <a
                           :href="createUrl(invoice[index].invoice)"
                           target="_blank"
-                          class="col-6"
                         >
                           <div class="p-2 border rounded mb-4">
-                            <div class="media">
+                            <div class="media p-1">
                               <div class="avatar-sm font-weight-bold mr-3">
                                 <span
                                   class="avatar-title rounded bg-soft-primary text-primary"
@@ -972,11 +1095,6 @@ export default {
                                   >{{ deliverable.name }}-Invoice.docx</div
                                 >
                               </div>
-                              <!-- <div class="float-right mt-1">
-                                                                <div class="p-2">
-                                                                    <i class="uil-download-alt font-size-18"></i>
-                                                                </div>
-                                                            </div> -->
                             </div>
                           </div>
                         </a>
@@ -1028,16 +1146,39 @@ export default {
                       <button
                         type="button"
                         class="btn btn-soft-primary btn-sm"
-                        @click="saveDelivarableFile(invoice[index])"
+                        @click="
+                          handleDeliverableFileUpload({
+                            fileName: `${deliverable.name}-Invoice.docx`,
+                            file: invoice[index].invoice,
+                            key: 'invoice',
+                            id: deliverable.id,
+                            extra: {
+                              invoice_days: deliverable.invoice_days,
+                              invoice_status: deliverable.invoice_status,
+                            },
+                          })
+                        "
                       >
                         save
                       </button>
                       <button
+                        v-if="invoice[index].invoice"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="removeInvoiceFile(invoice[index])"
+                        @click="
+                          handleDeliverableFileUpload({
+                            fileName: `${deliverable.name}-Invoice.docx`,
+                            file: null,
+                            key: 'invoice',
+                            id: deliverable.id,
+                            extra: {
+                              invoice_days: deliverable.invoice_days,
+                              invoice_status: deliverable.invoice_status,
+                            },
+                          })
+                        "
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -1301,17 +1442,6 @@ export default {
                       </b-form-input>
                     </b-form-group>
                   </div>
-                  <!-- <div class="row mt-2">
-                                        <div v-for="deliverable in getProjectTypesDeliverables" :key="deliverable.id"
-                                            class="col-md-6">
-                                            <b-form-group id="input-group-1"
-                                                :label="`Mobilisation (${deliverable.deliverable_name})`"
-                                                label-for="input-1">
-                                                <b-form-input id="input-1" v-model="form.prof" type="number" required
-                                                    placeholder="Mobilisation"></b-form-input>
-                                            </b-form-group>
-                                        </div>
-                                    </div> -->
                 </li>
               </ul>
             </div>

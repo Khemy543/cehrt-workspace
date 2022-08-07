@@ -2,6 +2,7 @@
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
+import graph from '@/src/msalConfig/graph'
 
 export default {
   page: {
@@ -12,7 +13,6 @@ export default {
   data() {
     return {
       loading: true,
-      project: {},
       proposal: {},
       title: 'Proposal Overview',
       items: [
@@ -68,37 +68,37 @@ export default {
         correspondent_path: e.target.files[0],
       })
     },
-    async saveProjectData() {
-      try {
-        const formData = new FormData()
-        if (
-          this.awardOfContractFile &&
-          typeof this.awardOfContractFile !== 'string'
-        ) {
-          formData.append('award_of_contract', this.awardOfContractFile)
-        }
-        if (this.requestForEol && typeof this.requestForEol !== 'string') {
-          formData.append('request_for_eol', this.requestForEol)
-        }
-        if (
-          this.requestForProposal &&
-          typeof this.requestForProposal !== 'string'
-        ) {
-          formData.append('request_for_proposal', this.requestForProposal)
-        }
-        this.correspondents.forEach((file) => {
-          if (
-            file.correspondent_path &&
-            typeof file.correspondent_path !== 'string'
-          ) {
-            formData.append('correspondents[]', file.correspondent_path)
-          }
-        })
-        formData.append('_method', 'PATCH')
 
-        const response = await this.$http.post(
+    async handleFileUpload({ fileName, file, key }) {
+      const data = await graph.uploadProposalFile({
+        fileName,
+        fileContent: file,
+        folder: this.proposal.title,
+      })
+
+      const uploadData = await graph.uploadFileInChunk({
+        fileName,
+        fileContent: file,
+        uploadUrl: data.uploadUrl,
+      })
+
+      await this.saveProjectData({
+        apiKey: key,
+        value: uploadData.webUrl,
+      })
+    },
+
+    async saveProjectData({ apiKey, value }) {
+      try {
+        let requestData = {}
+        if (apiKey === 'correspondents') {
+          requestData[apiKey] = [value]
+        } else {
+          requestData[apiKey] = value
+        }
+        const response = await this.$http.patch(
           `/admin/update/${this.$route.params.id}/proposal`,
-          formData
+          requestData
         )
 
         if (response) {
@@ -195,18 +195,37 @@ export default {
         file: null,
       })
     },
-    async deleteProposalFile(key) {
+
+    async removeFile(key) {
       try {
-        const response = await this.$http.post(
-          `/admin/delete/proposal/${this.$route.params.id}/files`,
-          {
-            file_to_delete: key,
-            _method: 'DELETE',
-          }
+        let requestData = {}
+        requestData[key] = null
+        const response = await this.$http.patch(
+          `/admin/update/${this.$route.params.id}/proposal`,
+          requestData
         )
 
         if (response) {
-          return response
+          const { corespondent } = response.data
+          this.awardOfContractFile = corespondent.award_of_contract
+          this.requestForEol = corespondent.request_for_eol
+          this.requestForProposal = corespondent.request_for_proposal
+          this.correspondents =
+            corespondent.correspondents.length > 0
+              ? corespondent.correspondents
+              : [
+                  {
+                    id: 1,
+                    correspondent_path: null,
+                  },
+                ]
+          this.$bvToast.toast('File deleted successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+            toastClass: 'text-white',
+          })
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -217,78 +236,10 @@ export default {
         })
       }
     },
-    async deleteAwardOfContractFile() {
-      try {
-        if (typeof this.awardOfContractFile === 'object') {
-          this.awardOfContractFile = null
-          return
-        }
-
-        const response = await this.deleteProposalFile('award_of_contract')
-
-        if (response) {
-          this.awardOfContractFile = null
-          this.$bvToast.toast('File deleted successfully', {
-            title: 'Success',
-            autoHideDelay: 5000,
-            appendToast: false,
-            variant: 'success',
-            toastClass: 'text-white',
-          })
-        }
-      } catch (error) {}
-    },
-    async deleteRequestForProposal() {
-      try {
-        if (typeof this.requestForProposal === 'object') {
-          this.requestForProposal = null
-          return
-        }
-
-        const response = await this.deleteProposalFile('request_for_proposal')
-
-        if (response) {
-          this.requestForProposal = null
-          this.$bvToast.toast('File deleted successfully', {
-            title: 'Success',
-            autoHideDelay: 5000,
-            appendToast: false,
-            variant: 'success',
-            toastClass: 'text-white',
-          })
-        }
-      } catch (error) {}
-    },
-    async deleteRequestForEol() {
-      try {
-        if (typeof this.requestForEol === 'object') {
-          this.requestForEol = null
-          return
-        }
-
-        const response = await this.deleteProposalFile('request_for_eol')
-
-        if (response) {
-          this.requestForEol = null
-          this.$bvToast.toast('File deleted successfully', {
-            title: 'Success',
-            autoHideDelay: 5000,
-            appendToast: false,
-            variant: 'success',
-            toastClass: 'text-white',
-          })
-        }
-      } catch (error) {}
-    },
     async deleteCorrespondent(id) {
       try {
-        const response = await this.$http.post(
-          `/admin/delete/proposal/${this.$route.params.id}/files`,
-          {
-            correspondent_id: id,
-            _method: 'DELETE',
-          }
-        )
+        const response = await this.$http.delete(
+          `/admin/delete/proposal/${id}/files`)
         if (response) {
           return response
         }
@@ -380,14 +331,14 @@ export default {
                     </div>
                   </div>
                 </div>
-                <div>
+                <!-- <div>
                   <button
                     type="button"
                     class="btn btn-primary"
                     @click="saveProjectData"
                     >Save Changes</button
                   >
-                </div>
+                </div> -->
               </div>
             </div>
             <!-- end card body-->
@@ -445,12 +396,28 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="
+                          awardOfContractFile &&
+                            typeof awardOfContractFile === 'object'
+                        "
+                        type="button"
+                        class="btn btn-soft-primary btn-sm mx-2"
+                        @click="
+                          handleFileUpload({
+                            fileName: 'Award of contract.docx',
+                            file: awardOfContractFile,
+                            key: 'award_of_contract',
+                          })
+                        "
+                        >Save</button
+                      >
+                      <button
                         v-if="awardOfContractFile"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="deleteAwardOfContractFile"
+                        @click="removeFile('award_of_contract')"
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -497,12 +464,27 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="
+                          requestForEol && typeof requestForEol === 'object'
+                        "
+                        type="button"
+                        class="btn btn-soft-primary btn-sm mx-2"
+                        @click="
+                          handleFileUpload({
+                            fileName: 'Request for EOI.docx',
+                            file: requestForEol,
+                            key: 'request_for_eol',
+                          })
+                        "
+                        >Save</button
+                      >
+                      <button
                         v-if="requestForEol"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="deleteRequestForEol"
+                        @click="removeFile('request_for_eol')"
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -549,12 +531,28 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="
+                          requestForProposal &&
+                            typeof requestForProposal === 'object'
+                        "
+                        type="button"
+                        class="btn btn-soft-primary btn-sm mx-2"
+                        @click="
+                          handleFileUpload({
+                            fileName: 'Request for Proposal.docx',
+                            file: requestForProposal,
+                            key: 'request_for_proposal',
+                          })
+                        "
+                        >Save</button
+                      >
+                      <button
                         v-if="requestForProposal"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
-                        @click="deleteRequestForProposal"
+                        @click="removeFile('request_for_proposal')"
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>
@@ -635,11 +633,29 @@ export default {
                     </div>
                     <div class="d-flex">
                       <button
+                        v-if="
+                          correspondents[index].correspondent_path &&
+                            typeof correspondents[index].correspondent_path ===
+                              'object'
+                        "
+                        type="button"
+                        class="btn btn-soft-primary btn-sm mx-2"
+                        @click="
+                          handleFileUpload({
+                            fileName: `Correspondent${index + 1}.docx`,
+                            file: correspondents[index].correspondent_path,
+                            key: 'correspondents',
+                          })
+                        "
+                        >Save</button
+                      >
+                      <button
+                        v-if="correspondents[index].correspondent_path"
                         type="button"
                         class="btn btn-soft-danger btn-sm mx-2"
                         @click="removeCorrespondent(deliverable)"
                       >
-                        <i class="uil uil-trash"></i>
+                        Delete
                       </button>
                     </div>
                   </div>

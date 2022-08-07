@@ -10,11 +10,59 @@
           <div class="card">
             <div class="card-body">
               <div class="row align-items-center">
-                <div class="col-md-4 col-xl-4 col-lg-4">
+                <div class="col-12">
                   <div class="mt-4 mt-lg-0">
-                    <h5 class="mt-0 mb-1 font-weight-bold">
-                      {{ proposal.title }}
-                    </h5>
+                    <div class="row">
+                      <div class="col-md-6">
+                        <h5 class="mt-0 mb-1 font-weight-bold">
+                          {{ proposal.title }}
+                        </h5>
+                      </div>
+                      <div class="col-md-6 d-flex justify-content-end">
+                        <div>
+                          <b-dropdown
+                            class="d-inline"
+                            variant="link"
+                            toggle-class="font-weight-bold p-0 align-middle"
+                          >
+                            <template v-slot:button-content>
+                              <button
+                                id="btn-new-event"
+                                class="btn btn-primary mr-3"
+                              >
+                                <i class="uil-plus-circle"></i> Create New
+                                Proposal
+                              </button>
+                            </template>
+                            <b-dropdown-item
+                              v-for="report in vReportTypes"
+                              :key="report.id"
+                              href="javascript: void(0);"
+                              variant="seconday"
+                              @click="openModal(report)"
+                              >{{ report.report_title }}</b-dropdown-item
+                            >
+                          </b-dropdown>
+                        </div>
+
+                        <div>
+                          <button
+                            class="btn btn-danger mr-3"
+                            @click="showCreateProject = true"
+                          >
+                            Create Project
+                          </button>
+                        </div>
+                        <div>
+                          <button
+                            class="btn btn-white"
+                            @click="exportToLibrary"
+                          >
+                            Export To Library
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
                     <div class="d-flex items-align-center mt-4">
                       <div>
@@ -34,59 +82,40 @@
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-md-12">
-                        <div class="mt-4">
+                      <div class="col-md-12 d-flex mt-4">
+                        <div class="">
                           <p class="mb-2">
                             <i class="uil-user text-danger"></i> Client
                           </p>
                           <h5 class="font-size-16">{{ proposal.client }}</h5>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class=" col-md-8">
-                  <div class="d-flex justify-content-end">
-                    <div>
-                      <b-dropdown
-                        class="d-inline"
-                        variant="link"
-                        toggle-class="font-weight-bold p-0 align-middle"
-                      >
-                        <template v-slot:button-content>
-                          <button
-                            id="btn-new-event"
-                            class="btn btn-primary mt-4 mr-3"
+                        <div>
+                        <div class="shadow-none border ml-5">
+                          <div
+                            class="p-1 px-2"
+                            style="cursor: pointer;"
+                            @click="openFile"
                           >
-                            <i class="uil-plus-circle"></i> Create New Proposal
-                          </button>
-                        </template>
-                        <b-dropdown-item
-                          v-for="report in vReportTypes"
-                          :key="report.id"
-                          href="javascript: void(0);"
-                          variant="seconday"
-                          @click="openModal(report)"
-                          >{{ report.report_title }}</b-dropdown-item
-                        >
-                      </b-dropdown>
-                    </div>
-
-                    <div>
-                      <button
-                        class="btn btn-danger mt-4 mr-3"
-                        @click="showCreateProject = true"
-                      >
-                        Create Project
-                      </button>
-                    </div>
-                    <div>
-                      <button
-                        class="btn btn-white mt-4"
-                        @click="exportToLibrary"
-                      >
-                        Export To Library
-                      </button>
+                            <div class="row align-items-center">
+                              <div class="col-auto">
+                                <div class="avatar-sm font-weight-bold mr-3">
+                                  <span
+                                    class="avatar-title rounded bg-soft-success text-success"
+                                  >
+                                    <i
+                                      class="uil-file-plus-alt font-size-18"
+                                    ></i>
+                                  </span>
+                                </div>
+                              </div>
+                              <div class="col pl-0">
+                                <div class="text-muted font-weight-bold">World bank renumeration calculator.xlsx</div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -284,6 +313,9 @@ export default {
     this.getProposalReports()
   },
   methods: {
+    openFile() {
+     window.open(this.proposal.proposal_path,'_blank');
+    },
     exportToLibrary() {
       this.$swal({
         title: 'Export proposal to library?',
@@ -435,9 +467,9 @@ export default {
           fileName: `${report.report_title}.docx`,
           fileContent: report.file,
           uploadUrl: data.uploadUrl,
-        });
+        })
 
-        console.log(uploadData);
+        console.log(uploadData)
 
         const response = await this.$http.post(
           `/create/${this.$route.params.id}/proposal-report`,

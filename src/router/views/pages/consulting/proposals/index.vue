@@ -80,18 +80,21 @@ export default {
           '@microsoft.graph.conflictBehavior': 'rename',
         })
 
-        const fileData = await graph.copyRenumirationFileToProposal({
+        console.log(`https://onedrive.live.com/edit.aspx?resid=${data.id.split('!')[0]}!${Number(data.id.split('!')[1]) + 1}&ithint=file%2cxlsx`)
+
+        graph.copyRenumirationFileToProposal({
           parentReference: { id: data.id },
-          name: 'World bank renumeration calculator'
+          name: 'World bank renumeration calculator.xlsx',
         })
 
         const response = await this.$http.post('/create/proposal', {
           ...form,
           onedrive_id: data.id,
-          proposal_path: fileData.webUrl,
+          proposal_path: `https://onedrive.live.com/edit.aspx?resid=${data.id.split('!')[0]}!${Number(data.id.split('!')[1]) + 1}&ithint=file%2cxlsx`,
         })
 
-        if (response && response.data) {
+        if (response) {
+          console.log('here')
           this.proposals.push(response.data.proposal)
           this.show = false
           this.$bvToast.toast('Proposal created successfully', {
