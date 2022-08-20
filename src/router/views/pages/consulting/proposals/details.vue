@@ -127,7 +127,7 @@
         </div>
 
         <div class="col-12 mt-2">
-          <h5>Proposal Reports</h5>
+          <h5>Proposal Types</h5>
           <div v-if="!loading && reports.length > 0" class="row mt-4">
             <router-link
               v-for="report in reports"

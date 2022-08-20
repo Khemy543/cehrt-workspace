@@ -37,11 +37,19 @@ export default {
         },
       ],
       projectTypes: [],
+      searchkey: '',
       projectType: null,
       loading: false,
       show: false,
       formTitle: 'Add New Project Type',
       viewShow: false,
+    }
+  },
+  computed: {
+    filteredList() {
+      return this.projectTypes.filter(item => {
+        return item.name.toLowerCase().includes(this.searchkey.toLowerCase())
+      })
     }
   },
   created() {
@@ -139,11 +147,11 @@ export default {
         if (response) {
           const index = this.projectTypes.findIndex(
             (item) => item.id === this.projectType.id
-          );
+          )
           this.projectType = null
           this.formTitle = 'Create Project Type'
-          this.show = false;
-          this.$set(this.projectTypes, index, response.data.projectType);
+          this.show = false
+          this.$set(this.projectTypes, index, response.data.projectType)
 
           console.log(this.projectTypes)
 
@@ -231,12 +239,20 @@ export default {
       <div class="col-lg-12">
         <div class="card">
           <div class="card-body">
-            <div class=" d-flex justify-content-between">
-              <div>
+            <div class=" d-flex justify-content-between w-100">
+              <div style="width: 40%">
                 <h4 class="header-title mt-0 mb-1">Project Types</h4>
                 <p class="sub-header">
                   view, add and edit details of all project types
                 </p>
+              </div>
+              <div style="width: 30%">
+                <b-form-input
+                  id="input-1"
+                  v-model="searchkey"
+                  type="search"
+                  placeholder="Search project type..."
+                />
               </div>
               <div>
                 <button
@@ -260,7 +276,7 @@ export default {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(pType, index) in projectTypes" :key="pType.id">
+                  <tr v-for="(pType, index) in filteredList" :key="pType.id">
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ pType.name }}</td>
                     <td>{{ pType.deliverables.length || 'N/A' }}</td>

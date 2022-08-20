@@ -175,7 +175,7 @@ export default {
         )
 
         if (response) {
-          const { subtasks, tasks, reviewing_tasks: reviewTask, reviewing_subtasks: reviewSubTask } = response.data
+          const { subtasks, tasks, reviewing_tasks: reviewTask, reviewing_subtasks: reviewSubTask, proposal_report_tasks: proposalTasks, proposal_report_subtask: proposalSubtask } = response.data
           const vReviewTasks = reviewTask.map((item) => {
             return {
               id: `review-task-${item.id}`,
@@ -237,12 +237,42 @@ export default {
               }
             })
 
+            const vProposalTask = proposalTasks && proposalTasks.map((item) => {
+              return {
+                id: `proposal-task-${item.id}`,
+                title: `${item.name} ( ${item.status} )`,
+                end: item.end_date,
+                editable: false,
+                url: `/proposal/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
+                start:
+                  item.start_date ||
+                  (item.created_at && item.created_at.split('T')[0]),
+                className: 'bg-success text-white',
+              }
+            })
+
+            const vProposalSubTask = proposalSubtask && proposalSubtask.map((item) => {
+              return {
+                id: `proposal-subtask-${item.id}`,
+                title: `${item.name} ( ${item.status} )`,
+                end: item.end_date,
+                editable: false,
+                url: `/proposal/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
+                start:
+                  item.start_date ||
+                  (item.created_at && item.created_at.split('T')[0]),
+                className: 'bg-success text-white',
+              }
+            })
+
           this.calendarEvents = [
             ...this.calendarEvents,
             ...vSubtasks,
             ...vTasks,
             ...vReviewTasks,
-            ...vSubTaskReview
+            ...vSubTaskReview,
+            ...vProposalTask,
+            ...vProposalSubTask
           ]
         }
       } catch (error) {

@@ -321,6 +321,7 @@
 
 <script>
 import Multiselect from 'vue-multiselect'
+import { dateFormate } from '../utils/format-date'
 export default {
   components: {
     Multiselect,
@@ -337,6 +338,10 @@ export default {
     title: {
       type: String,
       default: 'Export Project To Library',
+    },
+    project: {
+      type: Object,
+      default: null,
     },
   },
   data() {
@@ -518,6 +523,32 @@ export default {
       set(val) {
         this.$emit('input', val)
       },
+    },
+  },
+  watch: {
+    project(newValue) {
+      this.form = {
+        ...newValue,
+        project_type_id: (newValue && newValue.project_type && newValue.project_type.id) || '',
+        project_sector_id: (newValue && newValue.project_sector && newValue.project_sector.id) || '',
+        regionIds: [],
+        start_date: dateFormate(newValue.start_date) || '',
+        end_date: dateFormate(newValue.end_date) || '',
+        professional_expects: newValue.professional_expect || [
+          {
+            id: 1,
+            name: '',
+            role: '',
+          },
+        ],
+        associated_consultants: newValue.associated_consultants || [
+          {
+            id: 1,
+            name: '',
+            role: '',
+          },
+        ],
+      }
     },
   },
   created() {

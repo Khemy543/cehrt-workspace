@@ -37,6 +37,7 @@ export default {
       loading: false,
       library: [],
       show: false,
+      vProject: null,
     }
   },
   computed: {
@@ -55,17 +56,17 @@ export default {
       try {
         const response = await this.$http.post(`/save/old/project`, {
           ...form,
-          regionIds: this.getIds(form.regionIds)
+          regionIds: this.getIds(form.regionIds),
         })
 
         if (response) {
           this.library.unshift(response.data.project)
-          this.$bvToast.toast("Project added to library successfully", {
-              title: 'Success',
-              autoHideDelay: 5000,
-              appendToast: false,
-              variant: 'success',
-            });
+          this.$bvToast.toast('Project added to library successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
 
           this.show = false
         }
@@ -114,6 +115,10 @@ export default {
     goToFiles(id) {
       this.$router.push(`/library/projects/${id}/files`)
     },
+    editProject(project) {
+      this.vProject = project;
+      this.show = true
+    }
   },
 }
 </script>
@@ -157,6 +162,7 @@ export default {
                     <th scope="col">Year</th>
                     <th scope="col">Client</th>
                     <th scope="col">Type</th>
+                    <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -164,16 +170,47 @@ export default {
                     v-for="(item, index) in library"
                     :key="item.id"
                     class="library-row"
-                    @click="goToFiles(item.id)"
                   >
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ item.name }}</td>
-                    <td>{{ item.country || 'N/A'}}</td>
+                    <td>{{ item.country || 'N/A' }}</td>
                     <td>Accra</td>
-                    <td>{{ item.district || 'N/A'}}</td>
+                    <td>{{ item.district || 'N/A' }}</td>
                     <td>2016</td>
                     <td>{{ item.client }}</td>
                     <td>{{ item.project_type.name }}</td>
+                    <td class="d-flex">
+                      <b-dropdown
+                        variant="link"
+                        class=" position-absolute"
+                        toggle-class="p-0 text-muted arrow-none"
+                      >
+                        <template v-slot:button-content>
+                          <i class="uil uil-ellipsis-v font-size-14"></i>
+                        </template>
+                        <b-dropdown-item
+                          :to="`/library/projects/${item.id}/files`"
+                          variant="secondary"
+                          ><i class="uil uil-exit mr-2"></i
+                          >View</b-dropdown-item
+                        >
+                        <b-dropdown-divider></b-dropdown-divider>
+                        <b-dropdown-item
+                          href="javascript: void(0);"
+                          variant="secondary"
+                          @click="editProject(item)"
+                        >
+                          <i class="uil uil-edit mr-2"></i>Edit
+                        </b-dropdown-item>
+                        <!-- <b-dropdown-item
+                          href="javascript: void(0);"
+                          variant="danger"
+                          @click="deleteProject(work)"
+                        >
+                          <i class="uil uil-trash-alt mr-2"></i>Delete
+                        </b-dropdown-item> -->
+                      </b-dropdown>
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -193,17 +230,18 @@ export default {
         :action="createProject"
         :value="show"
         title="Add Project To Library"
+        :project="vProject"
         @input="show = $event"
       />
     </div>
   </Layout>
 </template>
 <style scoped>
-.library-row:hover {
+/* .library-row:hover {
   background-color: #f8f9fa;
 }
 
 .library-row {
   cursor: pointer;
-}
+} */
 </style>

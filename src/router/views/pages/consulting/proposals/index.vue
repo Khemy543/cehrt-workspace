@@ -77,7 +77,7 @@ export default {
         const data = await graph.createProposalFolder({
           name: form.title,
           folder: {},
-          '@microsoft.graph.conflictBehavior': 'rename',
+          '@microsoft.graph.conflictBehavior': 'replace',
         })
 
         console.log(`https://onedrive.live.com/edit.aspx?resid=${data.id.split('!')[0]}!${Number(data.id.split('!')[1]) + 1}&ithint=file%2cxlsx`)

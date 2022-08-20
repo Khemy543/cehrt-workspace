@@ -134,7 +134,7 @@ export default {
         const response = await this.$http.get(`/fetch/dashboard-stats`);
 
         if(response) {
-          const { assignedTask, projects, tasks, project_list: projectList, proposal_list: proposalList, deliverable, total_task_assigned: totalTaskAssigned } = response.data
+          const { projects, tasks, project_list: projectList, proposal_list: proposalList, deliverable, total_task_assigned: totalTaskAssigned, proposal_report:proposalReport } = response.data
           this.statChart[0].value = projects;
           this.statChart[1].value = totalTaskAssigned;
           this.statChart[2].value = tasks.find(item => item.status === 'completed') && tasks.find(item => item.status === 'completed').count || 0;
@@ -149,7 +149,14 @@ export default {
             className: 'bg-danger text-white',
             allDay: true
           }))
-          this.calendarEvents = [...this.calendarEvents, ...vDeliverables]
+          const vProjectTypes = proposalReport.map((item) => ({
+            id: `projectType${item.id}`,
+            title: `${item.proposal_title} (${item.proposal_type.report_title})`,
+            start: calendarFormat(item.deadline),
+            className: 'bg-success text-white',
+            allDay: true
+          }))
+          this.calendarEvents = [...this.calendarEvents, ...vDeliverables, ...vProjectTypes]
         }
       } catch (error) {
         console.log(error)
@@ -482,9 +489,9 @@ export default {
                 <b-thead class="thead-white">
                   <b-tr>
                     <b-th>#</b-th>
-                    <b-th>Product Name</b-th>
+                    <b-th style="max-width: 200px;">Proposal Name</b-th>
                     <b-th>Client</b-th>
-                    <b-th>Project Type</b-th>
+                    <b-th>Proposal Type</b-th>
                     <b-th>Status</b-th>
                     <b-th>Status</b-th>
                   </b-tr>

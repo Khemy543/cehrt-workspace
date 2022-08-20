@@ -135,9 +135,8 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
-      }
-      finally {
-        this.uploading = false;
+      } finally {
+        this.uploading = false
       }
     },
     async getProjectDeliverables() {
@@ -321,10 +320,15 @@ export default {
               </div>
             </div>
 
-            <h6 class="mt-0 header-title">About Project</h6>
+            <h6 class="mt-0 header-title">Project description</h6>
 
-            <div class="text-muted mt-3">
-              <p>{{ project.description }}</p>
+            <p class=" mt-1">{{ project.description }}</p>
+
+            <h6 class="mt-3 header-title">Service description</h6>
+
+            <p class=" mt-1">{{ project.service_description }}</p>
+
+            <div class="text-muted">
               <div
                 class="badge badge-soft-primary font-size-13 font-weight-normal ml-1"
               >
@@ -335,42 +339,42 @@ export default {
                 class="badge badge-soft-success font-size-13 font-weight-normal ml-1"
                 >{{ project.project_type && project.project_type.name }}</div
               >
+            </div>
 
-              <div class="row">
-                <div class="col-lg-3 col-md-6">
-                  <div class="mt-4">
-                    <p class="mb-2">
-                      <i class="uil-user text-danger"></i> Coordinator
-                    </p>
-                    <h5 class="font-size-16">{{
-                      (project.coordinator && project.coordinator.name) || 'N/A'
-                    }}</h5>
-                  </div>
+            <div class="row">
+              <div class="col-lg-3 col-md-6">
+                <div class="mt-4">
+                  <p class="mb-2">
+                    <i class="uil-user text-danger"></i> Coordinator
+                  </p>
+                  <h5 class="font-size-16">{{
+                    (project.coordinator && project.coordinator.name) || 'N/A'
+                  }}</h5>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                  <div class="mt-4">
-                    <p class="mb-2">
-                      <i class="uil-calender text-danger"></i> Start Date
-                    </p>
-                    <h5 class="font-size-16">{{ project.start_date }}</h5>
-                  </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="mt-4">
+                  <p class="mb-2">
+                    <i class="uil-calender text-danger"></i> Start Date
+                  </p>
+                  <h5 class="font-size-16">{{ project.start_date }}</h5>
                 </div>
-                <div class="col-lg-3 col-md-6">
-                  <div class="mt-4">
-                    <p class="mb-2">
-                      <i class="uil-calendar-slash text-danger"></i> Due Date
-                    </p>
-                    <h5 class="font-size-16">{{ project.end_date }}</h5>
-                  </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="mt-4">
+                  <p class="mb-2">
+                    <i class="uil-calendar-slash text-danger"></i> Due Date
+                  </p>
+                  <h5 class="font-size-16">{{ project.end_date }}</h5>
                 </div>
+              </div>
 
-                <div class="col-lg-3 col-md-6">
-                  <div class="mt-4">
-                    <p class="mb-2">
-                      <i class="uil-user text-danger"></i> Client
-                    </p>
-                    <h5 class="font-size-16">{{ project.client }}</h5>
-                  </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="mt-4">
+                  <p class="mb-2">
+                    <i class="uil-user text-danger"></i> Client
+                  </p>
+                  <h5 class="font-size-16">{{ project.client }}</h5>
                 </div>
               </div>
             </div>
