@@ -30,6 +30,10 @@ export default {
       type: Function,
       required: true,
     },
+    projectId : {
+      type: Number,
+      default: null
+    },
   },
   data() {
     return {
@@ -50,7 +54,7 @@ export default {
     async requestProjectDeletion() {
       try {
         const response = await this.$http.post(
-          `/request/project/${this.$route.params.id}/delete`,
+          `/request/project/${this.projectId || this.$route.params.id}/delete`,
           this.form
         )
 

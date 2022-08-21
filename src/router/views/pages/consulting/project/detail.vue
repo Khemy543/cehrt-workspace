@@ -124,7 +124,6 @@ export default {
           this.$set(this.projectDeliverables, index, response.data.deliverable)
         }
       } catch (error) {
-        console.log(error)
       }
     },
     showUpdateDeliverable(deliverable) {

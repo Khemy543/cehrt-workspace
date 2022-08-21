@@ -159,7 +159,6 @@ export default {
           this.calendarEvents = [...this.calendarEvents, ...vDeliverables, ...vProjectTypes]
         }
       } catch (error) {
-        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -277,7 +276,6 @@ export default {
           })
         }
       } catch (error) {
-        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {

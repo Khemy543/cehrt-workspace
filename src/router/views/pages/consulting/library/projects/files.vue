@@ -4,6 +4,7 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import AddFileToLibrary from '@/src/components/AddFileToLibrary.vue'
 import graph from '@/src/msalConfig/graph'
+import { v4 as uuidv4 } from 'uuid'
 
 export default {
   page: {
@@ -39,25 +40,91 @@ export default {
       uploading: false,
       project: {},
       library: [],
+      correspondents: [],
       invoice: [],
       timeSheet: [],
       show: false,
+      adminFiles: [
+        {
+          id: 'contract',
+          name: 'Contract',
+        },
+        {
+          id: 'insurance',
+          name: 'Insurance',
+        },
+        {
+          id: 'permit',
+          name: 'Permit',
+        },
+        {
+          id: 'review_comment',
+          name: 'Review Comments',
+        },
+        {
+          id: 'corespondents',
+          name: 'Corespondents',
+        },
+      ],
+      financeFiles: [
+        {
+          id: 'contract',
+          name: 'Contract',
+        },
+        {
+          id: 'insurance',
+          name: 'Insurance',
+        },
+      ],
     }
   },
   computed: {
+    isConsulting() {
+      return this.$store.state.auth.userDepartment.name === 'Consultancy'
+    },
+    isAdmin() {
+      return this.$store.state.auth.userDepartment.name === 'Administration'
+    },
+    isFinance() {
+      return this.$store.state.auth.userDepartment.name === 'Finance'
+    },
     deliverables() {
       return (
         (this.project.project_type && this.project.project_type.deliverables) ||
         []
       )
     },
+    combindedFiles() {
+      return [...this.library, ...this.correspondents]
+    },
     formattedDeliverables() {
-      return this.deliverables.filter(
-        (item) =>
-          !this.library.some(
-            (library) => library.project_type_deliverable.id === item.id
-          )
-      )
+      if (this.isConsulting) {
+        return this.deliverables.filter(
+          (item) =>
+            !this.library.some(
+              (library) => library.project_type_deliverable.id === item.id
+            )
+        )
+      }
+      return []
+    },
+
+    formattedAdminFiles() {
+      if (this.isAdmin) {
+        return this.adminFiles.filter(
+          (item) => !this.library.some((library) => library.name === item.name)
+        )
+      }
+      return []
+    },
+
+    formattedFinanceFiles() {
+      if (this.isFinance) {
+        return this.financeFiles.filter(
+          (item) => !this.library.some((library) => library.name === item.name)
+        )
+      }
+      return []
     },
     department() {
       return this.$store ? this.$store.state.auth.userDepartment : {} || {}
@@ -75,36 +142,153 @@ export default {
           (item) => item.id === form.project_type_deliverable_id
         )
 
+        const fileName = form.file_key
+          .split('_')
+          .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
+          .join(' ')
+
         const extension = form.file.name.split('.').pop()
 
         const data = await graph.createUploadSession({
-          fileName: `${deliverable.deliverable_name}.${extension}`,
+          fileName: `${(deliverable && deliverable.deliverable_name) ||
+            fileName}.${extension}`,
           fileContent: form.file,
           folder: this.project.name,
         })
         const uploadData = await graph.uploadFileInChunk({
-          fileName: `${deliverable.deliverable_name}.${extension}`,
+          fileName: `${(deliverable && deliverable.deliverable_name) ||
+            fileName}.${extension}`,
           fileContent: form.file,
           uploadUrl: data.uploadUrl,
         })
 
-        const response = await this.$http.post(
-          `/project/${this.$route.params.id}/create-deliverable`,
-          { ...form, document_path: uploadData.webUrl }
-        )
+        let requestData = {}
+        let method = 'POST'
+        let url = `/project/${this.$route.params.id}/create-deliverable`
+        if (form.file_key) {
+          if (form.file_key === 'corespondents') {
+            requestData[form.file_key] = [uploadData.webUrl]
+          } else {
+            requestData[form.file_key] = uploadData.webUrl
+          }
+        }
+
+        if (this.isAdmin) {
+          method = 'PATCH'
+          url = `/admin/add/project/${this.$route.params.id}/corespondents`
+        }
+
+        if (this.isFinance) {
+          method = 'PATCH'
+          url = `/finance/update/${this.$route.params.id}/project`
+        }
+
+        const response = await this.$http({
+          method,
+          url,
+          data: { ...form, document_path: uploadData.webUrl, ...requestData },
+        })
 
         if (response) {
-          const file = response.data.deliverable
-          this.library.push({
-            id: file.id,
-            name:
-              file.project_type_deliverable &&
-              file.project_type_deliverable.deliverable_name,
-            file: file.document_path,
-            project_type_deliverable: file.project_type_deliverable,
-            document_path: file.document_path,
-          })
-          this.$bvToast.toast('Project deliverable created successfully', {
+          if (this.isConsulting) {
+            const file = response.data.deliverable
+            this.library.push({
+              id: file.id,
+              name:
+                file.project_type_deliverable &&
+                file.project_type_deliverable.deliverable_name,
+              file: file.document_path,
+              project_type_deliverable: file.project_type_deliverable,
+              document_path: file.document_path,
+            })
+          }
+
+          if (this.isFinance) {
+            const { project } = response.data;
+            this.library = []
+            const contract = {
+              id: 1,
+              name: 'Contract',
+              document_path: project.contract,
+            }
+
+            const insurance = {
+              id: 2,
+              name: 'Insurance',
+              document_path: project.insurance,
+            }
+
+            if (project.contract) {
+              this.library.push(contract)
+            }
+
+            if (project.insurance) {
+              this.library.push(insurance)
+            }
+            project.deliverables.forEach((item) => {
+              this.library.push({
+                id: uuidv4(),
+                name: `Invoice (${item.name})`,
+                document_path: item.invoice,
+              })
+
+              this.library.push({
+                id: uuidv4(),
+                name: `Time Sheet (${item.name})`,
+                document_path: item.timesheet,
+              })
+            })
+          }
+
+          if (this.isAdmin) {
+            this.correspondents = []
+            const { corespondent } = response.data
+            const contract = {
+              id: 1,
+              name: 'Contract',
+              document_path: corespondent.contract,
+            }
+            const insurance = {
+              id: 2,
+              name: 'Insurance',
+              document_path: corespondent.insurance,
+            }
+            const permit = {
+              id: 3,
+              name: 'Permit',
+              document_path: corespondent.permit,
+            }
+            const reviewComment = {
+              id: 4,
+              name: 'Review Comments',
+              document_path: corespondent.review_comment,
+            }
+
+            if (response.data.contract) {
+              this.library.push(contract)
+            }
+
+            if (response.data.insurance) {
+              this.library.push(insurance)
+            }
+            if (response.data.permit) {
+              this.library.push(permit)
+            }
+            if (response.data.review_comment) {
+              this.library.push(reviewComment)
+            }
+
+            // this.library = [contract, insurance, permit, reviewComment];
+
+            corespondent.corespondents.forEach((file, index) => {
+              this.correspondents.push({
+                id: uuidv4(),
+                name: `Correspondent (${index + 1})`,
+                document_path: file.corespondent_path,
+              })
+            })
+          }
+          this.$bvToast.toast('Project file created successfully', {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
@@ -139,6 +323,7 @@ export default {
         this.uploading = false
       }
     },
+
     async getProjectDeliverables() {
       try {
         const rawDepartment = window.localStorage.getItem('user.department')
@@ -156,22 +341,22 @@ export default {
             const contract = {
               id: 1,
               name: 'Contract',
-              file: response.data.contract,
+              document_path: response.data.contract,
             }
             const insurance = {
               id: 2,
-              name: 'insurance',
-              file: response.data.insurance,
+              name: 'Insurance',
+              document_path: response.data.insurance,
             }
             const permit = {
               id: 3,
               name: 'Permit',
-              file: response.data.permit,
+              document_path: response.data.permit,
             }
             const reviewComment = {
               id: 4,
               name: 'Review Comments',
-              file: response.data.review_comment,
+              document_path: response.data.review_comment,
             }
 
             if (response.data.contract) {
@@ -190,11 +375,11 @@ export default {
 
             // this.library = [contract, insurance, permit, reviewComment];
 
-            response.data.correspondents.forEach((file) => {
-              this.library.push({
-                id: this.library[this.library.length - 1].id + 1,
-                name: 'Correspondent',
-                file: file.corespondent_path,
+            response.data.corespondents.forEach((file, index) => {
+              this.correspondents.push({
+                id: uuidv4(),
+                name: `Correspondent (${index + 1})`,
+                document_path: file.corespondent_path,
               })
             })
           }
@@ -203,13 +388,13 @@ export default {
             const contract = {
               id: 1,
               name: 'Contract',
-              file: response.data.contract,
+              document_path: response.data.contract,
             }
 
             const insurance = {
               id: 2,
-              name: 'insurance',
-              file: response.data.insurance,
+              name: 'Insurance',
+              document_path: response.data.insurance,
             }
 
             if (response.data.contract) {
@@ -220,18 +405,16 @@ export default {
               this.library.push(insurance)
             }
             response.data.deliverables.forEach((item) => {
-              this.invoice.push({
-                invoice: item.invoice,
-                invoice_status: item.invoice_status || 'unpaid',
-                invoice_days: item.invoice_days,
-                name: item.name,
-                id: item.id,
+              this.library.push({
+                id: uuidv4(),
+                name: `Invoice (${item.name})`,
+                document_path: item.invoice,
               })
 
-              this.timeSheet.push({
-                timesheet: item.timesheet,
-                name: item.name,
-                id: item.id,
+              this.library.push({
+                id: uuidv4(),
+                name: `Time Sheet (${item.name})`,
+                document_path: item.timesheet,
               })
             })
           }
@@ -310,7 +493,6 @@ export default {
               </div>
               <div>
                 <button
-                  v-if="department.name === 'Consultancy'"
                   type="button"
                   class="btn btn-danger mr-4 mb-3 mb-sm-0"
                   @click="openModal"
@@ -385,17 +567,17 @@ export default {
       <div class="col-12">
         <div class="card">
           <div class="card-body">
-            <div v-if="library.length > 0" class="mt-5">
+            <div v-if="combindedFiles.length > 0" class="mt-5">
               <div class="row mt-4">
                 <a
-                  v-for="n in library"
+                  v-for="n in combindedFiles"
                   :key="n.id"
                   :href="n.document_path"
                   target="_blank"
                   class="col-md-3"
                 >
                   <div class="p-2 border rounded mb-4">
-                    <div class="media">
+                    <div class="media align-items-center">
                       <div class="avatar-sm font-weight-bold mr-3">
                         <span
                           class="avatar-title rounded bg-soft-primary text-primary"
@@ -404,79 +586,14 @@ export default {
                         </span>
                       </div>
                       <div class="media-body">
-                        <div class="d-inline-block mt-2">{{ n.name }}</div>
+                        <div class="d-inline-block">{{ n.name }}</div>
                       </div>
-                      <div class="float-right mt-1">
-                        <div class="p-2">
-                          <feather type="log-in" class="icons-xs"></feather>
-                        </div>
+                      <div class="float-right">
+                        <feather type="log-in" class="icons-xs"></feather>
                       </div>
                     </div>
                   </div>
                 </a>
-              </div>
-              <div v-if="invoice.length > 0" class=" mt-4">
-                <h6 class="mt-0">Deliverable Invoice</h6>
-
-                <div class="row mt-2">
-                  <router-link
-                    v-for="n in invoice"
-                    :key="n.id"
-                    to=""
-                    class="col-md-3"
-                  >
-                    <div class="p-2 border rounded mb-4">
-                      <div class="media">
-                        <div class="avatar-sm font-weight-bold mr-3">
-                          <span
-                            class="avatar-title rounded bg-soft-primary text-primary"
-                          >
-                            <i class="uil-file-plus-alt font-size-18"></i>
-                          </span>
-                        </div>
-                        <div class="media-body">
-                          <div class="d-inline-block mt-2">{{ n.name }}</div>
-                        </div>
-                        <div class="float-right mt-1">
-                          <div class="p-2">
-                            <i class="uil-download-alt font-size-18"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </router-link>
-                </div>
-              </div>
-              <div v-if="timeSheet.length > 0" class=" mt-4">
-                <h6 class="mt-0">Deliverable Time Sheets</h6>
-                <div class="row mt-4">
-                  <router-link
-                    v-for="n in timeSheet"
-                    :key="n.id"
-                    to=""
-                    class="col-md-3"
-                  >
-                    <div class="p-2 border rounded mb-4">
-                      <div class="media">
-                        <div class="avatar-sm font-weight-bold mr-3">
-                          <span
-                            class="avatar-title rounded bg-soft-primary text-primary"
-                          >
-                            <i class="uil-file-plus-alt font-size-18"></i>
-                          </span>
-                        </div>
-                        <div class="media-body">
-                          <div class="d-inline-block mt-2">{{ n.name }}</div>
-                        </div>
-                        <div class="float-right mt-1">
-                          <div class="p-2">
-                            <i class="uil-download-alt font-size-18"></i>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </router-link>
-                </div>
               </div>
             </div>
 
@@ -493,6 +610,8 @@ export default {
       <AddFileToLibrary
         :action="addFile"
         :deliverables="formattedDeliverables"
+        :admin-files="formattedAdminFiles"
+        :finance-files="formattedFinanceFiles"
         :value="show"
         :loading="uploading"
         @input="show = $event"

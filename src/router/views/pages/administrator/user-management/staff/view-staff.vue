@@ -105,7 +105,6 @@ export default {
           this.loading = false
         }
       } catch (error) {
-        console.log(error);
         this.$bvToast.toast('Something happend, please try again', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -180,7 +179,6 @@ export default {
           })
         }
       } catch (error) {
-        console.log(error)
         let message = 'Something happend, Please try again later'
         if (error.response) {
           const { status, data } = error.response

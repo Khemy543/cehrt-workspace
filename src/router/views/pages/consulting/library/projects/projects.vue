@@ -3,6 +3,7 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import AddProjectToLibrary from '@components/AddProjectToLibrary.vue'
+import ProjectDeletionModal from '@components/ProjectDeletionModal.vue'
 
 export default {
   page: {
@@ -13,6 +14,7 @@ export default {
     Layout,
     PageHeader,
     AddProjectToLibrary,
+    ProjectDeletionModal
   },
   props: {
     id: {
@@ -38,6 +40,8 @@ export default {
       library: [],
       show: false,
       vProject: null,
+      showProjectDeletionModal: false,
+      projectId: null
     }
   },
   computed: {
@@ -51,6 +55,10 @@ export default {
   methods: {
     getIds(regions) {
       return regions.map((items) => items.id)
+    },
+    deleteProject(id) {
+      this.showProjectDeletionModal = true
+      this.projectId = id
     },
     async createProject(form) {
       try {
@@ -118,7 +126,7 @@ export default {
     editProject(project) {
       this.vProject = project;
       this.show = true
-    }
+    },
   },
 }
 </script>
@@ -202,13 +210,13 @@ export default {
                         >
                           <i class="uil uil-edit mr-2"></i>Edit
                         </b-dropdown-item>
-                        <!-- <b-dropdown-item
+                        <b-dropdown-item
                           href="javascript: void(0);"
                           variant="danger"
-                          @click="deleteProject(work)"
+                          @click="deleteProject(item.id)"
                         >
                           <i class="uil uil-trash-alt mr-2"></i>Delete
-                        </b-dropdown-item> -->
+                        </b-dropdown-item>
                       </b-dropdown>
                     </td>
                   </tr>
@@ -234,6 +242,14 @@ export default {
         @input="show = $event"
       />
     </div>
+
+
+    <ProjectDeletionModal
+      :close="() => (showProjectDeletionModal = false)"
+      :value="showProjectDeletionModal"
+      :project-id = "projectId"
+      @input="showProjectDeletionModal = $event"
+    />
   </Layout>
 </template>
 <style scoped>

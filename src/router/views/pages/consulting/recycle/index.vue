@@ -115,7 +115,6 @@ export default {
               })
             }
           } catch (error) {
-            console.log(error)
             this.$bvToast.toast('Something happened, Please try again later', {
               title: 'Error',
               autoHideDelay: 5000,

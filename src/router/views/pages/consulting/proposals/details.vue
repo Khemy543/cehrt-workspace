@@ -469,8 +469,6 @@ export default {
           uploadUrl: data.uploadUrl,
         })
 
-        console.log(uploadData)
-
         const response = await this.$http.post(
           `/create/${this.$route.params.id}/proposal-report`,
           {

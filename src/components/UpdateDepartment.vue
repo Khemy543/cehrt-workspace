@@ -142,8 +142,6 @@ export default {
         if (response) {
           const { positions } = this.form
 
-          console.log(positions)
-
           if (positions.length <= 1) {
             this.form.positions = [
               {

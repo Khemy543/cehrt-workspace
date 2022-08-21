@@ -22,7 +22,7 @@ export default {
 
 <template>
   <router-link :to="`/${$route.fullPath.split('/')[1]}/project/${project.id}/details/`" class="col-xl-4 col-lg-6">
-    <div class="card border">
+    <div style="height: 380px" class="card border">
       <div class="card-body">
         <slot name="status">
           <div
@@ -44,7 +44,7 @@ export default {
         </h5>
         <p class="text-muted mb-4 description_text">{{ project.description }}</p>
       </div>
-      <div class="card-body border-top">
+      <div class="card-body border-top position-absolute" style="bottom: 0; left: 0; right: 0">
         <div>
           <div>
             <ul class="list-inline">

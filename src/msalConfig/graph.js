@@ -365,8 +365,6 @@ async function putGraph(apiPath, data) {
 async function customPutGraph(apiPath, data, headers) {
   accessToken = await auth.acquireToken(GRAPH_SCOPES)
 
-  console.log(data, data.size)
-
   let resp = await fetch(apiPath, {
     method: 'PUT',
     headers: {

@@ -30,21 +30,12 @@ export default {
     const config = {
       auth: {
         clientId: clientId,
-        redirectUri: 'https://workspace.cehrtghana.com',
+        redirectUri: 'http://localhost:8081',
         authority: 'https://login.microsoftonline.com/common'
       },
       cache: {
         cacheLocation: 'localStorage'
       }
-      // Only uncomment when you *really* need to debug what is going on in MSAL
-      /* system: {
-        logger: new msal.Logger(
-          (logLevel, msg) => { console.log(msg) },
-          {
-            level: msal.LogLevel.Verbose
-          }
-        )
-      } */
     }
     console.log('### Azure AD sign-in: enabled\n', config)
 

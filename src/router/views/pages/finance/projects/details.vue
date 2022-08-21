@@ -208,11 +208,6 @@ export default {
       return Number(amt).toFixed(2)
     },
   },
-  watch: {
-    getAmountPaid(newValue) {
-      console.log(newValue)
-    },
-  },
   created() {
     this.getProjectDetials()
   },
@@ -870,7 +865,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >Contract.docx</div
+                                  >Contract</div
                                 >
                               </div>
                             </div>
@@ -893,7 +888,7 @@ export default {
                         class="btn btn-soft-primary btn-sm"
                         @click="
                           handleFileUpload({
-                            fileName: 'Contract.docx',
+                            fileName: `Contract.${contractFile.name.split('.').pop()}`,
                             file: contractFile,
                             key: 'contract',
                           })
@@ -938,7 +933,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >Insurance.docx</div
+                                  >Insurance</div
                                 >
                               </div>
                             </div>
@@ -958,7 +953,7 @@ export default {
                         class="btn btn-soft-primary btn-sm"
                         @click="
                           handleFileUpload({
-                            fileName: 'Insurance.docx',
+                            fileName: `Insurance.${insuranceFile.name.split('.').pop()}`,
                             file: insuranceFile,
                             key: 'insurance',
                           })
@@ -1009,7 +1004,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >{{ deliverable.name }}-Timesheet.docx</div
+                                  >{{ deliverable.name }}-Timesheet</div
                                 >
                               </div>
                             </div>
@@ -1036,7 +1031,7 @@ export default {
                         class="btn btn-soft-primary btn-sm"
                         @click="
                           handleDeliverableFileUpload({
-                            fileName: `${deliverable.name}-Timesheet.docx`,
+                            fileName: `${deliverable.name}-Timesheet.${timeSheet[index].timesheet.name.split('.').pop()}`,
                             file: timeSheet[index].timesheet,
                             key: 'timesheet',
                             id: deliverable.id,
@@ -1092,7 +1087,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >{{ deliverable.name }}-Invoice.docx</div
+                                  >{{ deliverable.name }}-Invoice</div
                                 >
                               </div>
                             </div>
@@ -1148,7 +1143,7 @@ export default {
                         class="btn btn-soft-primary btn-sm"
                         @click="
                           handleDeliverableFileUpload({
-                            fileName: `${deliverable.name}-Invoice.docx`,
+                            fileName: `${deliverable.name}-Invoice.${invoice[index].invoice.name.split('.').pop()}`,
                             file: invoice[index].invoice,
                             key: 'invoice',
                             id: deliverable.id,

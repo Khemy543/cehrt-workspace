@@ -153,8 +153,6 @@ export default {
           this.show = false
           this.$set(this.projectTypes, index, response.data.projectType)
 
-          console.log(this.projectTypes)
-
           this.$bvToast.toast('Project type updated successfully', {
             title: 'Success',
             autoHideDelay: 5000,

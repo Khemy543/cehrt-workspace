@@ -43,7 +43,6 @@ export default {
 		this.$msalInstance = new PublicClientApplication(
 			this.$store.state.auth.msalConfig,
 		);
-		// console.log(this.$msalInstance.loginPopup({}));
 	},
 	mounted() {
 		const accounts = this.$msalInstance.getAllAccounts();
@@ -58,7 +57,6 @@ export default {
 			this.$parent.toggleMenu()
 		},
 		async SignIn() {
-			console.log('here')
 			await this.$msalInstance
 				.loginPopup({})
 				.then(() => {

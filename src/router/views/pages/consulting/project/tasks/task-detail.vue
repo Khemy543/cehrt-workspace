@@ -176,7 +176,6 @@ export default {
     },
 
     async changeStatus(status) {
-      console.log(status, this.task.reviewer, this.$store.state.auth.currentUser)
       if(status.api === 'completed' && this.task.reviewer.id !== this.$store.state.auth.currentUser.id) {
         return this.$bvToast.toast('Only task reviewer call move task to completed', {
           title: 'Error',
