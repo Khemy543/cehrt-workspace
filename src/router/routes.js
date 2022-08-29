@@ -483,6 +483,12 @@ const financeRoutes = [
     name: "Projects finance details",
     meta: { authRequired: true },
     component: () => lazyLoadView(import('@views/pages/finance/projects/details.vue')),
+  },
+  {
+    path: '/finance/project/:id/project-plan',
+    name: 'Finance Project Plan',
+    meta: { authRequired: true },
+    component: () => lazyLoadView(import('@views/pages/finance/projects/project-plan.vue'))
   }
 ]
 

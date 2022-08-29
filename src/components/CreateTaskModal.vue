@@ -5,7 +5,6 @@
         <b-form-input
           id="input-1"
           v-model="form.name"
-          type="text"
           required
           placeholder="Enter name of task"
         ></b-form-input>
@@ -59,6 +58,8 @@
 </template>
 
 <script>
+import { dateFormate } from '../utils/format-date'
+
 export default {
   props: {
     action: {
@@ -84,6 +85,7 @@ export default {
         priority: '',
         assignee_id: '',
         reviewer_id: '',
+        start_date: dateFormate(new Date())
       },
       staff: [],
     }

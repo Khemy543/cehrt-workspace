@@ -103,6 +103,21 @@
             </b-form-input>
           </b-form-group>
         </div>
+        <div class="col-md-6">
+          <b-form-group
+            id="input-group-1"
+            label="Value of Service / Contract Amount"
+            label-for="input-1"
+          >
+            <b-form-input
+              id="input-1"
+              v-model="form.contract"
+              type="text"
+              placeholder="Value of service"
+            >
+            </b-form-input>
+          </b-form-group>
+        </div>
         <!-- <div class="col-md-6">
           <b-form-group
             id="input-group-1"
@@ -122,7 +137,7 @@
       </div>
       <div class="row">
         <div class="col-md-6">
-          <b-form-group label="Project Summary / Narrative description">
+          <b-form-group label="Project Summary / Narrative Description">
             <b-form-textarea
               id="input-1"
               v-model="form.description"
@@ -133,7 +148,7 @@
           </b-form-group>
         </div>
         <div class="col-md-6">
-          <b-form-group label="Description of service provided">
+          <b-form-group label="Description of Service Provided">
             <b-form-textarea
               id="input-1"
               v-model="form.service_description"
@@ -181,7 +196,7 @@
         <div class="col-md-6">
           <b-form-group
             id="input-group-1"
-            label="Address of client"
+            label="Address of Client"
             label-for="input-1"
           >
             <b-form-input
@@ -196,14 +211,14 @@
         <div class="col-md-6">
           <b-form-group
             id="input-group-1"
-            label="Phone number"
+            label="Phone Number / Email"
             label-for="input-1"
           >
             <b-form-input
               id="input-1"
               v-model="form.client_contact"
               type="text"
-              placeholder="Phone number of contact person"
+              placeholder="Phone number / email of contact person"
             >
             </b-form-input>
           </b-form-group>
@@ -277,7 +292,7 @@
         </div>
       </div>
       <div class="d-flex mb-2">
-        <label for="">Associated consultants / Partners</label>
+        <label for="">Associated Consultants / Partners</label>
         <button
           type="button"
           class="btn btn-soft-primary btn-sm ml-4"
@@ -529,8 +544,11 @@ export default {
     project(newValue) {
       this.form = {
         ...newValue,
-        project_type_id: (newValue && newValue.project_type && newValue.project_type.id) || '',
-        project_sector_id: (newValue && newValue.project_sector && newValue.project_sector.id) || '',
+        project_type_id:
+          (newValue && newValue.project_type && newValue.project_type.id) || '',
+        project_sector_id:
+          (newValue && newValue.project_sector && newValue.project_sector.id) ||
+          '',
         regionIds: [],
         start_date: dateFormate(newValue.start_date) || '',
         end_date: dateFormate(newValue.end_date) || '',

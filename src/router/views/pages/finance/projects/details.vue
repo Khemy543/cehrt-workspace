@@ -282,7 +282,9 @@ export default {
                     fillColor: '#f77e53',
                   },
                   {
-                    y: this.getAmountPaid() - this.getExpenditure(),
+                    y: (this.getAmountPaid() - this.getExpenditure()).toFixed(
+                      2
+                    ),
                     x: `Income - ${(
                       ((this.getAmountPaid() - this.getExpenditure()) /
                         this.getAmountPaid()) *
@@ -785,6 +787,9 @@ export default {
                   <p>{{ project.description }}</p>
                 </div>
                 <div>
+                  <router-link :to="`/finance/project/${project.id}/project-plan`" type="button" class="btn btn-warning mx-4"
+                    >View Project Plan</router-link
+                  >
                   <button
                     type="button"
                     class="btn btn-primary"
@@ -864,9 +869,7 @@ export default {
                                 </span>
                               </div>
                               <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >Contract</div
-                                >
+                                <div class="d-inline-block mt-2">Contract</div>
                               </div>
                             </div>
                           </div>
@@ -888,7 +891,9 @@ export default {
                         class="btn btn-soft-primary btn-sm"
                         @click="
                           handleFileUpload({
-                            fileName: `Contract.${contractFile.name.split('.').pop()}`,
+                            fileName: `Contract.${contractFile.name
+                              .split('.')
+                              .pop()}`,
                             file: contractFile,
                             key: 'contract',
                           })
@@ -932,9 +937,7 @@ export default {
                                 </span>
                               </div>
                               <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >Insurance</div
-                                >
+                                <div class="d-inline-block mt-2">Insurance</div>
                               </div>
                             </div>
                           </div>
@@ -953,7 +956,9 @@ export default {
                         class="btn btn-soft-primary btn-sm"
                         @click="
                           handleFileUpload({
-                            fileName: `Insurance.${insuranceFile.name.split('.').pop()}`,
+                            fileName: `Insurance.${insuranceFile.name
+                              .split('.')
+                              .pop()}`,
                             file: insuranceFile,
                             key: 'insurance',
                           })
@@ -1031,7 +1036,11 @@ export default {
                         class="btn btn-soft-primary btn-sm"
                         @click="
                           handleDeliverableFileUpload({
-                            fileName: `${deliverable.name}-Timesheet.${timeSheet[index].timesheet.name.split('.').pop()}`,
+                            fileName: `${
+                              deliverable.name
+                            }-Timesheet.${timeSheet[index].timesheet.name
+                              .split('.')
+                              .pop()}`,
                             file: timeSheet[index].timesheet,
                             key: 'timesheet',
                             id: deliverable.id,
@@ -1143,7 +1152,11 @@ export default {
                         class="btn btn-soft-primary btn-sm"
                         @click="
                           handleDeliverableFileUpload({
-                            fileName: `${deliverable.name}-Invoice.${invoice[index].invoice.name.split('.').pop()}`,
+                            fileName: `${deliverable.name}-Invoice.${invoice[
+                              index
+                            ].invoice.name
+                              .split('.')
+                              .pop()}`,
                             file: invoice[index].invoice,
                             key: 'invoice',
                             id: deliverable.id,

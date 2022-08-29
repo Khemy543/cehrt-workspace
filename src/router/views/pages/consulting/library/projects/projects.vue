@@ -53,6 +53,9 @@ export default {
     this.getProjectsLibrary()
   },
   methods: {
+    getProjectRegions(regions) {
+      return regions.map((item) => item.region).join(', ');
+    },
     getIds(regions) {
       return regions.map((items) => items.id)
     },
@@ -182,9 +185,9 @@ export default {
                     <th scope="row">{{ index + 1 }}</th>
                     <td>{{ item.name }}</td>
                     <td>{{ item.country || 'N/A' }}</td>
-                    <td>Accra</td>
+                    <td>{{ getProjectRegions(item.regions) }}</td>
                     <td>{{ item.district || 'N/A' }}</td>
-                    <td>2016</td>
+                    <td>{{ new Date(item.end_date).getFullYear() }}</td>
                     <td>{{ item.client }}</td>
                     <td>{{ item.project_type.name }}</td>
                     <td class="d-flex">
