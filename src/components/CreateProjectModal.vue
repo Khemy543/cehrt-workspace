@@ -5,6 +5,10 @@
     title-class="font-18"
     hide-footer
     size="lg"
+    :cancel-disabled="loading"
+    :hide-header-close="loading"
+    :no-close-on-backdrop="loading"
+    :no-close-on-esc="loading"
   >
     <form @submit.prevent="action(form)">
       <b-form-group
@@ -78,12 +82,9 @@
           >
             <b-form-select v-model="form.coordinator_id" class="mb-2" required>
               <option value="" disabled>Select project coordinator</option>
-              <option
-                v-for="user in staff"
-                :key="user.id"
-                :value="user.id"
-                >{{ user.name }}</option
-              >
+              <option v-for="user in staff" :key="user.id" :value="user.id">{{
+                user.name
+              }}</option>
             </b-form-select>
           </b-form-group>
         </div>
@@ -115,7 +116,12 @@
           </b-form-group>
         </div> -->
       </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button v-if="!loading" type="submit" class="btn btn-primary"
+        >Submit</button
+      >
+      <button v-else class="btn btn-primary" disabled
+        ><b-spinner small variant="white"></b-spinner> Creating Project</button
+      >
     </form>
   </b-modal>
 </template>
@@ -139,6 +145,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
     return {
@@ -150,7 +160,7 @@ export default {
       },
       projectTypes: [],
       sectors: [],
-      staff: []
+      staff: [],
     }
   },
   computed: {
@@ -167,7 +177,7 @@ export default {
     project(newValue) {
       this.form = {
         ...newValue,
-        name: newValue.name || newValue.title || "",
+        name: newValue.name || newValue.title || '',
         project_type_id: newValue.project_type.id || '',
         project_sector_id: newValue.project_sector.id || '',
         coordinator_id: newValue.coordinator.id || '',
@@ -190,7 +200,7 @@ export default {
   created() {
     this.getSectors()
     this.getProjectTypes()
-    this.getStaff();
+    this.getStaff()
   },
   methods: {
     async getSectors() {
@@ -213,15 +223,13 @@ export default {
     },
     async getStaff() {
       try {
-        const response = await this.$http.get(`/fetch/all-staff`);
+        const response = await this.$http.get(`/fetch/all-staff`)
 
-        if(response) {
+        if (response) {
           this.staff = response.data
         }
-      } catch (error) {
-        
-      }
-    }
+      } catch (error) {}
+    },
   },
 }
 </script>

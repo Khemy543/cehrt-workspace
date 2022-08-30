@@ -30,8 +30,8 @@ export default {
     const config = {
       auth: {
         clientId: clientId,
-        // redirectUri: 'https://workspace.cehrtghana.com',
-        redirectUri: 'http://localhost:8081',
+        redirectUri: 'https://workspace.cehrtghana.com',
+        // redirectUri: 'http://localhost:8081',
         authority: 'https://login.microsoftonline.com/common'
       },
       cache: {

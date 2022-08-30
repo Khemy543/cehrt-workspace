@@ -28,6 +28,7 @@ export default {
           active: true,
         },
       ],
+      vloading: false,
       loading: false,
       show: false,
       form: {
@@ -72,7 +73,7 @@ export default {
     },
     async addNewProject(form) {
       try {
-
+        this.vloading = true;
         const data = await graph.createProjectFolder({
           name: form.name,
           folder: { },
@@ -93,6 +94,8 @@ export default {
           this.projectData = [{...response.data.project, assignees: []}, ...this.projectData]
 
           this.closeModal()
+
+          this.vloading = false;
 
           this.$bvToast.toast('New project added successfully', {
             title: 'Success',
@@ -122,6 +125,7 @@ export default {
           variant: 'danger',
           toastClass: 'text-white',
         })
+        this.vloading = false;
       }
     },
   },
@@ -207,6 +211,7 @@ export default {
       :form-title="formtitle"
       :close="closeModal"
       :action="addNewProject"
+      :loading="vloading"
       @input="show = $event"
     />
   </Layout>

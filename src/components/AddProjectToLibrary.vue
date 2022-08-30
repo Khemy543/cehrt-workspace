@@ -549,7 +549,7 @@ export default {
         project_sector_id:
           (newValue && newValue.project_sector && newValue.project_sector.id) ||
           '',
-        regionIds: [],
+        regionIds: newValue.regions || [],
         start_date: dateFormate(newValue.start_date) || '',
         end_date: dateFormate(newValue.end_date) || '',
         professional_expects: newValue.professional_expect || [

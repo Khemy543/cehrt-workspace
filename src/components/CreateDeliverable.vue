@@ -4,6 +4,10 @@
     :title="title"
     title-class="font-18"
     hide-footer
+    :cancel-disabled="loading"
+    :hide-header-close="loading"
+    :no-close-on-backdrop="loading"
+    :no-close-on-esc="loading"
   >
     <form @submit.prevent="action({ ...deliverable, ...form, file, filename })">
       <b-form-group
@@ -30,7 +34,10 @@
           @change="onFileChange"
         />
       </b-form-group>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button v-if="!loading" type="submit" class="btn btn-primary">Submit</button>
+      <button v-else class="btn btn-primary" disabled
+        ><b-spinner small variant="white"></b-spinner> Creating Deliverable</button
+      >
     </form>
   </b-modal>
 </template>
@@ -54,6 +61,10 @@ export default {
     editting: {
       type: Boolean,
       default: false
+    },
+    loading: {
+      type: Boolean,
+      default: false 
     }
   },
   data() {

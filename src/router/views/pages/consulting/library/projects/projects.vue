@@ -14,7 +14,7 @@ export default {
     Layout,
     PageHeader,
     AddProjectToLibrary,
-    ProjectDeletionModal
+    ProjectDeletionModal,
   },
   props: {
     id: {
@@ -36,12 +36,13 @@ export default {
           active: true,
         },
       ],
+      editting: false,
       loading: false,
       library: [],
       show: false,
       vProject: null,
       showProjectDeletionModal: false,
-      projectId: null
+      projectId: null,
     }
   },
   computed: {
@@ -53,8 +54,14 @@ export default {
     this.getProjectsLibrary()
   },
   methods: {
+    handleAction(form) {
+      if (this.editting) {
+        return this.updateProject(form)
+      }
+      return this.createProject(form)
+    },
     getProjectRegions(regions) {
-      return regions.map((item) => item.region).join(', ');
+      return regions.map((item) => item.region).join(', ')
     },
     getIds(regions) {
       return regions.map((items) => items.id)
@@ -102,6 +109,42 @@ export default {
         })
       }
     },
+    async updateProject(form) {
+      try {
+        const response = await this.$http.put(`/update/${form.id}/project`, { ...form, coordinator_id: this.$store.state.auth.currentUser.id});
+
+        if (response) {
+          this.$bvToast.toast('Project updated successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
+          this.show = false
+          this.editting = false;
+          this.vProject = null;
+        }
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
     async getProjectsLibrary() {
       try {
         this.loading = true
@@ -127,7 +170,8 @@ export default {
       this.$router.push(`/library/projects/${id}/files`)
     },
     editProject(project) {
-      this.vProject = project;
+      this.vProject = project
+      this.editting = true
       this.show = true
     },
   },
@@ -238,7 +282,7 @@ export default {
         </div>
       </div>
       <AddProjectToLibrary
-        :action="createProject"
+        :action="handleAction"
         :value="show"
         title="Add Project To Library"
         :project="vProject"
@@ -246,11 +290,10 @@ export default {
       />
     </div>
 
-
     <ProjectDeletionModal
       :close="() => (showProjectDeletionModal = false)"
       :value="showProjectDeletionModal"
-      :project-id = "projectId"
+      :project-id="projectId"
       @input="showProjectDeletionModal = $event"
     />
   </Layout>

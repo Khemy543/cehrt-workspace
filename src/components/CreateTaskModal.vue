@@ -58,7 +58,7 @@
 </template>
 
 <script>
-import { dateFormate } from '../utils/format-date'
+import { dateFormate, isDateAfter } from '../utils/format-date'
 
 export default {
   props: {
@@ -121,6 +121,11 @@ export default {
         }
       }
     },
+    form(newForm) {
+      if (isDateAfter(newForm.start_date, newForm.end_date)) {
+        this.form.end_date = this.form.start_date
+      }
+    }
   },
   created() {
     this.getStaff()

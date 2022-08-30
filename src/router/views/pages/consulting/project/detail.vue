@@ -44,6 +44,7 @@ export default {
           active: true,
         },
       ],
+      vloading: false,
       projectDeliverables: [],
       vDeliverable: null,
       editting: false,
@@ -321,6 +322,7 @@ export default {
     },
     async createDeliverable(form) {
       try {
+        this.vloading = true;
         const data = await graph.uploadProjectFile({
           fileName: `${form.deliverable_name}.docx`,
           fileContent: form.file,
@@ -354,6 +356,7 @@ export default {
           this.showCreateDeliverable = false
 
           this.vDeliverable = null
+          this.vloading = false;
 
           /* await this.updateDeliverableWithPathName({
             ...response.data.deliverable,
@@ -382,6 +385,7 @@ export default {
           variant: 'danger',
         })
       }
+      this.vloading = false;
     },
 
     async EditDeliverable(form) {
@@ -1011,6 +1015,7 @@ export default {
       :value="showCreateDeliverable"
       :deliverable="vDeliverable"
       :editting="editting"
+      :loading="vloading"
       @input="showCreateDeliverable = $event"
     />
 
