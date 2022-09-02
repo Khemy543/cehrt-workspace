@@ -65,13 +65,13 @@ export default {
       return roles && roles.id || null;
     },
     adminRoles() {
-      return this.roles.filter(role => role.department_id === this.adiminId);
+      return this.roles.filter(role => role.department.id === this.adiminId);
     },
     consultingRoles() {
-      return this.roles.filter(role => role.department_id === this.consultingId);
+      return this.roles.filter(role => role.department.id === this.consultingId);
     },
     financeRoles() {
-      return this.roles.filter(role => role.department_id === this.financeId)
+      return this.roles.filter(role => role.department.id === this.financeId)
     }
   },
   created() {

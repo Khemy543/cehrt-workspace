@@ -151,7 +151,7 @@ export default {
           tooltip: {
             y: {
               formatter: function(val) {
-                return 'GHS' + val
+                return 'GHS ' + val
               },
             },
           },

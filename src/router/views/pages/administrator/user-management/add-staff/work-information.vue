@@ -1,10 +1,10 @@
 <script>
 import { required } from 'vuelidate/lib/validators'
-import Multiselect from 'vue-multiselect';
+import Multiselect from 'vue-multiselect'
 
 export default {
   components: {
-    Multiselect
+    Multiselect,
   },
   data() {
     return {
@@ -18,123 +18,138 @@ export default {
       staffOptions: [],
       roles: [],
       staffId: null,
-      rate: "",
+      rate: '',
       rateCurrency: 'GHS',
       consultingRoleId: '',
       adminRoleId: '',
-      financeRoleId: ''
+      financeRoleId: '',
     }
   },
   computed: {
     adiminId() {
-      const roles = this.departmentsOptions.find(item => item.name === 'Administration');
-      return roles && roles.id || null;
+      const roles = this.departmentsOptions.find(
+        (item) => item.name === 'Administration'
+      )
+      return (roles && roles.id) || null
     },
     consultingId() {
-      const roles = this.departmentsOptions.find(item => item.name === 'Consultancy');
-      return roles && roles.id || null;
+      const roles = this.departmentsOptions.find(
+        (item) => item.name === 'Consultancy'
+      )
+      return (roles && roles.id) || null
     },
     financeId() {
-      const roles = this.departmentsOptions.find(item => item.name === 'Finance');
-      return roles && roles.id || null;
+      const roles = this.departmentsOptions.find(
+        (item) => item.name === 'Finance'
+      )
+      return (roles && roles.id) || null
     },
     adminRoles() {
-      return this.roles.filter(role => role.department.id === this.adiminId);
+      return this.roles.filter((role) => role.department.id === this.adiminId)
     },
     consultingRoles() {
-      return this.roles.filter(role => role.department.id === this.consultingId);
+      return this.roles.filter(
+        (role) => role.department.id === this.consultingId
+      )
     },
     financeRoles() {
-      return this.roles.filter(role => role.department.id === this.financeId)
+      return this.roles.filter((role) => role.department.id === this.financeId)
     },
     showFinaceRole() {
-      return this.departments.some(item => item.id === this.financeId);
+      return this.departments.some((item) => item.id === this.financeId)
     },
     showAdminRole() {
-      return this.departments.some(item => item.id === this.adiminId);
+      return this.departments.some((item) => item.id === this.adiminId)
     },
     showConsultingRole() {
-      return this.departments.some(item => item.id === this.consultingId)
-    }
+      return this.departments.some((item) => item.id === this.consultingId)
+    },
   },
   created() {
-    this.fetchDepartments();
+    this.fetchDepartments()
     this.fetchSuperviosrs()
-    this.fetchRoles();
+    this.fetchRoles()
   },
   validations: {
     title: {
       required,
     },
     supervisor: {
-      required: false
+      required: false,
     },
     workLocation: {
-      required: false
+      required: false,
     },
     workPhone: {
-      required: false
+      required: false,
     },
     startDate: {
-      required
+      required,
     },
     departments: {
-      required
+      required,
     },
     staffId: {
-      required
+      required,
     },
     rate: {
-      required: false
+      required: false,
     },
     rateCurrency: {
-      required: false
+      required: false,
     },
     consultingRoleId: {
-      required: false
+      required: false,
     },
     adminRoleId: {
-      required: false
+      required: false,
     },
     financeRoleId: {
-      required: false
+      required: false,
     },
 
-    form: ['title', 'supervisor', 'workLocation', 'workPhone', 'startDate', 'departments', 'staffId', 'rate', 'rateCurrency', 'consultingRoleId', 'adminRoleId', 'financeRoleId'],
+    form: [
+      'title',
+      'supervisor',
+      'workLocation',
+      'workPhone',
+      'startDate',
+      'departments',
+      'staffId',
+      'rate',
+      'rateCurrency',
+      'consultingRoleId',
+      'adminRoleId',
+      'financeRoleId',
+    ],
   },
   methods: {
     async fetchDepartments() {
       try {
-        const response = await this.$http.get('/admin/fetch/departments');
+        const response = await this.$http.get('/admin/fetch/departments')
 
         if (response && response.data) {
-          this.departmentsOptions = response.data;
+          this.departmentsOptions = response.data
         }
-      } catch (error) {
-
-      }
+      } catch (error) {}
     },
     async fetchSuperviosrs() {
       try {
-        const response = await this.$http.get('/admin/fetch/staff');
+        const response = await this.$http.get('/admin/fetch/staff')
 
         if (response && response.data) {
           this.staffOptions = response.data
         }
-      } catch (error) {
-
-      }
+      } catch (error) {}
     },
     async fetchRoles() {
       try {
-        const response = await this.$http.get('/admin/department/positions');
+        const response = await this.$http.get('/admin/department/positions')
 
         if (response) {
-          this.roles = response.data;
+          this.roles = response.data
         }
-      } catch (error) {
-
-      }
+      } catch (error) {}
     },
     validate() {
       this.$v.form.$touch()
@@ -151,7 +166,9 @@ export default {
     <div class="row">
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.title.$error }">
-          <label class="col-md-12 col-form-label">Title <span class=" text-danger">*</span></label>
+          <label class="col-md-12 col-form-label"
+            >Title <span class=" text-danger">*</span></label
+          >
           <div class="col-md-12">
             <multiselect
               v-model="title"
@@ -160,13 +177,19 @@ export default {
             <span
               v-if="$v.title.$error && !$v.title.required"
               class="help-block invalid-feedback"
-            >title is required</span>
+              >title is required</span
+            >
           </div>
         </div>
       </div>
       <div class="col-md-6">
-        <div class="form-group mb-3" :class="{ 'has-error': $v.departments.$error }">
-          <label class="col-md-12 col-form-label">Departments <span class=" text-danger">*</span></label>
+        <div
+          class="form-group mb-3"
+          :class="{ 'has-error': $v.departments.$error }"
+        >
+          <label class="col-md-12 col-form-label"
+            >Departments <span class=" text-danger">*</span></label
+          >
           <div class="col-md-12">
             <multiselect
               v-model="departments"
@@ -178,13 +201,14 @@ export default {
             <span
               v-if="$v.departments.$error && !$v.departments.required"
               class="help-block invalid-feedback"
-            >departments is required</span>
+              >departments is required</span
+            >
           </div>
         </div>
       </div>
     </div>
     <div class="row">
-      <div  v-if="showConsultingRole" class="col-md-6">
+      <div v-if="showConsultingRole" class="col-md-6">
         <div class="form-group mb-3">
           <label class="col-md-12 col-form-label">Consulting Role</label>
           <div class="col-md-12">
@@ -194,7 +218,8 @@ export default {
                 v-for="option in consultingRoles"
                 :key="option.id"
                 :value="option.id"
-              >{{ option.name }}</option>
+                >{{ option.name }}</option
+              >
             </select>
           </div>
         </div>
@@ -210,12 +235,13 @@ export default {
                 v-for="option in adminRoles"
                 :key="option.id"
                 :value="option.id"
-              >{{ option.name }}</option>
+                >{{ option.name }}</option
+              >
             </select>
           </div>
         </div>
       </div>
-      <div  v-if="showFinaceRole" class="col-md-6">
+      <div v-if="showFinaceRole" class="col-md-6">
         <div class="form-group mb-3">
           <label class="col-md-12 col-form-label">Finance Role</label>
           <div class="col-md-12">
@@ -225,7 +251,8 @@ export default {
                 v-for="option in financeRoles"
                 :key="option.id"
                 :value="option.id"
-              >{{ option.name }}</option>
+                >{{ option.name }}</option
+              >
             </select>
           </div>
         </div>
@@ -233,7 +260,10 @@ export default {
     </div>
     <div class="row">
       <div class="col-md-6">
-        <div class="form-group mb-3" :class="{ 'has-error': $v.supervisor.$error }">
+        <div
+          class="form-group mb-3"
+          :class="{ 'has-error': $v.supervisor.$error }"
+        >
           <label class="col-md-12 col-form-label">Supervisor</label>
           <div class="col-md-12">
             <select
@@ -246,18 +276,23 @@ export default {
                 v-for="option in staffOptions"
                 :key="option.id"
                 :value="option.id"
-              >{{ option.firstname }} {{ option.lastname }}</option>
+                >{{ option.firstname }} {{ option.lastname }}</option
+              >
             </select>
             <span
               v-if="$v.supervisor.$error && !$v.supervisor.required"
               class="help-block invalid-feedback"
-            >supervisor is required</span>
+              >supervisor is required</span
+            >
           </div>
         </div>
       </div>
 
       <div class="col-md-6">
-        <div class="form-group mb-3" :class="{ 'has-error': $v.workPhone.$error }">
+        <div
+          class="form-group mb-3"
+          :class="{ 'has-error': $v.workPhone.$error }"
+        >
           <label class="col-md-12 col-form-label">Work Phone</label>
           <div class="col-md-12">
             <input
@@ -269,7 +304,8 @@ export default {
             <span
               v-if="$v.workPhone.$error && !$v.workPhone.required"
               class="help-block invalid-feedback"
-            >work phone is required</span>
+              >work phone is required</span
+            >
           </div>
         </div>
       </div>
@@ -277,7 +313,10 @@ export default {
 
     <div class="row">
       <div class="col-md-6">
-        <div class="form-group mb-3" :class="{ 'has-error': $v.workLocation.$error }">
+        <div
+          class="form-group mb-3"
+          :class="{ 'has-error': $v.workLocation.$error }"
+        >
           <label class="col-md-12 col-form-label">Work Location</label>
           <div class="col-md-12">
             <input
@@ -289,13 +328,19 @@ export default {
             <span
               v-if="$v.workLocation.$error && !$v.workLocation.required"
               class="help-block invalid-feedback"
-            >work location is required</span>
+              >work location is required</span
+            >
           </div>
         </div>
       </div>
       <div class="col-md-6">
-        <div class="form-group mb-3" :class="{ 'has-error': $v.startDate.$error }">
-          <label class="col-md-12 col-form-label">Start Date <span class=" text-danger">*</span></label>
+        <div
+          class="form-group mb-3"
+          :class="{ 'has-error': $v.startDate.$error }"
+        >
+          <label class="col-md-12 col-form-label"
+            >Start Date <span class=" text-danger">*</span></label
+          >
           <div class="col-md-12">
             <input
               v-model.trim="startDate"
@@ -306,7 +351,8 @@ export default {
             <span
               v-if="$v.startDate.$error && !$v.startDate.required"
               class="help-block invalid-feedback"
-            >start date is required</span>
+              >start date is required</span
+            >
           </div>
         </div>
       </div>
@@ -314,8 +360,14 @@ export default {
 
     <div class="row">
       <div class="col-md-6">
-        <div class="form-group mb-3" :class="{ 'has-error': $v.staffId.$error }">
-          <label class="col-md-12 col-form-label">Staff Identification Number <span class=" text-danger">*</span></label>
+        <div
+          class="form-group mb-3"
+          :class="{ 'has-error': $v.staffId.$error }"
+        >
+          <label class="col-md-12 col-form-label"
+            >Staff Identification Number
+            <span class=" text-danger">*</span></label
+          >
           <div class="col-md-12">
             <input
               v-model.trim="staffId"
@@ -326,12 +378,13 @@ export default {
             <span
               v-if="$v.staffId.$error && !$v.staffId.required"
               class="help-block invalid-feedback"
-            >Staff identification number is required</span>
+              >Staff identification number is required</span
+            >
           </div>
         </div>
       </div>
     </div>
-    <div  v-if="showConsultingRole" class="row">
+    <div v-if="showConsultingRole" class="row">
       <div class="col-md-6">
         <div class="form-group mb-3" :class="{ 'has-error': $v.rate.$error }">
           <label class="col-md-12 col-form-label">Staff Rate</label>
@@ -345,22 +398,22 @@ export default {
           </div>
         </div>
       </div>
-<!--      <div class="col-md-6">-->
-<!--        <div class="form-group mb-3" :class="{ 'has-error': $v.rateCurrency.$error }">-->
-<!--          <label class="col-md-12 col-form-label">Rate Currency</label>-->
-<!--          <div class="col-md-12">-->
-<!--            <select-->
-<!--              v-model.trim="rateCurrency"-->
-<!--              class="form-control"-->
-<!--              :class="{ 'is-invalid': $v.rateCurrency.$error }"-->
-<!--            >-->
-<!--              <option disabled value>Select Currency</option>-->
-<!--              <option value="GHS">GHS</option>-->
-<!--              <option value="USD">USD</option>-->
-<!--            </select>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
+      <!--      <div class="col-md-6">-->
+      <!--        <div class="form-group mb-3" :class="{ 'has-error': $v.rateCurrency.$error }">-->
+      <!--          <label class="col-md-12 col-form-label">Rate Currency</label>-->
+      <!--          <div class="col-md-12">-->
+      <!--            <select-->
+      <!--              v-model.trim="rateCurrency"-->
+      <!--              class="form-control"-->
+      <!--              :class="{ 'is-invalid': $v.rateCurrency.$error }"-->
+      <!--            >-->
+      <!--              <option disabled value>Select Currency</option>-->
+      <!--              <option value="GHS">GHS</option>-->
+      <!--              <option value="USD">USD</option>-->
+      <!--            </select>-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--      </div>-->
     </div>
   </div>
 </template>
