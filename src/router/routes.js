@@ -327,7 +327,7 @@ const calendarAppsRoutes = [
 const projectAppsRoutes = [
   {
     path: '/project/list',
-    name: 'Project',
+    name: 'Projects',
     icon: 'briefcase',
     department: 'Consultancy',
     meta: { authRequired: true },
@@ -373,7 +373,7 @@ const projectAppsRoutes = [
 const adminProjectRoutes = [
   {
     path: '/admin/project-management',
-    name: 'Manage Project',
+    name: 'Projects',
     icon: 'briefcase',
     department: 'Administration',
     meta: { authRequired: true },

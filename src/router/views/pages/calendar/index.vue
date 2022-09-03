@@ -115,7 +115,7 @@ export default {
               return {
                 id: item.id,
                 title: `${item.user} (${item.type} Leave) ${item.status}`,
-                editable: true,
+                editable: false,
                 start: calendarFormat(item.start_date),
                 end: calendarFormat(item.end_date),
                 reason: item.reason,
@@ -192,7 +192,7 @@ export default {
             return {
               id: `review-task-${item.id}`,
               title: item.name,
-              url: `/project/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
+              url: `/project/task/${item.id}/details?hasSubTask=${item.has_subtask}&subtask=false`,
               start: isDateAfter(item.start_date, item.end_date)
                 ? this.formateEndDate(item.end_date)
                 : item.start_date,
@@ -249,8 +249,6 @@ export default {
                 className: 'bg-primary-text-white',
               }
             })
-
-          console.log(vTasks)
 
           const vProposalTask =
             proposalTasks &&
@@ -477,6 +475,7 @@ export default {
      * Modal open for edit event
      */
     editEvent(info) {
+      console.log(info)
       if (info.event.startEditable) {
         this.edit = info.event
         this.editableEvent = {

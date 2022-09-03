@@ -49,6 +49,9 @@ export default {
     this.getProposalDetails()
   },
   methods: {
+    extension(file) {
+      return file.name.split('.').pop()
+    },
     handleContractChange({ target }) {
       this.awardOfContractFile = target.files[0]
     },
@@ -378,7 +381,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >Award-of-contract.docx</div
+                                  >Award-of-contract</div
                                 >
                               </div>
                             </div>
@@ -404,7 +407,7 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: 'Award of contract.docx',
+                            fileName: `Award of contract.${extension(awardOfContractFile)}`,
                             file: awardOfContractFile,
                             key: 'award_of_contract',
                           })
@@ -448,7 +451,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >Request-for-EOL.docx</div
+                                  >Request-for-EOL</div
                                 >
                               </div>
                             </div>
@@ -471,7 +474,7 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: 'Request for EOI.docx',
+                            fileName: `Request for EOI.${extension(requestForEol)}`,
                             file: requestForEol,
                             key: 'request_for_eol',
                           })
@@ -515,7 +518,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >Request-For-Proposal.docx</div
+                                  >Request-For-Proposal</div
                                 >
                               </div>
                             </div>
@@ -539,7 +542,7 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: 'Request for Proposal.docx',
+                            fileName: `Request for Proposal.${extension(requestForProposal)}`,
                             file: requestForProposal,
                             key: 'request_for_proposal',
                           })
@@ -610,7 +613,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >correspondent.docx
+                                  >correspondent
                                 </div>
                               </div>
                             </div>
@@ -642,7 +645,7 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: `Correspondent${index + 1}.docx`,
+                            fileName: `Correspondent${index + 1}.${extension(correspondents[index].correspondent_path)}`,
                             file: correspondents[index].correspondent_path,
                             key: 'correspondents',
                           })

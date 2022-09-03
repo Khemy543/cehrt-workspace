@@ -99,7 +99,9 @@ export default {
       return this.assignees.length
     },
     isCoordinator() {
-      return this.project.coordinator.id === this.$store.state.auth.currentUser.id;
+      return (
+        this.project.coordinator.id === this.$store.state.auth.currentUser.id
+      )
     },
   },
   created() {
@@ -108,6 +110,9 @@ export default {
     this.getComments()
   },
   methods: {
+    extension(file) {
+      return file.name.split('.').pop()
+    },
     async updateDeliverableWithPathName(item) {
       try {
         const response = await this.$http.patch(
@@ -124,8 +129,7 @@ export default {
 
           this.$set(this.projectDeliverables, index, response.data.deliverable)
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     },
     showUpdateDeliverable(deliverable) {
       this.vDeliverable = deliverable
@@ -322,15 +326,15 @@ export default {
     },
     async createDeliverable(form) {
       try {
-        this.vloading = true;
+        this.vloading = true
         const data = await graph.uploadProjectFile({
-          fileName: `${form.deliverable_name}.docx`,
+          fileName: `${form.deliverable_name}.${this.extension(form.file)}`,
           fileContent: form.file,
           folder: this.project.name,
         })
 
         const uploadData = await graph.uploadFileInChunk({
-          fileName: `${form.deliverable_name}.docx`,
+          fileName: `${form.deliverable_name}.${this.extension(form.file)}`,
           fileContent: form.file,
           uploadUrl: data.uploadUrl,
         })
@@ -356,7 +360,7 @@ export default {
           this.showCreateDeliverable = false
 
           this.vDeliverable = null
-          this.vloading = false;
+          this.vloading = false
 
           /* await this.updateDeliverableWithPathName({
             ...response.data.deliverable,
@@ -385,7 +389,7 @@ export default {
           variant: 'danger',
         })
       }
-      this.vloading = false;
+      this.vloading = false
     },
 
     async EditDeliverable(form) {
@@ -589,36 +593,41 @@ export default {
               >
                 <div class="row page-title" style="padding:0">
                   <div class="col-sm-12 col-xl-12 d-flex">
-                    <h4 class="mt-0">
-                      {{ project.name }}
-                    </h4>
-                    <div v-if="isCoordinator" class=" mx-4">
-                      <b-dropdown
-                        class="d-inline"
-                        variant="link"
-                        toggle-class="font-weight-bold p-0 align-middle"
-                      >
-                        <template v-slot:button-content>
-                          {{ selectedStatus.name }}
-                          <i
-                            class="uil uil-angle-down font-size-16 align-middle"
-                          ></i>
-                        </template>
-                        <b-dropdown-item
-                          v-for="status in projectStatuses"
-                          :key="status.id"
-                          href="javascript: void(0);"
-                          variant="seconday"
-                          @click="changeStatus(status)"
+                    <div>
+                      <h4 class="mt-0">
+                        {{ project.name }}
+                      </h4>
+                      <div v-if="isCoordinator">
+                        <b-dropdown
+                          class="d-inline"
+                          variant="link"
+                          toggle-class="font-weight-bold p-0 align-middle"
                         >
-                          {{ status.name }}
-                        </b-dropdown-item>
-                      </b-dropdown>
+                          <template v-slot:button-content>
+                            {{ selectedStatus.name }}
+                            <i
+                              class="uil uil-angle-down font-size-16 align-middle"
+                            ></i>
+                          </template>
+                          <b-dropdown-item
+                            v-for="status in projectStatuses"
+                            :key="status.id"
+                            href="javascript: void(0);"
+                            variant="seconday"
+                            @click="changeStatus(status)"
+                          >
+                            {{ status.name }}
+                          </b-dropdown-item>
+                        </b-dropdown>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                <div v-if="isCoordinator" class="col-sm-4 col-xl-6 text-sm-right">
+                <div
+                  v-if="isCoordinator"
+                  class="col-sm-4 col-xl-6 text-sm-right"
+                >
                   <router-link
                     :to="`/project/${project.id}/project-plan`"
                     class="btn-group ml-2 d-none d-sm-inline-block"
@@ -655,6 +664,7 @@ export default {
                     </button>
                   </div>
                 </div>
+                <div v-else class="col-sm-4 col-xl-6 text-sm-right"></div>
               </div>
               <div class="row py-1">
                 <!-- Widget -->
@@ -691,7 +701,7 @@ export default {
 
                 <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
-                  <div class="media p-3">
+                  <div class="media p-3"> 
                     <feather
                       type="clock"
                       class="align-self-center icon-dual icon-lg mr-4"
@@ -898,56 +908,62 @@ export default {
                   class="activity-list"
                 >
                   <div class="media d-flex justify-content-between">
-                    <div class="media-body overflow-hidden">
-                      <h5 class="font-size-15 mt-2 mb-1">
-                        <router-link
-                          :to="
-                            `/project/${$route.params.id}/deliverable/${deliverable.id}`
-                          "
-                          class="text-dark"
-                        >
+                    <router-link
+                      :to="
+                        `/project/${$route.params.id}/deliverable/${deliverable.id}`
+                      "
+                      class="text-dark"
+                    >
+                      <div class="media-body overflow-hidden">
+                        <h5 class="font-size-15 mt-2 mb-1">
                           {{
                             deliverable.project_type_deliverable &&
                               deliverable.project_type_deliverable
                                 .deliverable_name
                           }}
-                        </router-link>
-                      </h5>
-                      <div class="d-flex">
-                        <div>
-                          <a
-                            :id="`task-tooltip-${deliverable.id}`"
-                            href="javascript: void(0)"
-                            class="text-muted d-inline-block bg-transparent"
-                          >
-                            <b-tooltip
-                              :target="`task-tooltip-${deliverable.id}`"
-                              triggers="hover"
-                              placement="top"
-                              >Tasks
-                            </b-tooltip>
-                            <i class="uil uil-bars mr-1 text-primary"></i>
-                            {{ deliverable.tasks_count || 0 }} task(s)
-                          </a>
-                        </div>
-                        <div class=" mx-2">
-                          <a
-                            :id="`task-tooltip-${deliverable.id}`"
-                            href="javascript: void(0)"
-                            class="text-muted d-inline-block bg-transparent"
-                          >
-                            <b-tooltip
-                              :target="`task-tooltip-${deliverable.id}`"
-                              triggers="hover"
-                              placement="top"
-                              >Due Date
-                            </b-tooltip>
-                            <i class="uil-calendar-slash mr-1 text-danger"></i>
-                            {{ deliverable.deadline }}
-                          </a>
+                        </h5>
+                        <div class="d-flex">
+                          <div>
+                            <router-link
+                              :id="`task-tooltip-${deliverable.id}`"
+                              :to="
+                                `/project/${$route.params.id}/deliverable/${deliverable.id}`
+                              "
+                              class="text-muted d-inline-block bg-transparent"
+                            >
+                              <b-tooltip
+                                :target="`task-tooltip-${deliverable.id}`"
+                                triggers="hover"
+                                placement="top"
+                                >Tasks
+                              </b-tooltip>
+                              <i class="uil uil-bars mr-1 text-primary"></i>
+                              {{ deliverable.tasks_count || 0 }} task(s)
+                            </router-link>
+                          </div>
+                          <div class=" mx-2">
+                            <router-link
+                              :id="`deadline-tooltip-${deliverable.id}`"
+                              :to="
+                                `/project/${$route.params.id}/deliverable/${deliverable.id}`
+                              "
+                              class="text-muted d-inline-block bg-transparent"
+                            >
+                              <b-tooltip
+                                :target="`deadline-tooltip-${deliverable.id}`"
+                                triggers="hover"
+                                placement="top"
+                                >Due Date
+                              </b-tooltip>
+                              <i
+                                class="uil-calendar-slash mr-1 text-danger"
+                              ></i>
+                              {{ deliverable.deadline }}
+                            </router-link>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </router-link>
                     <div class="d-flex">
                       <button
                         type="button"
@@ -995,13 +1011,17 @@ export default {
             </div>
           </div>
 
-          <div  class="card">
+          <div class="card">
             <div class="card-body">
               <h6 class="mt-0 header-title">View and Upload Project Media</h6>
 
               <div class="wrapper">
-                <a target="_blank" :href="project.images_path" class="image-wrapper">
-                  <img src="@assets/images/photos.png" alt="" class="image"/>
+                <a
+                  target="_blank"
+                  :href="project.images_path"
+                  class="image-wrapper"
+                >
+                  <img src="@assets/images/photos.png" alt="" class="image" />
                 </a>
               </div>
             </div>

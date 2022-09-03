@@ -133,7 +133,7 @@
               v-for="report in reports"
               :key="report.id"
               :to="`/proposal/${proposal.id}/report/${report.id}`"
-              class="col-md-3"
+              class="col-md-4"
             >
               <div class="card" style="min-height: 180px;">
                 <div class="card-body position-relative">
@@ -313,6 +313,9 @@ export default {
     this.getProposalReports()
   },
   methods: {
+    extension(file) {
+      return file.name.split('.').pop()
+    },
     openFile() {
      window.open(this.proposal.proposal_path,'_blank');
     },
@@ -458,13 +461,13 @@ export default {
     async createReport(report) {
       try {
         const data = await graph.uploadProposalFile({
-          fileName: `${report.report_title}.docx`,
+          fileName: `${report.report_title}.${this.extension(report.file)}`,
           fileContent: report.file,
           folder: this.proposal.title,
         })
 
         const uploadData = await graph.uploadFileInChunk({
-          fileName: `${report.report_title}.docx`,
+          fileName: `${report.report_title}.${this.extension(report.file)}`,
           fileContent: report.file,
           uploadUrl: data.uploadUrl,
         })

@@ -76,7 +76,7 @@
                         <div class="d-inline-block mt-2"
                           >{{
                             report.name
-                          }}.docx</div
+                          }}</div
                         >
                       </div>
                     </div>

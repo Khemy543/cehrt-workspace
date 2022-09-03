@@ -80,7 +80,11 @@ export default {
           '@microsoft.graph.conflictBehavior': 'replace',
         })
 
-        console.log(`https://onedrive.live.com/edit.aspx?resid=${data.id.split('!')[0]}!${Number(data.id.split('!')[1]) + 1}&ithint=file%2cxlsx`)
+        console.log(
+          `https://onedrive.live.com/edit.aspx?resid=${
+            data.id.split('!')[0]
+          }!${Number(data.id.split('!')[1]) + 1}&ithint=file%2cxlsx`
+        )
 
         graph.copyRenumirationFileToProposal({
           parentReference: { id: data.id },
@@ -90,7 +94,9 @@ export default {
         const response = await this.$http.post('/create/proposal', {
           ...form,
           onedrive_id: data.id,
-          proposal_path: `https://onedrive.live.com/edit.aspx?resid=${data.id.split('!')[0]}!${Number(data.id.split('!')[1]) + 1}&ithint=file%2cxlsx`,
+          proposal_path: `https://onedrive.live.com/edit.aspx?resid=${
+            data.id.split('!')[0]
+          }!${Number(data.id.split('!')[1]) + 1}&ithint=file%2cxlsx`,
         })
 
         if (response) {
@@ -261,7 +267,10 @@ export default {
                       <div
                         class="d-flex justify-content-between align-items-center"
                       >
-                        <div> </div>
+                        <p
+                          class="text-uppercase font-size-12 mb-2 text-primary"
+                          >{{ vProposal.client }}</p
+                        >
 
                         <b-dropdown
                           variant="link"
@@ -293,10 +302,10 @@ export default {
                               vProposal.title
                             }}</a>
                           </h5>
-                          <div
+                          <!-- <div
                             class="text-uppercase font-size-12 mb-2 text-primary"
                             >{{ vProposal.client }}</div
-                          >
+                          > -->
                           <p class="text-muted mb-4 description_text">{{
                             vProposal.project_type.name
                           }}</p>
@@ -307,6 +316,11 @@ export default {
                           >
                         </div>
                       </router-link>
+                    </div>
+                    <div class="card-body position-absolute" style="bottom: 0; left: 0; right: 0">
+                      <div class="border-top py-2">
+                        Click to view details
+                      </div>
                     </div>
                   </div>
                 </div>

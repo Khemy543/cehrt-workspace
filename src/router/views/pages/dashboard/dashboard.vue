@@ -179,7 +179,7 @@ export default {
               title: item.name,
               start: item.start_date,
               end: item.end_date,
-              editable: true,
+              editable: false,
               className: 'bg-primary text-white',
               allDay: false
             }
@@ -211,7 +211,7 @@ export default {
             title: this.editableEvent.name,
             start: this.editableEvent.start_date,
             end: this.editableEvent.end_date,
-            editable: true,
+            editable: false,
             className: 'bg-primary text-white',
             allDay: false
           })
@@ -264,7 +264,7 @@ export default {
             title: name,
             start: startDate,
             end: date,
-            editable: true,
+            editable: false,
             className: 'bg-danger text-white',
             allDay: false
           })
@@ -428,29 +428,29 @@ export default {
           <div class="card-body">
             <h5 class="card-title mt-0 mb-0 header-title">Projects</h5>
             <div class="table-responsive mt-4 mb-0">
-              <b-table-simple class="table table-hover table-nowrap mb-0">
-                <b-thead class="thead-white">
-                  <b-tr>
-                    <b-th>#</b-th>
-                    <b-th>Title</b-th>
-                    <b-th>Client</b-th>
-                    <b-th>Project Type</b-th>
-                    <b-th>Status</b-th>
-                    <b-th>Action</b-th>
-                  </b-tr>
-                </b-thead>
-                <b-tbody>
-                  <b-tr
+              <table class="table mb-0">
+                <thead class="thead-light">
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Project Type</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
                     v-for="(project, index) in projectData"
                     :key="project.id"
                   >
-                    <b-td>{{ index + 1 }}</b-td>
-                    <b-td>{{ project.name }}</b-td>
-                    <b-td>{{ project.client }}</b-td>
-                    <b-td>{{
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ project.name }}</td>
+                    <td>{{ project.client }}</td>
+                    <td>{{
                       project.project_type && project.project_type.name
-                    }}</b-td>
-                    <b-td>
+                    }}</td>
+                    <td>
                       <span
                         class="badge"
                         :class="{
@@ -465,15 +465,15 @@ export default {
                         }"
                         >{{ project.status }}</span
                       >
-                    </b-td>
-                    <b-td class="text-primary">
+                    </td>
+                    <td class="text-primary">
                       <router-link :to="createProjectUrl(project.id)">
                         View</router-link
                       >
-                    </b-td>
-                  </b-tr>
-                </b-tbody>
-              </b-table-simple>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -484,24 +484,24 @@ export default {
           <div class="card-body">
             <h5 class="card-title mt-0 mb-0 header-title">Proposals</h5>
             <div class="table-responsive mt-4 mb-0">
-              <b-table-simple class="table table-hover table-nowrap mb-0">
-                <b-thead class="thead-white">
-                  <b-tr>
-                    <b-th>#</b-th>
-                    <b-th style="max-width: 200px;">Proposal Name</b-th>
-                    <b-th>Client</b-th>
-                    <b-th>Proposal Type</b-th>
-                    <b-th>Status</b-th>
-                    <b-th>Status</b-th>
-                  </b-tr>
-                </b-thead>
-                <b-tbody>
-                  <b-tr v-for="(proposal, index) in proposalData" :key="proposal.name">
-                    <b-td>{{ index + 1 }}</b-td>
-                    <b-td>{{ proposal.title }}</b-td>
-                    <b-td>{{ proposal.client }}</b-td>
-                    <b-td>{{ proposal.project_type }}</b-td>
-                    <b-td><span
+              <table class="table table-hover table-nowrap mb-0">
+                <thead scope="col" class="thead-white">
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col" style="max-width: 200px;">Proposal Name</th>
+                    <th scope="col">Client</th>
+                    <th scope="col">Proposal Type</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(proposal, index) in proposalData" :key="proposal.name">
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ proposal.title }}</td>
+                    <td>{{ proposal.client }}</td>
+                    <td>{{ proposal.project_type }}</td>
+                    <td><span
                         class="badge"
                         :class="{
                           'badge-soft-warning':
@@ -514,15 +514,15 @@ export default {
                             `${proposal.status}` === 'active',
                         }"
                     >{{ proposal.status }}</span
-                    ></b-td>
-                    <b-td>
+                    ></td>
+                    <td>
                        <router-link :to="`proposals/details/${proposal.id}`"
                         >View</router-link
                       >
-                    </b-td>
-                  </b-tr>
-                </b-tbody>
-              </b-table-simple>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

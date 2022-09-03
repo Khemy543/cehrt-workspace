@@ -49,14 +49,6 @@ export default {
     }
   },
   computed: {
-    initals() {
-      return this.task.assignee.name
-        ? this.task.assignee.name
-            .match(/\b(\w)/g)
-            .join('')
-            .toUpperCase()
-        : 'GA'
-    },
     isSubTask() {
       return this.$route.query.subtask === 'true'
     },
@@ -76,6 +68,14 @@ export default {
     }
   },
   methods: {
+    initals(name) {
+      return name
+        ? name
+            .match(/\b(\w)/g)
+            .join('')
+            .toUpperCase()
+        : 'AA'
+    },
     async createSubTask(form) {
       try {
         const response = await this.$http.post(
@@ -373,12 +373,12 @@ export default {
             <div class="col-5">
               <!-- assignee -->
               <p class="mt-2 mb-1 text-muted">Assigned To</p>
-              <div v-if="task.assignee.name" class="media">
+              <div v-if="task.assignee.name" class="media d-flex align-items-center">
                 <div
                   v-if="task.assignee.id"
                   class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center"
                 >
-                  {{ initals }}
+                  {{ initals(task.assignee.name) }}
                 </div>
                 <div class="media-body">
                   <h5 class="mt-1 font-size-14">{{ task.assignee.name }}</h5>
@@ -425,6 +425,26 @@ export default {
               <!-- end due date -->
             </div>
             <!-- end col -->
+
+            <div class="col-5">
+              <!-- assignee -->
+              <p class="mt-2 mb-1 text-muted">Reviewer</p>
+              <div v-if="task.reviewer.name" class="media d-flex align-items-center">
+                <div
+                  v-if="task.reviewer.id"
+                  class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center"
+                >
+                  {{ initals(task.reviewer.name) }}
+                </div>
+                <div class="media-body">
+                  <h5 class="mt-1 font-size-14">{{ task.reviewer.name }}</h5>
+                </div>
+              </div>
+              <h5 v-else>
+                Not Assigned
+              </h5>
+              <!-- end assignee -->
+            </div>
           </div>
           <!-- end row -->
 
@@ -576,7 +596,7 @@ export default {
                           <!-- item-->
                           <b-dropdown-item
                             :to="
-                              `/task/${subtask.id}/details?subtask=true&hasSubTask=false`
+                              `/project/task/${subtask.id}/details?subtask=true&hasSubTask=false`
                             "
                           >
                             View

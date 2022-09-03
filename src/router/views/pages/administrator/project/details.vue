@@ -51,6 +51,9 @@ export default {
     this.getProjectDetials()
   },
   methods: {
+    extension(file) {
+      return file.name.split('.').pop()
+    },
     handleContractChange({ target }) {
       this.contractFile = target.files[0]
     },
@@ -268,10 +271,11 @@ export default {
     },
     async deletProjectFile(key) {
       try {
-        let requestData = {};
+        let requestData = {}
         requestData[key] = null
         const response = await this.$http.patch(
-          `/admin/add/project/${this.$route.params.id}/corespondents`,requestData
+          `/admin/add/project/${this.$route.params.id}/corespondents`,
+          requestData
         )
 
         if (response) {
@@ -305,7 +309,8 @@ export default {
     async deleteCorrespondent(id) {
       try {
         const response = await this.$http.delete(
-          `/admin/delete/project/${id}/files`)
+          `/admin/delete/project/${id}/files`
+        )
         if (response) {
           return response
         }
@@ -361,22 +366,74 @@ export default {
               <div
                 class="card-title border-bottom p-3 mb-0 w-100 d-flex justify-content-between"
               >
-                <div class="page-title" style="padding:0">
+                <div class="page-title" style="padding:0; max-width: 60%;">
                   <h4 class="mt-0">
-                    Project: {{ project.name }}
-                    <div
-                      class="badge font-size-13 font-weight-normal ml-3"
-                      :class="
-                        project.status === 'overdue'
-                          ? ' badge-danger'
-                          : project.status === 'ongoing'
-                          ? 'badge-primary'
-                          : 'badge-success'
-                      "
-                      >{{ project.status }}</div
-                    >
+                    {{ project.name }}
                   </h4>
-                  <p>{{ project.description }}</p>
+                  <div
+                    class="badge font-size-13 font-weight-normal"
+                    :class="
+                      project.status === 'overdue'
+                        ? ' badge-danger'
+                        : project.status === 'ongoing'
+                        ? 'badge-primary'
+                        : 'badge-success'
+                    "
+                    >{{ project.status }}</div
+                  >
+                </div>
+              </div>
+              <div class="row py-1">
+                <div class="card-body">
+                  <h6 class="mt-0 header-title">About Project</h6>
+
+                  <div class="text-muted mt-3">
+                    <p>{{ project.description }}</p>
+                    <div
+                      class="badge badge-soft-primary font-size-13 font-weight-normal ml-1"
+                    >
+                      {{
+                        project.project_sector && project.project_sector.name
+                      }}
+                    </div>
+
+                    <div
+                      class="badge badge-soft-success font-size-13 font-weight-normal ml-1"
+                      >{{
+                        project.project_type && project.project_type.name
+                      }}</div
+                    >
+
+                    <div class="row">
+                      <div class="col-lg-4 col-md-6">
+                        <div class="mt-4">
+                          <p class="mb-2">
+                            <i class="uil-user text-danger"></i> Coordinator
+                          </p>
+                          <h5 class="font-size-16">{{
+                            (project.coordinator && project.coordinator.name) ||
+                              'N/A'
+                          }}</h5>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 col-md-6">
+                        <div class="mt-4">
+                          <p class="mb-2">
+                            <i class="uil-calender text-danger"></i> Start Date
+                          </p>
+                          <h5 class="font-size-16">{{ project.start_date }}</h5>
+                        </div>
+                      </div>
+                      <div class="col-lg-4 col-md-6">
+                        <div class="mt-4">
+                          <p class="mb-2">
+                            <i class="uil-user text-danger"></i> Client
+                          </p>
+                          <h5 class="font-size-16">{{ project.client }}</h5>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -414,9 +471,7 @@ export default {
                                 </span>
                               </div>
                               <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >Contract.docx</div
-                                >
+                                <div class="d-inline-block mt-2">Contract</div>
                               </div>
                             </div>
                           </div>
@@ -438,7 +493,7 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: 'Contract.docx',
+                            fileName: `Contract.${extension(contractFile)}`,
                             file: contractFile,
                             key: 'contract',
                           })
@@ -481,9 +536,7 @@ export default {
                                 </span>
                               </div>
                               <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >Insurance.docx</div
-                                >
+                                <div class="d-inline-block mt-2">Insurance</div>
                               </div>
                             </div>
                           </div>
@@ -502,7 +555,7 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: 'Insurance.docx',
+                            fileName: `Insurance.${extension(insuranceFile)}`,
                             file: insuranceFile,
                             key: 'insurance',
                           })
@@ -573,7 +626,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >correspondence.docx
+                                  >correspondence
                                 </div>
                               </div>
                             </div>
@@ -605,7 +658,9 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: `Correspondent${index + 1}.docx`,
+                            fileName: `Correspondent${index + 1}.${extension(
+                              correspondents[index].corespondent_path
+                            )}`,
                             file: correspondents[index].corespondent_path,
                             key: 'corespondents',
                           })
@@ -647,9 +702,7 @@ export default {
                                 </span>
                               </div>
                               <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >Permit.docx</div
-                                >
+                                <div class="d-inline-block mt-2">Permit</div>
                               </div>
                             </div>
                           </div>
@@ -666,7 +719,7 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: 'Permit.docx',
+                            fileName: `Permit.${extension(permitFile)}`,
                             file: permitFile,
                             key: 'permit',
                           })
@@ -710,7 +763,7 @@ export default {
                               </div>
                               <div class="media-body">
                                 <div class="d-inline-block mt-2"
-                                  >Review-comment.docx
+                                  >Review-comment
                                 </div>
                               </div>
                             </div>
@@ -731,7 +784,9 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: 'Review Comments.docx',
+                            fileName: `Review Comments.${extension(
+                              reviewFile
+                            )}`,
                             file: reviewFile,
                             key: 'review_comment',
                           })
