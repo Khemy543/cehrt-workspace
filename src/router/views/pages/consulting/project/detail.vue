@@ -838,13 +838,6 @@ export default {
                   </div>
 
                   <form class="media" @submit.prevent="sendComment">
-                    <!--                    <div class="d-flex mr-3">-->
-                    <!--                      <a href="#">-->
-                    <!--                        <div-->
-                    <!--                          class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center">-->
-                    <!--                          {{ initials }}</div>-->
-                    <!--                      </a>-->
-                    <!--                    </div>-->
                     <div class="media-body">
                       <input
                         v-model="comment"
@@ -880,6 +873,39 @@ export default {
                             </div>
                             <div class="float-right mt-1">
                               <a :href="dev.document_path" target="_blank">
+                                <feather
+                                  type="log-in"
+                                  class="icons-xs"
+                                ></feather>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+                </b-tab>
+                <b-tab title="Review Comment">
+                  <h5 class="mb-3 header-title">Review Comment</h5>
+                  <div v-if="project.review_comment" class="row">
+                    <div
+                      class="col-md-4"
+                    >
+                      <a :href="project.review_comment" target="_blank">
+                        <div class="p-2 border rounded mb-3">
+                          <div class="media">
+                            <div class="avatar-sm font-weight-bold mr-3">
+                              <span
+                                class="avatar-title rounded bg-soft-primary text-primary"
+                              >
+                                <i class="uil-file-plus-alt font-size-18"></i>
+                              </span>
+                            </div>
+                            <div class="media-body">
+                              <div href="#" class="d-inline-block mt-2">Review Comment</div>
+                            </div>
+                            <div class="float-right mt-1">
+                              <a :href="project.review_comment" target="_blank">
                                 <feather
                                   type="log-in"
                                   class="icons-xs"

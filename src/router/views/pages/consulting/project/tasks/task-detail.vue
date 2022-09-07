@@ -105,7 +105,9 @@ export default {
           const { status, data } = error.response
 
           if (status === 422) {
-            message = message = data.errors[Object.keys(data.errors)[0]]
+            message =  data.errors[Object.keys(data.errors)[0]];
+
+            message = message || error.response.message
           }
 
           this.$bvToast.toast(message, {
@@ -143,7 +145,7 @@ export default {
           const { status, data } = error.response
 
           if (status === 422) {
-            message = message = data.errors[Object.keys(data.errors)[0]]
+            message = data.errors[Object.keys(data.errors)[0]]
           }
 
           this.$bvToast.toast(message, {
@@ -466,9 +468,9 @@ export default {
           <!-- end sub tasks/checklists -->
 
           <!-- start attachments -->
-          <h5 class="mt-4 mb-2 font-size-16">Attachments</h5>
+          <h5 v-if="!isSubTask" class="mt-4 mb-2 font-size-16">Attachments</h5>
 
-          <div class="card mb-2 shadow-none border">
+          <div v-if="!isSubTask" class="card mb-2 shadow-none border">
             <div class="p-1 px-2">
               <a target="_blank" :href="task.deliverable.document_path" class="row align-items-center">
                 <div class="col-auto">

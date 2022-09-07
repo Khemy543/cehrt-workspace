@@ -14,7 +14,7 @@ export default {
       return this.project.status || 'Pending'
     },
     isProjectPage() {
-      return this.$route.name === 'Project'
+      return this.$route.name === 'Projects'
     },
     assignees() {
       const uniqueIds = []

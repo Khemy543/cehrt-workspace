@@ -117,6 +117,70 @@
                       </div>
                       </div>
                     </div>
+
+
+                    <div class="row">
+                    <div
+                      v-if="proposal.request_for_eol"
+                      class="col-md-4"
+                    >
+                      <a :href="proposal.request_for_eol" target="_blank">
+                        <div class="p-2 border rounded mb-3">
+                          <div class="media">
+                            <div class="avatar-sm font-weight-bold mr-3">
+                              <span
+                                class="avatar-title rounded bg-soft-primary text-primary"
+                              >
+                                <i class="uil-file-plus-alt font-size-18"></i>
+                              </span>
+                            </div>
+                            <div class="media-body">
+                              <div href="#" class="d-inline-block mt-2">Request For EOI</div>
+                            </div>
+                            <div class="float-right mt-1">
+                              <a :href="proposal.request_for_eol" target="_blank">
+                                <feather
+                                  type="log-in"
+                                  class="icons-xs"
+                                ></feather>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+
+                    <div
+                      v-if="proposal.request_for_proposal"
+                      class="col-md-4"
+                    >
+                      <a :href="proposal.request_for_proposal" target="_blank">
+                        <div class="p-2 border rounded mb-3">
+                          <div class="media">
+                            <div class="avatar-sm font-weight-bold mr-3">
+                              <span
+                                class="avatar-title rounded bg-soft-primary text-primary"
+                              >
+                                <i class="uil-file-plus-alt font-size-18"></i>
+                              </span>
+                            </div>
+                            <div class="media-body">
+                              <div href="#" class="d-inline-block mt-2">Request For Proposal</div>
+                            </div>
+                            <div class="float-right mt-1">
+                              <a :href="proposal.request_for_proposal" target="_blank">
+                                <feather
+                                  type="log-in"
+                                  class="icons-xs"
+                                ></feather>
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                    </div>
+                  </div>
+
                   </div>
                 </div>
               </div>

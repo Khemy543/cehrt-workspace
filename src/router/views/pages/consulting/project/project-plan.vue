@@ -38,6 +38,15 @@ export default {
     }
   },
   computed: {
+    subTasks() {
+      let subTasks = []
+      this.projectDeliverable.forEach((deliverable) => {
+        deliverable.tasks.forEach((task) => {
+          subTasks = [...subTasks, ...task.subtasks]
+        })
+      })
+      return subTasks
+    },
     positions() {
       return this.$store
         ? this.$store.state.auth.currentUser.position
@@ -69,6 +78,14 @@ export default {
     this.getConsultingStaff()
   },
   methods: {
+    getDeliverableSubtasks(tasks) {
+      let subTasks = []
+      tasks.forEach((task) => {
+        subTasks = [...subTasks, ...task.subtasks]
+      })
+
+      return subTasks
+    },
     showSubmitModal() {
       this.submitModal = true
     },
@@ -142,10 +159,39 @@ export default {
         })
       }
     },
+
+    async saveSubTaskDetails(task) {
+      const tempTask = { ...task, amount: task.rate * task.allocated_days }
+
+      try {
+        const response = await this.$http.put(
+          `/update/${task.id}/sub-task`,
+          tempTask
+        )
+
+        if (response) {
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
     getDeliverableTotalPrice(tasks) {
       let total = 0
 
       for (const task of tasks) {
+        for (const subTask of task.subtasks) {
+          const subtaskTotal = this.getAmount(
+            subTask.allocated_days,
+            subTask.rate,
+            subTask.ExtractRawComponents
+          )
+          total = Number(total) + Number(subtaskTotal)
+        }
         const taskTotal = this.getAmount(
           task.allocated_days,
           task.rate,
@@ -159,6 +205,9 @@ export default {
     getTotalDaysAllocated(tasks) {
       let total = 0
       for (const task of tasks) {
+        for (const subTask of task.subtasks) {
+          total = Number(total) + Number(subTask.allocated_days)
+        }
         total = Number(total) + Number(task.allocated_days)
       }
 
@@ -341,7 +390,7 @@ export default {
                       <tbody>
                         <tr
                           v-for="(task, index) in deliverable.tasks"
-                          :key="task.id"
+                          :key="`task-${task.id}`"
                         >
                           <th scope="row">{{ index + 1 }}</th>
                           <td>{{ task.name }}</td>
@@ -391,6 +440,64 @@ export default {
                             )
                           }}</td>
                         </tr>
+
+                        <tr
+                          v-for="(task, index) in getDeliverableSubtasks(
+                            deliverable.tasks
+                          )"
+                          :key="`subtask-${task.id}`"
+                        >
+                          <th scope="row">{{
+                            index + deliverable.tasks.length + 1
+                          }}</th>
+                          <td>{{ task.name }}</td>
+                          <td>{{ task.assignee || 'N/A' }}</td>
+                          <td>
+                            <div style="width:100px;">
+                              <b-form-input
+                                v-model="task.allocated_days"
+                                type="number"
+                                placeholder="0"
+                                required
+                                @blur="saveSubTaskDetails(task)"
+                              ></b-form-input>
+                            </div>
+                          </td>
+                          <td
+                            v-if="
+                              getConsultingRole(task.assignee_position).name ===
+                                'External Consultant'
+                            "
+                            style="width:200px"
+                          >
+                            <div style="display: flex; align-items: center">
+                              <div>GHS</div>
+                              <b-form-input
+                                v-model="task.rate"
+                                type="text"
+                                placeholder="0"
+                                required
+                                class=" mx-2"
+                                @blur="saveSubTaskDetails(task)"
+                              ></b-form-input>
+                            </div>
+                          </td>
+                          <td v-else
+                            >{{ task.rate_currency }}
+                            {{ amountFormat(task.rate) || 'N/A' }}</td
+                          >
+
+                          <td>{{
+                            amountFormat(
+                              getAmount(
+                                task.allocated_days,
+                                task.rate,
+                                task.ExtractRawComponents
+                              )
+                            )
+                          }}</td>
+                        </tr>
+
                         <tr>
                           <td></td>
                           <td>Total</td>
@@ -414,12 +521,6 @@ export default {
                       </tbody>
                     </table>
                   </div>
-                  <!-- <div class=" d-flex justify-content-end">
-                    <h5 v-if="deliverable.tasks.length > 0"
-                      >
-                      {{ getDeliverableTotalPrice(deliverable.tasks) }}</h5
-                    >
-                  </div> -->
                 </div>
 
                 <div v-if="projectDeliverable.length > 0" class="mt-4">

@@ -116,7 +116,7 @@ export default {
           const { status, data } = error.response
 
           if (status === 422) {
-            message = message = data.errors[Object.keys(data.errors)[0]]
+            message = data.errors[Object.keys(data.errors)[0]]
           }
 
           this.$bvToast.toast(message, {
@@ -159,7 +159,7 @@ export default {
           const { status, data } = error.response
 
           if (status === 422) {
-            message = message = data.errors[Object.keys(data.errors)[0]]
+            message = data.errors[Object.keys(data.errors)[0]]
           }
 
           this.$bvToast.toast(message, {

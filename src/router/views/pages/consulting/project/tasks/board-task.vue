@@ -106,7 +106,7 @@ export default {
         </span>
         <br />
         <br/>
-        <span class="text-nowrap align-middle font-size-13 mr-2">
+        <!-- <span class="text-nowrap align-middle font-size-13 mr-2">
           <i class="uil uil-comments-alt text-muted mr-1"></i
           >{{ task.comments || 0 }}
         </span>
@@ -114,7 +114,7 @@ export default {
         <span class="text-nowrap align-middle font-size-13">
           <i class="uil uil-check-square mr-1 text-muted"></i
           >{{ task.subTasks || 0 }}
-        </span>
+        </span> -->
         <small class="float-right text-muted">
           <i class="uil uil-calendar-alt text-muted mr-1"></i
           >{{ task.formatted_end_date }}

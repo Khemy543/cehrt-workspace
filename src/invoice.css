@@ -1,0 +1,107 @@
+*,
+body,
+html {
+  font-family: 'Montserrat', sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 p {
+  margin: 0;
+}
+
+/* colors
+deep #072153
+medium #348ffd
+light #76bffe */
+
+main {
+  max-width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  padding: 60px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  text-transform: uppercase;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.header-items {
+  display: flex;
+}
+
+.invoice-info {
+  margin-top: 45px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.to-info {
+  max-width: 300px;
+}
+
+.to-info p {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.invoice-info h2 {
+  font-size: 35px;
+  color: #348ffd;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+.to-name {
+  color: #348ffd;
+  font-size: 16px;
+}
+
+.to-ref {
+  font-size: 16px;
+}
+
+.to-location {
+  color: #348ffd;
+}
+
+.info-group {
+    display: flex;
+    justify-content: space-between;
+    column-gap: 80px;
+}
+
+.info-group h3 {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.table-wrapper {
+    width: 100%;
+}
+
+.top-right {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 80px;
+  width: 80px;
+}
+
+.bottom-left {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}

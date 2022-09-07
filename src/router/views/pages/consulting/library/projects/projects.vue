@@ -114,6 +114,12 @@ export default {
         const response = await this.$http.put(`/update/${form.id}/project`, { ...form, coordinator_id: this.$store.state.auth.currentUser.id});
 
         if (response) {
+          const newData = {
+            ...response.data.project,
+            district: form.district
+          }
+          const index = this.library.findIndex((item) => item.id === form.id);
+          this.$set(this.library, index, newData)
           this.$bvToast.toast('Project updated successfully', {
             title: 'Success',
             autoHideDelay: 5000,
