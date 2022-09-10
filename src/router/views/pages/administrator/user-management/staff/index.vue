@@ -5,7 +5,7 @@ import PageHeader from '@components/page-header'
 
 export default {
   page: {
-    title: 'View Staff',
+    title: 'User Management',
     meta: [{ name: 'description', content: appConfig.description }],
   },
   components: {
@@ -14,7 +14,7 @@ export default {
   },
   data() {
     return {
-      title: 'View Staff',
+      title: 'User Management',
       items: [
         {
           text: 'Cehrt',

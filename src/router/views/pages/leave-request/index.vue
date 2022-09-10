@@ -88,27 +88,70 @@ export default {
       category: { required },
     },
   },
+  computed: {
+    annualCount() {
+      return this.calendarEvents.filter(
+        (evt) =>
+          evt.type === 'Annual' &&
+          (evt.status === 'pending' || evt.status === 'approved')
+      ).length
+    },
+    totalLeave() {
+      return this.calendarEvents.filter(
+        (evt) => evt.status === 'pending' || evt.status === 'approved'
+      ).length
+    },
+    totalSickLeave() {
+      return this.calendarEvents.filter(
+        (evt) =>
+          evt.type === 'Sick' &&
+          (evt.status === 'pending' || evt.status === 'approved')
+      ).length
+    },
+    totalOthers() {
+      return this.calendarEvents.filter(
+        (evt) =>
+          (evt.type === 'Maternity' ||
+            evt.type === 'Others' ||
+            evt.type === 'Compassionate') &&
+          (evt.status === 'pending' || evt.status === 'approved')
+      ).length
+    },
+  },
   created() {
-    this.getAllProved();
-    this.getLeaveRequests();
+    this.getAllProved()
+    this.getLeaveRequests()
   },
   methods: {
     async getLeaveRequests() {
       try {
-        const response = await this.$http.get(`/fetch/leave/requests`);
+        const response = await this.$http.get(`/fetch/leave/requests`)
 
         if (response) {
-          const requestedLeaves = response.data.filter(request => request.status === 'pending').map((item) => {
-            return {
-              id: item.id,
-              title: `${item.user} (${item.type} Leave)`,
-              editable: true,
-              start: dateFormate(item.start_date),
-              end: dateFormate(item.end_date),
-              reason: item.reason,
-              className: item.type === 'Sick' ? `bg-soft-danger text-danger` : item.type === 'Annual' ? 'bg-soft-primary text-primary' : item.type === 'Maternity' ? 'bg-soft-success text-success' : item.type === 'Compassionate' ? 'bg-soft-warning text-warning' : 'bg-soft-secondary text-secondary'
-            }
-          })
+          const requestedLeaves = response.data
+            .filter((request) => request.status === 'pending')
+            .map((item) => {
+              return {
+                id: item.id,
+                title: `${item.user} (${item.type} Leave)`,
+                editable: true,
+                start: dateFormate(item.start_date),
+                end: dateFormate(item.end_date),
+                reason: item.reason,
+                status: item.status,
+                type: item.type,
+                className:
+                  item.type === 'Sick'
+                    ? `bg-soft-danger text-danger`
+                    : item.type === 'Annual'
+                    ? 'bg-soft-primary text-primary'
+                    : item.type === 'Maternity'
+                    ? 'bg-soft-success text-success'
+                    : item.type === 'Compassionate'
+                    ? 'bg-soft-warning text-warning'
+                    : 'bg-soft-secondary text-secondary',
+              }
+            })
           this.calendarEvents = [...this.calendarEvents, ...requestedLeaves]
         }
       } catch (error) {
@@ -124,7 +167,9 @@ export default {
 
     async getAllProved() {
       try {
-        const response = await this.$http.get(`/fetch/all/approved/leave/requests`);
+        const response = await this.$http.get(
+          `/fetch/all/approved/leave/requests`
+        )
 
         if (response) {
           const approvedLeaves = response.data.map((item) => {
@@ -134,7 +179,18 @@ export default {
               start: dateFormate(item.start_date),
               end: dateFormate(item.end_date),
               reason: item.reason,
-              className: item.type === 'Sick' ? `bg-danger text-white` : item.type === 'Annual' ? 'bg-primary text-white' : item.type === 'Maternity' ? 'bg-success text-white' : item.type === 'Compassionate' ? 'bg-warning text-white' : 'bg-secondary text-white'
+              status: item.status,
+              type: item.type,
+              className:
+                item.type === 'Sick'
+                  ? `bg-danger text-white`
+                  : item.type === 'Annual'
+                  ? 'bg-primary text-white'
+                  : item.type === 'Maternity'
+                  ? 'bg-success text-white'
+                  : item.type === 'Compassionate'
+                  ? 'bg-warning text-white'
+                  : 'bg-secondary text-white',
             }
           })
 
@@ -152,7 +208,10 @@ export default {
     },
     async handleSubmit() {
       try {
-        const response = await this.$http.post(`/request/for-leave`, { ...this.event, type: this.event.type })
+        const response = await this.$http.post(`/request/for-leave`, {
+          ...this.event,
+          type: this.event.type,
+        })
         if (response) {
           const {
             id,
@@ -160,20 +219,30 @@ export default {
             user,
             start_date: startDate,
             end_date: endDate,
-            reason
+            reason,
+            status,
           } = response.data.leave
-          this.calendarEvents = this.calendarEvents.concat(
-            {
-              id,
-              title: `${user} (${type})`,
-              start: dateFormate(startDate),
-              end: dateFormate(endDate),
-              editable: true,
-              allDay: false,
-              reason,
-              className: type === 'Sick' ? `bg-soft-danger text-danger` : type === 'Annual' ? 'bg-soft-primary text-primary' : type === 'Maternity' ? 'bg-soft-success text-success' : type === 'Compassionate' ? 'bg-soft-warning text-warning' : 'bg-soft-secondary text-secondary'
-            }
-          )
+          this.calendarEvents = this.calendarEvents.concat({
+            id,
+            title: `${user} (${type})`,
+            start: dateFormate(startDate),
+            end: dateFormate(endDate),
+            editable: true,
+            allDay: false,
+            reason,
+            status,
+            type,
+            className:
+              type === 'Sick'
+                ? `bg-soft-danger text-danger`
+                : type === 'Annual'
+                ? 'bg-soft-primary text-primary'
+                : type === 'Maternity'
+                ? 'bg-soft-success text-success'
+                : type === 'Compassionate'
+                ? 'bg-soft-warning text-warning'
+                : 'bg-soft-secondary text-secondary',
+          })
           this.$bvToast.toast('Request created successfully', {
             title: 'Success',
             autoHideDelay: 5000,
@@ -217,23 +286,39 @@ export default {
      */
     async editSubmit() {
       try {
-        const response = await this.$http.put(`/update/${this.editevent.id}/leave/request`, this.editevent);
+        const response = await this.$http.put(
+          `/update/${this.editevent.id}/leave/request`,
+          this.editevent
+        )
 
         if (response) {
-          const index = this.calendarEvents.findIndex(event => event.id === this.editevent.id);
+          const index = this.calendarEvents.findIndex(
+            (event) => event.id === this.editevent.id
+          )
           const { type } = this.editevent
-          this.$set(this.calendarEvents, index,  {
+          this.$set(this.calendarEvents, index, {
             id: this.editevent.id,
             title: this.editevent.name,
             start: this.editevent.start_date,
             end: this.editevent.end_date,
             editable: true,
+            status: this.editEvent.status,
+            type,
             reason: this.editevent.reason,
-            className: type === 'Sick' ? `bg-soft-danger text-danger` : type === 'Annual' ? 'bg-soft-primary text-primary' : type === 'Maternity' ? 'bg-soft-success text-success' : type === 'Compassionate' ? 'bg-soft-warning text-warning' : 'bg-soft-secondary text-secondary',
-            allDay: false
+            className:
+              type === 'Sick'
+                ? `bg-soft-danger text-danger`
+                : type === 'Annual'
+                ? 'bg-soft-primary text-primary'
+                : type === 'Maternity'
+                ? 'bg-soft-success text-success'
+                : type === 'Compassionate'
+                ? 'bg-soft-warning text-warning'
+                : 'bg-soft-secondary text-secondary',
+            allDay: false,
           })
           this.eventModal = false
-          this.eventModal = false;
+          this.eventModal = false
 
           this.$bvToast.toast('Request updated successfully', {
             title: 'Success',
@@ -242,7 +327,6 @@ export default {
             variant: 'success',
           })
         }
-
       } catch (error) {
         if (error.response) {
           const { status, data } = error.response
@@ -281,13 +365,15 @@ export default {
         if (isConfirmed) {
           try {
             const deleteId = this.edit.id
-            const response = await this.$http.delete(`/delete/${deleteId}/leave/request`);
+            const response = await this.$http.delete(
+              `/delete/${deleteId}/leave/request`
+            )
 
             if (response) {
               this.calendarEvents = this.calendarEvents.filter(
                 (x) => '' + x.id !== '' + this.edit.id
               )
-              this.eventModal = false;
+              this.eventModal = false
               this.$bvToast.toast('Request deleted successfully', {
                 title: 'Success',
                 autoHideDelay: 5000,
@@ -320,12 +406,14 @@ export default {
     editEvent(info) {
       if (info.event.startEditable) {
         this.edit = info.event
-        const index = this.calendarEvents.findIndex(item => item.id === Number(this.edit.id))
+        const index = this.calendarEvents.findIndex(
+          (item) => item.id === Number(this.edit.id)
+        )
         this.editevent = {
           type: this.edit.title.split('(')[1].split(' ')[0],
           start_date: dateFormate(this.edit.start),
           end_date: dateFormate(this.edit.end),
-          reason: this.calendarEvents[index].reason
+          reason: this.calendarEvents[index].reason,
         }
         this.eventModal = true
       }
@@ -370,6 +458,70 @@ export default {
                   >
                     <i class="uil-plus-circle"></i> Create Leave Request
                   </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="row py-1">
+              <!-- Widget -->
+
+              <div class="col-xl-3 col-sm-6">
+                <!-- stat 1 -->
+                <div class="media p-3">
+                  <feather
+                    type="grid"
+                    class="align-self-center icon-dual icon-lg mr-4"
+                  ></feather>
+                  <div class="media-body">
+                    <h4 class="mt-0 mb-0">{{ totalLeave }}</h4>
+                    <span class="text-muted">Total Leave</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-xl-3 col-sm-6">
+                <!-- stat 1 -->
+                <div class="media p-3">
+                  <feather
+                    type="layers"
+                    class="align-self-center icon-dual icon-lg mr-4"
+                  ></feather>
+                  <div class="media-body">
+                    <h4 class="mt-0 mb-0">
+                      {{ annualCount }}
+                    </h4>
+                    <span class="text-muted">Total Annual Leave</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-xl-3 col-sm-6">
+                <!-- stat 1 -->
+                <div class="media p-3">
+                  <feather
+                    type="heart"
+                    class="align-self-center icon-dual icon-lg mr-4"
+                  ></feather>
+                  <div class="media-body">
+                    <h4 class="mt-0 mb-0">
+                      {{ totalSickLeave }}
+                    </h4>
+                    <span class="text-muted">Total Sick Leave</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-xl-3 col-sm-6">
+                <!-- stat 1 -->
+                <div class="media p-3">
+                  <feather
+                    type="archive"
+                    class="align-self-center icon-dual icon-lg mr-4"
+                  ></feather>
+                  <div class="media-body">
+                    <h4 class="mt-0 mb-0">{{ totalOthers }}</h4>
+                    <span class="text-muted">Total Others</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -419,19 +571,34 @@ export default {
         </div>
       </div>
     </div>
-    <b-modal v-model="showmodal" title="Leave request" title-class="text-black font-18" hide-footer>
+    <b-modal
+      v-model="showmodal"
+      title="Leave request"
+      title-class="text-black font-18"
+      hide-footer
+    >
       <form @submit.prevent="handleSubmit">
         <div class="row">
           <div class="col-12">
             <div class="form-group">
-              <b-form-group id="marital_status" label="Leave Type" label-for="marital_status">
-                <b-form-select id="marital_status" v-model="event.type" type="text" required>
+              <b-form-group
+                id="marital_status"
+                label="Leave Type"
+                label-for="marital_status"
+              >
+                <b-form-select
+                  id="marital_status"
+                  v-model="event.type"
+                  type="text"
+                  required
+                >
                   <option value>Select leave type</option>
                   <option
                     v-for="type in categories"
                     :key="type.id"
                     :value="type.type"
-                  >{{ type.type }}</option>
+                    >{{ type.type }}</option
+                  >
                 </b-form-select>
               </b-form-group>
             </div>
@@ -479,25 +646,42 @@ export default {
 
         <div class="text-right">
           <button type="submit" class="btn btn-success">Save</button>
-          <b-button class="ml-1" variant="light" @click="hideModal">Close</b-button>
+          <b-button class="ml-1" variant="light" @click="hideModal"
+            >Close</b-button
+          >
         </div>
       </form>
     </b-modal>
 
     <!-- Edit Modal -->
-    <b-modal v-model="eventModal" title="Edit Leave request" title-class="text-black font-18" hide-footer>
+    <b-modal
+      v-model="eventModal"
+      title="Edit Leave request"
+      title-class="text-black font-18"
+      hide-footer
+    >
       <form @submit.prevent="editEvent">
         <div class="row">
           <div class="col-12">
             <div class="form-group">
-              <b-form-group id="marital_status" label="Leave Type" label-for="marital_status">
-                <b-form-select id="marital_status" v-model="editevent.type" type="text" required>
+              <b-form-group
+                id="marital_status"
+                label="Leave Type"
+                label-for="marital_status"
+              >
+                <b-form-select
+                  id="marital_status"
+                  v-model="editevent.type"
+                  type="text"
+                  required
+                >
                   <option value>Select leave type</option>
                   <option
                     v-for="type in categories"
                     :key="type.id"
                     :value="type.type"
-                  >{{ type.type }}</option>
+                    >{{ type.type }}</option
+                  >
                 </b-form-select>
               </b-form-group>
             </div>
@@ -544,7 +728,9 @@ export default {
         </div>
 
         <div class="d-flex justify-content-between">
-          <b-button type="button" variant="danger" @click="deleteEvent">Delete Request</b-button>
+          <b-button type="button" variant="danger" @click="deleteEvent"
+            >Delete Request</b-button
+          >
           <button type="submit" class="btn btn-success">Save</button>
         </div>
       </form>
