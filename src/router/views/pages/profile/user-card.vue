@@ -27,7 +27,7 @@ export default {
             class="mr-2 d-flex align-items-center justify-content-center bg-primary text-white font-weight-bold"
           >{{ initials }}</div>
         </div>
-        <h5 class="mt-2 mb-0">{{ user.firstname }} {{ user.other_names }} {{ user.lastname }} {{ user.other_names }}</h5>
+        <h5 class="mt-2 mb-0">{{ user.firstname }} {{ user.other_names }} {{ user.lastname }}</h5>
         <h6 class="text-muted font-weight-normal mt-2 mb-0">SIN: {{ user.staff_id }}</h6>
         <!-- <h6 class="font-weight-normal mt-1 mb-4"></h6> -->
       </div>

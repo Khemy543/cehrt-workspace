@@ -149,13 +149,12 @@
         </div>
         <div class="col-md-6">
           <b-form-group label="Description of Service Provided">
-            <b-form-textarea
-              id="input-1"
-              v-model="form.service_description"
-              placeholder="Description of service provided"
-              rows="4"
-            >
-            </b-form-textarea>
+            <div id="taskDesk" style="height: 100px; position: relative; z-index: 100;">
+              <vue-editor
+                v-model="form.service_description"
+                :editor-options="editorOptions"
+              ></vue-editor>
+            </div>
           </b-form-group>
         </div>
       </div>
@@ -335,11 +334,14 @@
 </template>
 
 <script>
+import { VueEditor } from 'vue2-editor'
+import 'quill/dist/quill.bubble.css'
 import Multiselect from 'vue-multiselect'
 import { dateFormate } from '../utils/format-date'
 export default {
   components: {
     Multiselect,
+    VueEditor
   },
   props: {
     value: {
@@ -361,6 +363,9 @@ export default {
   },
   data() {
     return {
+      editorOptions: {
+        theme: 'bubble',
+      },
       form: {
         project_type_id: '',
         project_sector_id: '',
@@ -626,4 +631,12 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+  ::v-deep .quillWrapper .ql-container .ql-editor  {
+    min-height: 100px !important;
+  }
+
+  .quillWrapper {
+    height: 100% !important;
+  }
+</style>

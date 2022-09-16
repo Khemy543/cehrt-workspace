@@ -59,8 +59,8 @@ export default {
       return this.$route.query.hasSubTask === 'true'
     },
     taskPriority() {
-      return this.task.priority.toLowerCase();
-    }
+      return this.task.priority.toLowerCase()
+    },
   },
   mounted() {
     this.form = {
@@ -105,7 +105,7 @@ export default {
           const { status, data } = error.response
 
           if (status === 422) {
-            message =  data.errors[Object.keys(data.errors)[0]];
+            message = data.errors[Object.keys(data.errors)[0]]
 
             message = message || error.response.message
           }
@@ -178,21 +178,27 @@ export default {
     },
 
     async changeStatus(status) {
-      if(status.api === 'completed' && this.task.reviewer.id !== this.$store.state.auth.currentUser.id) {
-        return this.$bvToast.toast('Only task reviewer call move task to completed', {
-          title: 'Error',
-          autoHideDelay: 5000,
-          appendToast: false,
-          variant: 'danger',
-        })
-      }
-      try {
-        const response = await this.$http.patch(
-          `/update/${this.$route.params.id}/task-status`,
+      if (
+        status.api === 'completed' &&
+        this.task.reviewer.id !== this.$store.state.auth.currentUser.id
+      ) {
+        return this.$bvToast.toast(
+          'Only task reviewer call move task to completed',
           {
-            status: status.api,
+            title: 'Error',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'danger',
           }
         )
+      }
+      try {
+        const url = this.isSubTask
+          ? `/update/${this.$route.params.id}/subtask-status`
+          : `/update/${this.$route.params.id}/task-status`
+        const response = await this.$http.patch(url, {
+          status: status.api,
+        })
 
         if (response) {
           this.$emit('updateTask', {
@@ -212,7 +218,7 @@ export default {
     },
 
     findPostiveNumberNotInArray(array) {
-      const postiveNumbers = array.filter((item) => item > 0);
+      const postiveNumbers = array.filter((item) => item > 0)
       let number = 1
       while (postiveNumbers.includes(number)) {
         number++
@@ -375,7 +381,10 @@ export default {
             <div class="col-5">
               <!-- assignee -->
               <p class="mt-2 mb-1 text-muted">Assigned To</p>
-              <div v-if="task.assignee.name" class="media d-flex align-items-center">
+              <div
+                v-if="task.assignee.name"
+                class="media d-flex align-items-center"
+              >
                 <div
                   v-if="task.assignee.id"
                   class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center"
@@ -431,10 +440,14 @@ export default {
             <div class="col-5">
               <!-- assignee -->
               <p class="mt-2 mb-1 text-muted">Reviewer</p>
-              <div v-if="task.reviewer.name" class="media d-flex align-items-center">
+              <div
+                v-if="task.reviewer.name"
+                class="media d-flex align-items-center"
+              >
                 <div
                   v-if="task.reviewer.id"
-                  class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center"
+                  class="avatar-sm rounded-circle mr-2 mb-2 p-2 text-white d-flex align-items-center justify-content-center"
+                  style="background-color: #6c6c82"
                 >
                   {{ initals(task.reviewer.name) }}
                 </div>
@@ -472,7 +485,11 @@ export default {
 
           <div v-if="!isSubTask" class="card mb-2 shadow-none border">
             <div class="p-1 px-2">
-              <a target="_blank" :href="task.deliverable.document_path" class="row align-items-center">
+              <a
+                target="_blank"
+                :href="task.deliverable.document_path"
+                class="row align-items-center"
+              >
                 <div class="col-auto">
                   <div class="avatar-sm font-weight-bold mr-3">
                     <span
@@ -483,22 +500,18 @@ export default {
                   </div>
                 </div>
                 <div class="col pl-0">
-                  <a
-                    href="javascript:void(0);"
-                    class="text-muted font-weight-bold"
-                    >{{ task.deliverable.name }}</a
-                  >
+                  <div class="text-muted font-weight-bold">{{
+                    task.deliverable.name
+                  }}</div>
                 </div>
                 <div class="col-auto">
                   <!-- Button -->
-                  <a
+                  <div
                     v-b-tooltip.hover
-                    title="open"
-                    href="javascript:void(0);"
                     class="btn btn-link text-muted btn-lg p-0"
                   >
                     <feather type="log-in" class="icons-xs"></feather>
-                  </a>
+                  </div>
                 </div>
               </a>
             </div>
@@ -554,7 +567,9 @@ export default {
                                 >Status</b-tooltip
                               >
                               <i class="uil uil-windsock mr-1"></i>
-                             <span style="text-transform:capitalize">{{ subtask.status }}</span> 
+                              <span style="text-transform:capitalize">{{
+                                subtask.status
+                              }}</span>
                             </a>
                           </div>
                           <div class=" ml-3">
@@ -582,6 +597,54 @@ export default {
                                 {{ subtask.priority }}
                               </span>
                             </a>
+                          </div>
+                        </div>
+                        <div class="row mt-1">
+                          <div class="col-5">
+                            <!-- assignee -->
+                            <p class="mt-2 mb-1 text-muted">Assigned To</p>
+                            <div
+                              v-if="subtask.assignee.name"
+                              class="media d-flex align-items-center"
+                            >
+                              <div
+                                v-if="subtask.assignee.id"
+                                class="avatar-sm rounded-circle mr-2 bg-primary mb-2 p-2 text-white d-flex align-items-center justify-content-center"
+                              >
+                                {{ initals(subtask.assignee.name) }}
+                              </div>
+                              <div class="media-body">
+                                <h5 class="mt-1 font-size-14">{{
+                                  subtask.assignee.name
+                                }}</h5>
+                              </div>
+                            </div>
+                            <h5 v-else>
+                              Not Assigned
+                            </h5>
+                            <!-- end assignee -->
+                          </div>
+                          <div class="col-5">
+                            <!-- assignee -->
+                            <p class="mt-2 mb-1 text-muted">Reviewer</p>
+                            <div
+                              v-if="subtask.reviewer.name"
+                              class="media d-flex align-items-center"
+                            >
+                              <div
+                                v-if="subtask.reviewer.id"
+                                class="avatar-sm rounded-circle mr-2 mb-2 p-2 text-white d-flex align-items-center justify-content-center"
+                                style="background-color: #6c6c82;"
+                              >
+                                {{ initals(subtask.reviewer.name) }}
+                              </div>
+                              <div class="media-body">
+                                <h5 class="mt-1 font-size-14">{{
+                                  subtask.reviewer.name
+                                }}</h5>
+                              </div>
+                            </div>
+                            <!-- end assignee -->
                           </div>
                         </div>
                       </router-link>

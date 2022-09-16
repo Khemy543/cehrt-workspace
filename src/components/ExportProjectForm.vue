@@ -98,13 +98,15 @@
         </div>
         <div class="col-md-6">
           <b-form-group label="Description of service provided">
-            <b-form-textarea
-              id="input-1"
-              v-model="form.service_description"
-              placeholder="Description of service provided"
-              rows="4"
+            <div
+              id="taskDesk"
+              style="height: 100px; position: relative; z-index: 100;"
             >
-            </b-form-textarea>
+              <vue-editor
+                v-model="form.service_description"
+                :editor-options="editorOptions"
+              ></vue-editor>
+            </div>
           </b-form-group>
         </div>
       </div>
@@ -285,10 +287,13 @@
 </template>
 
 <script>
+import { VueEditor } from 'vue2-editor'
+import 'quill/dist/quill.bubble.css'
 import Multiselect from 'vue-multiselect'
 export default {
   components: {
     Multiselect,
+    VueEditor,
   },
   props: {
     value: {
@@ -306,10 +311,13 @@ export default {
     title: {
       type: String,
       default: 'Export Project To Library',
-    }
+    },
   },
   data() {
     return {
+      editorOptions: {
+        theme: 'bubble',
+      },
       form: {
         regionIds: [],
         professional_expects: [
@@ -364,56 +372,56 @@ export default {
           name: 'Central Region',
           districts: [
             {
-                id: 1,
-                name: "Abura/Asebu/Kwamankese District"
+              id: 1,
+              name: 'Abura/Asebu/Kwamankese District',
             },
             {
-                id: 2,
-                name: "Agona East District"
+              id: 2,
+              name: 'Agona East District',
             },
             {
-                id: 3,
-                name: "Agona West Municipal "
+              id: 3,
+              name: 'Agona West Municipal ',
             },
             {
-                id: 4,
-                name: "Ajumako/Enyan/Essiam District"
+              id: 4,
+              name: 'Ajumako/Enyan/Essiam District',
             },
             {
-                id: 5,
-                name: "Asikuma Odoben Brakwa District"
+              id: 5,
+              name: 'Asikuma Odoben Brakwa District',
             },
             {
-                id: 6,
-                name: "Assin Central Municipal"
+              id: 6,
+              name: 'Assin Central Municipal',
             },
             {
-                id: 7,
-                name: "Assin North District"
+              id: 7,
+              name: 'Assin North District',
             },
             {
-                id: 8,
-                name: "Assin South District"
+              id: 8,
+              name: 'Assin South District',
             },
             {
-                id: 9,
-                name: "Awutu Senya East Municipal"
+              id: 9,
+              name: 'Awutu Senya East Municipal',
             },
             {
-                id: 10,
-                name: "Awutu Senya West District"
+              id: 10,
+              name: 'Awutu Senya West District',
             },
             {
-                id: 11,
-                name: "Cape Coast Metropolitan "
+              id: 11,
+              name: 'Cape Coast Metropolitan ',
             },
             {
-                id: 12,
-                name: "Effutu Municipal"
+              id: 12,
+              name: 'Effutu Municipal',
             },
             {
-                id: 13,
-            }
+              id: 13,
+            },
           ],
         },
         {
@@ -533,4 +541,12 @@ export default {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+  ::v-deep .quillWrapper .ql-container .ql-editor  {
+    min-height: 100px !important;
+  }
+
+  .quillWrapper {
+    height: 100% !important;
+  }
+</style>

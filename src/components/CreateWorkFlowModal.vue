@@ -116,7 +116,7 @@ export default {
       const lastIndex = this.form.tasks.length - 1
       if (this.form.tasks[lastIndex].task_name !== '') {
         this.form.tasks.push({
-          id: `#${lastIndex + 1}`,
+          fake_id: `#${lastIndex + 1}`,
           task_name: '',
         })
       } else {

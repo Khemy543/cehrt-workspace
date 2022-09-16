@@ -191,6 +191,7 @@ export default {
           const vReviewTasks = reviewTask.map((item) => {
             return {
               id: `review-task-${item.id}`,
+              display:'list-item',
               title: item.name,
               url: `/project/task/${item.id}/details?hasSubTask=${item.has_subtask}&subtask=false`,
               start: isDateAfter(item.start_date, item.end_date)
@@ -205,6 +206,7 @@ export default {
           const vSubTaskReview = reviewSubTask.map((item) => {
             return {
               id: `review-subtask-${item.id}`,
+              display:'list-item',
               title: item.name,
               url: `/project/task/${item.id}/details?hasSubTask=false&subtask=true`,
               start: isDateAfter(item.start_date, item.end_date)
@@ -221,6 +223,7 @@ export default {
               return (
                 {
                   id: `subtask-${item.id}`,
+                  display:'list-item',
                   title: `${item.name} ( ${item.status})`,
                   editable: false,
                   url: `/project/task/${item.id}/details?hasSubTask=false&subtask=true`,
@@ -238,10 +241,10 @@ export default {
             tasks.map((item) => {
               return {
                 id: `task-${item.id}`,
+                display:'list-item',
                 title: `${item.name} ( ${item.status} )`,
                 editable: false,
                 url: `/project/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
-                difference: isDateAfter('05-10-2022', '10-10-2022'),
                 start: isDateAfter(item.start_date, item.end_date)
                   ? this.formateEndDate(item.end_date)
                   : item.start_date,
@@ -255,6 +258,7 @@ export default {
             proposalTasks.map((item) => {
               return {
                 id: `proposal-task-${item.id}`,
+                display:'list-item',
                 title: `${item.name} ( ${item.status} )`,
                 editable: false,
                 url: `/proposal/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
@@ -271,6 +275,7 @@ export default {
             proposalSubtask.map((item) => {
               return {
                 id: `proposal-subtask-${item.id}`,
+                display:'list-item',
                 title: `${item.name} ( ${item.status} )`,
                 editable: false,
                 url: `/proposal/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,

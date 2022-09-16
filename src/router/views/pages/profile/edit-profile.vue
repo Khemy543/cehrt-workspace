@@ -404,7 +404,6 @@ export default {
               id="next_of_king_postal_address"
               v-model="form.next_of_king_postal_address"
               type="text"
-              required
               placeholder="Enter postal address"
             ></b-form-input>
           </b-form-group>
@@ -419,7 +418,6 @@ export default {
               id="next_of_king_house_address"
               v-model="form.next_of_king_house_address"
               type="text"
-              required
               placeholder="Enter house address"
             ></b-form-input>
           </b-form-group>
