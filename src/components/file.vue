@@ -55,7 +55,7 @@ export default {
     background:#edeff4;
   }
   h4 {
-    font-size: 12px;
+    font-size: 11px;
     color: #6c757d !important;
     text-transform: uppercase;
     white-space: nowrap;
