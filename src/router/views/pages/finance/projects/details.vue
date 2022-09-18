@@ -4,13 +4,14 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import graph from '@/src/msalConfig/graph'
+import ProjectSummary from '@/src/components/Finance/ProjectSummary.vue'
 
 export default {
   page: {
     title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, PageHeader },
+  components: { Layout, PageHeader, ProjectSummary },
   data() {
     return {
       loading: true,
@@ -861,6 +862,7 @@ export default {
           </div>
         </div>
       </div>
+      
       <div class="row">
         <div class="col-md-6">
           <div class="card">
@@ -897,6 +899,12 @@ export default {
           </div>
         </div>
       </div>
+
+      <div class="row">
+        <ProjectSummary />
+      </div>
+
+
       <div class="row">
         <div class="col-xl-6">
           <div class="card">

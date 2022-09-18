@@ -147,7 +147,7 @@ export default {
           <div class="pt-2">
             <b-progress
               :value="project.progress || 0"
-              variant="danger"
+              variant="success"
               height="5px"
               class="m-0"
             ></b-progress>
