@@ -65,16 +65,6 @@ export default {
     department() {
       return this.$store ? this.$store.state.auth.userDepartment : {} || {}
     },
-    allTasks() {
-      let allTasks = []
-      for (const delivarble of this.projectDeliverable) {
-        allTasks = [...allTasks, ...delivarble.tasks];
-        for(const task of delivarble.tasks) {
-          allTasks = [...allTasks, ...task.subtasks]
-        }
-      }
-      return allTasks
-    },
   },
   created() {
     this.getProjectPlan()
@@ -84,20 +74,6 @@ export default {
       return formateAmount(amount)
     },
 
-    getUniqueUsersTasks(){
-      let uniqueUsers = []
-      for (const task of this.allTasks) {
-        const index = task.assignee ? uniqueUsers.findIndex((vtask) => vtask.assignee === task.assignee) : -10;
-        if(index > -1) {
-          const uTask = uniqueUsers[index]
-          uniqueUsers[index] = { ...uTask, total_days: Number(uTask.total_days + task.allocated_days)  }
-        }else if(index !== -10){
-          uniqueUsers.push({...task, total_days: task.allocated_days})
-        }
-      }
-      return uniqueUsers;
-    },
-   
     async getProjectPlan() {
       try {
         this.loading = true
@@ -195,10 +171,9 @@ export default {
           <div class="card-body p-0">
             <div class="card-title border-bottom p-3 mb-0 w-100">
               <div class="d-flex justify-content-between">
-                <h4 style="text-transform: uppercase">{{ project.name }} </h4>
+                <h4>{{ project.name }} </h4>
               </div>
               <div>
-                <!-- <h5>Project Deliverables</h5> -->
                 <div
                   v-if="projectDeliverable.length <= 0"
                   class="mt-5 d-flex align-items-center justify-content-center text-center"
@@ -213,119 +188,120 @@ export default {
                     >
                   </div>
                 </div>
-
-                <div
-                  v-for="deliverable in projectDeliverable"
-                  v-else
-                  :key="deliverable.id"
-                  class="mt-4"
-                >
-                  <div class="p-1 deliverable_wrap">
-                    <h5 class="deliverable_name">{{ deliverable.name }}</h5>
-                  </div>
-
-                  <h6 v-if="deliverable.tasks.length <= 0" class="mt-2"
-                    >This Deliverable has no task</h6
+                <b-tabs v-else pills class="navtab-bg mt-5">
+                  <b-tab
+                    v-for="(deliverable, dIndex) in projectDeliverable"
+                    :key="deliverable.id"
+                    class="mt-4"
+                    :title="deliverable.name"
+                    :active="dIndex === 0"
                   >
-                  <div v-else class="w-100">
-                    <div
-                      class="d-flex justify-content-between align-items-center table-head w-100"
+                    <h6 v-if="deliverable.tasks.length <= 0" class="mt-2"
+                      >This Deliverable has no task</h6
                     >
-                      <h4>#</h4>
-                      <h4>Task</h4>
-                      <h4>Assignee</h4>
-                      <h4>Days Allocated</h4>
-                      <h4>Rate</h4>
-                      <h4>Amount</h4>
-                    </div>
-
-                    <div
-                      v-for="(task, index) in deliverable.tasks"
-                      :key="`task-${task.id}`"
-                    >
+                    <div v-else class="w-100">
                       <div
-                        class="d-flex justify-content-between align-items-center table-body w-100 bg-primary"
+                        class="d-flex justify-content-between align-items-center table-head w-100"
                       >
-                        <h4>{{ index + 1 }}</h4>
-                        <h4>{{ task.name }}</h4>
-                        <h4>{{ task.assignee || 'N/A' }}</h4>
-                        <h4>{{ task.allocated_days || 'N/A' }}</h4>
-                        <h4
-                          >{{ task.rate_currency }}
-                          {{ amountFormat(task.rate) || 'N/A' }}</h4
-                        >
-                        <h4>{{
-                          amountFormat(
-                            getAmount(
-                              task.allocated_days,
-                              task.rate,
-                              task.ExtractRawComponents
-                            )
-                          )
-                        }}</h4>
+                        <h4>#</h4>
+                        <h4>Task</h4>
+                        <h4>Assignee</h4>
+                        <h4>Days Allocated</h4>
+                        <h4>Rate</h4>
+                        <h4>Amount</h4>
                       </div>
-                      <div v-if="task.subtasks.length > 0" class="subtask">
-                        <h3 class="subtask-label">Subtasks</h3>
+
+                      <div
+                        v-for="(task, index) in deliverable.tasks"
+                        :key="`task-${task.id}`"
+                      >
                         <div
-                          v-for="vtask in task.subtasks"
-                          :key="`subtask-${vtask.id}`"
                           class="d-flex justify-content-between align-items-center table-body w-100"
                         >
-                          <h4></h4>
-                          <h4>{{ vtask.name }}</h4>
-                          <h4>{{ vtask.assignee || 'N/A' }}</h4>
-                          <h4>{{ vtask.allocated_days || 'N/A' }}</h4>
+                          <h4>{{ index + 1 }}</h4>
+                          <h4>{{ task.name }}</h4>
+                          <h4>{{ task.assignee || 'N/A' }}</h4>
+                          <h4>{{ task.allocated_days || 'N/A' }}</h4>
                           <h4
-                            >{{ vtask.rate_currency }}
-                            {{ amountFormat(vtask.rate) || 'N/A' }}</h4
+                            >{{ task.rate_currency }}
+                            {{ amountFormat(task.rate) || 'N/A' }}</h4
                           >
                           <h4>{{
                             amountFormat(
                               getAmount(
-                                vtask.allocated_days,
-                                vtask.rate,
-                                vtask.ExtractRawComponents
+                                task.allocated_days,
+                                task.rate,
+                                task.ExtractRawComponents
                               )
                             )
                           }}</h4>
                         </div>
+                        <div v-if="task.subtasks.length > 0" class="subtask">
+                          <div
+                            v-for="(vtask, vIndex) in task.subtasks"
+                            :key="`subtask-${vtask.id}`"
+                            class="d-flex justify-content-between align-items-center table-body w-100"
+                          >
+                            <h4>{{ index + 1 }}.{{ vIndex + 1 }}</h4>
+                            <h4>{{ vtask.name }}</h4>
+                            <h4>{{ vtask.assignee || 'N/A' }}</h4>
+                            <h4>{{ vtask.allocated_days || 'N/A' }}</h4>
+                            <h4
+                              >{{ vtask.rate_currency }}
+                              {{ amountFormat(vtask.rate) || 'N/A' }}</h4
+                            >
+                            <h4>{{
+                              amountFormat(
+                                getAmount(
+                                  vtask.allocated_days,
+                                  vtask.rate,
+                                  vtask.ExtractRawComponents
+                                )
+                              )
+                            }}</h4>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="table-footer">
+                        <h4
+                          >total days allocated:
+                          <span>{{
+                            getTotalDaysAllocated(deliverable.tasks)
+                          }}</span></h4
+                        >
+                        <h4
+                          >Deliverable total:
+                          <span
+                            >GHS
+                            {{
+                              amountFormat(
+                                getDeliverableTotalPrice(deliverable.tasks)
+                              )
+                            }}</span
+                          ></h4
+                        >
                       </div>
                     </div>
 
-                    <div class="table-footer">
-                      <h4
-                        >total days allocated:
-                        <span>{{
-                          getTotalDaysAllocated(deliverable.tasks)
-                        }}</span></h4
-                      >
-                      <h4
-                        >Deliverable total:
-                        <span
-                          >GHS
-                          {{
-                            amountFormat(
-                              getDeliverableTotalPrice(deliverable.tasks)
-                            )
-                          }}</span
-                        ></h4
-                      >
+                    <hr />
+
+                    <div v-if="deliverable.tasks.length > 0" class="my-5 payment-table ">
+                      <h4 class="mb-1">Consultant Total Payment Table</h4>
+                      <PaymentTable :deliverable="deliverable" />
                     </div>
-                  </div>
+                  </b-tab>
+                </b-tabs>
 
-                  <hr />
-                </div>
-
-                <div v-if="projectDeliverable.length > 0" class="table-footer mt-4">
-                  <h4>Project Total: <span>GHS {{ amountFormat(getTotal()) }}</span></h4>
-                </div>
-              </div>
-
-              <hr>
-
-              <div class="my-5 payment-table ">
-                <h4 class="mb-1">Consultant Total Payment Table</h4>
-                <PaymentTable :tasks="getUniqueUsersTasks()"/>
+                <!-- <div
+                  v-if="projectDeliverable.length > 0"
+                  class="table-footer mt-4"
+                >
+                  <h4
+                    >Project Total:
+                    <span>GHS {{ amountFormat(getTotal()) }}</span></h4
+                  >
+                </div> -->
               </div>
             </div>
           </div>
@@ -366,7 +342,7 @@ export default {
 .table-body h4 {
   font-size: 13px;
   text-align: left;
-  color: white;
+  color: #4b4b5a;
 }
 
 .table-head h4:first-child,

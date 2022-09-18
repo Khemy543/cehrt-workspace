@@ -2,9 +2,10 @@
 import { VueEditor } from 'vue2-editor'
 import 'quill/dist/quill.bubble.css'
 import CreateTaskModal from '@components/CreateTaskModal.vue'
+import File from '@/src/components/file.vue'
 
 export default {
-  components: { VueEditor, CreateTaskModal },
+  components: { VueEditor, CreateTaskModal, File },
   props: {
     task: {
       type: Object,
@@ -483,38 +484,12 @@ export default {
           <!-- start attachments -->
           <h5 v-if="!isSubTask" class="mt-4 mb-2 font-size-16">Attachments</h5>
 
-          <div v-if="!isSubTask" class="card mb-2 shadow-none border">
-            <div class="p-1 px-2">
-              <a
-                target="_blank"
-                :href="task.deliverable.document_path"
-                class="row align-items-center"
-              >
-                <div class="col-auto">
-                  <div class="avatar-sm font-weight-bold mr-3">
-                    <span
-                      class="avatar-title rounded bg-soft-primary text-primary"
-                    >
-                      <i class="uil-file-plus-alt font-size-18"></i>
-                    </span>
-                  </div>
-                </div>
-                <div class="col pl-0">
-                  <div class="text-muted font-weight-bold">{{
-                    task.deliverable.name
-                  }}</div>
-                </div>
-                <div class="col-auto">
-                  <!-- Button -->
-                  <div
-                    v-b-tooltip.hover
-                    class="btn btn-link text-muted btn-lg p-0"
-                  >
-                    <feather type="log-in" class="icons-xs"></feather>
-                  </div>
-                </div>
-              </a>
-            </div>
+          <div v-if="!isSubTask" class="card mb-2 shadow-none">
+              <File 
+                :path="task.deliverable.document_path"
+                type="word"
+                :name="task.deliverable.name"
+              />
           </div>
           <!-- end attachments -->
 

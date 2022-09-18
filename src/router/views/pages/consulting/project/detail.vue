@@ -7,6 +7,7 @@ import CreateProjectModal from '@components/CreateProjectModal.vue'
 import CreateDeliverable from '@components/CreateDeliverable'
 import ProjectDeletionModal from '../../../../../components/ProjectDeletionModal.vue'
 import ExportProjectForm from '@/src/components/ExportProjectForm.vue'
+import File from '@/src/components/file.vue'
 
 export default {
   page: {
@@ -20,7 +21,8 @@ export default {
     CreateDeliverable,
     ProjectDeletionModal,
     ExportProjectForm,
-  },
+    File
+},
   data() {
     return {
       show: false,
@@ -701,7 +703,7 @@ export default {
 
                 <div class="col-xl-3 col-sm-6">
                   <!-- stat 1 -->
-                  <div class="media p-3"> 
+                  <div class="media p-3">
                     <feather
                       type="clock"
                       class="align-self-center icon-dual icon-lg mr-4"
@@ -850,47 +852,20 @@ export default {
                 </b-tab>
                 <b-tab title="Files/Resources">
                   <h5 class="mb-3 header-title">Attached Files</h5>
-                  <div class="row">
-                    <div
-                      v-for="dev in projectDeliverables"
-                      :key="dev.id"
-                      class="col-md-4"
-                    >
-                      <a :href="dev.document_path" target="_blank">
-                        <div class="p-2 border rounded mb-3">
-                          <div class="media">
-                            <div class="avatar-sm font-weight-bold mr-3">
-                              <span
-                                class="avatar-title rounded bg-soft-primary text-primary"
-                              >
-                                <i class="uil-file-plus-alt font-size-18"></i>
-                              </span>
-                            </div>
-                            <div class="media-body">
-                              <div href="#" class="d-inline-block mt-2">{{
-                                dev.project_type_deliverable.deliverable_name
-                              }}</div>
-                            </div>
-                            <div class="float-right mt-1">
-                              <a :href="dev.document_path" target="_blank">
-                                <feather
-                                  type="log-in"
-                                  class="icons-xs"
-                                ></feather>
-                              </a>
-                            </div>
-                          </div>
-                        </div>
-                      </a>
+                  <div class="d-flex align-items-center mt-2">
+                    <div v-for="dev in projectDeliverables" :key="dev.id">
+                      <File 
+                        :path="dev.document_path"
+                        :name="dev.project_type_deliverable.deliverable_name"
+                        type="word"
+                      />
                     </div>
                   </div>
                 </b-tab>
                 <b-tab title="Review Comment">
                   <h5 class="mb-3 header-title">Review Comment</h5>
                   <div v-if="project.review_comment" class="row">
-                    <div
-                      class="col-md-4"
-                    >
+                    <div class="col-md-4">
                       <a :href="project.review_comment" target="_blank">
                         <div class="p-2 border rounded mb-3">
                           <div class="media">
@@ -902,7 +877,9 @@ export default {
                               </span>
                             </div>
                             <div class="media-body">
-                              <div href="#" class="d-inline-block mt-2">Review Comment</div>
+                              <div href="#" class="d-inline-block mt-2"
+                                >Review Comment</div
+                              >
                             </div>
                             <div class="float-right mt-1">
                               <a :href="project.review_comment" target="_blank">

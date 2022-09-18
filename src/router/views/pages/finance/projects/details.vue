@@ -5,13 +5,15 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import graph from '@/src/msalConfig/graph'
 import ProjectSummary from '@/src/components/Finance/ProjectSummary.vue'
+import formateAmount from '@src/utils/formate-money.js'
+import File from '@/src/components/file.vue'
 
 export default {
   page: {
     title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, PageHeader, ProjectSummary },
+  components: { Layout, PageHeader, ProjectSummary, File },
   data() {
     return {
       loading: true,
@@ -79,7 +81,7 @@ export default {
           tooltip: {
             y: {
               formatter: function(val) {
-                return 'GHS ' + val
+                return 'GHS ' + formateAmount(val)
               },
             },
           },
@@ -152,7 +154,7 @@ export default {
           tooltip: {
             y: {
               formatter: function(val) {
-                return 'GHS ' + val
+                return 'GHS ' + formateAmount(val)
               },
             },
           },
@@ -255,7 +257,7 @@ export default {
                 (this.contractForm.expenditure_miscellaneous /
                   this.getExpenditure()) *
                 100
-              ).toPrecision(4)}%`,
+              ).toFixed(2)}%`,
               fillColor: '#FFD700',
             },
           ],
@@ -862,7 +864,7 @@ export default {
           </div>
         </div>
       </div>
-      
+
       <div class="row">
         <div class="col-md-6">
           <div class="card">
@@ -901,9 +903,15 @@ export default {
       </div>
 
       <div class="row">
-        <ProjectSummary />
+        <div class="col-12">
+          <ProjectSummary
+            :project="project"
+            :contract-amount="contractAmount"
+            :amount-paid="getAmountPaid()"
+            :expenditure="getExpenditure()"
+          />
+        </div>
       </div>
-
 
       <div class="row">
         <div class="col-xl-6">
@@ -920,27 +928,12 @@ export default {
                       <h5 class="font-size-18 mt-2 mb-1">
                         Contract
                       </h5>
-                      <div v-if="createUrl(contractFile)" class="row">
-                        <a
-                          :href="createUrl(contractFile)"
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2">Contract</div>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                      <div v-if="createUrl(contractFile)">
+                        <File
+                          name="Contract"
+                          type="pdf"
+                          :path="createUrl(contractFile)"
+                        />
                       </div>
 
                       <div v-else>
@@ -988,27 +981,12 @@ export default {
                       <h5 class="font-size-18 mt-2 mb-1">
                         Insurance
                       </h5>
-                      <div v-if="createUrl(insuranceFile)" class="row">
-                        <a
-                          :href="createUrl(insuranceFile)"
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2">Insurance</div>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                      <div v-if="createUrl(insuranceFile)">
+                        <File
+                          name="Insurance"
+                          type="pdf"
+                          :path="createUrl(insuranceFile)"
+                        />
                       </div>
                       <div v-else>
                         <input type="file" @change="handleInsuranceChange" />
@@ -1057,31 +1035,12 @@ export default {
                       <h5 class="font-size-14 mt-2 mb-1">
                         {{ deliverable.name }}
                       </h5>
-                      <div
-                        v-if="createUrl(timeSheet[index].timesheet)"
-                        class="row"
-                      >
-                        <a
-                          :href="createUrl(timeSheet[index].timesheet)"
-                          target="_blank"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media p-1">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >{{ deliverable.name }}-Timesheet</div
-                                >
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                      <div v-if="createUrl(timeSheet[index].timesheet)">
+                        <File
+                          :name="`${deliverable.name}-Timesheet`"
+                          :path="createUrl(timeSheet[index].timesheet)"
+                          type="excel"
+                        />
                       </div>
                       <div v-else>
                         <input
@@ -1147,28 +1106,12 @@ export default {
                       <h5 class="font-size-14 mt-2 mb-1">
                         {{ deliverable.name }}
                       </h5>
-                      <div v-if="createUrl(invoice[index].invoice)" class="row">
-                        <a
-                          :href="createUrl(invoice[index].invoice)"
-                          target="_blank"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media p-1">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >{{ deliverable.name }}-Invoice</div
-                                >
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                      <div v-if="createUrl(invoice[index].invoice)">
+                        <File 
+                          :name="`${deliverable.name}-Invoice`"
+                          :path="createUrl(invoice[index].invoice)"
+                          type="pdf"
+                        />
                       </div>
                       <div v-else>
                         <input
@@ -1272,7 +1215,8 @@ export default {
                   <div class="media d-flex justify-content-between">
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
-                        Contract Amount (GH {{ formateAmount(contractAmount) }})
+                        Contract Amount (GHS
+                        {{ formateAmount(contractAmount) }})
                       </h5>
                     </div>
                   </div>
@@ -1335,7 +1279,7 @@ export default {
                   <div class="media d-flex justify-content-between">
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
-                        Expenditure (GH {{ formateAmount(getExpenditure()) }})
+                        Expenditure (GHS {{ formateAmount(getExpenditure()) }})
                       </h5>
                     </div>
                   </div>
@@ -1429,7 +1373,7 @@ export default {
                   <div class="media d-flex justify-content-between">
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
-                        Tax (GH {{ formateAmount(getTaxAmount) }})
+                        Tax (GHS {{ formateAmount(getTaxAmount) }})
                       </h5>
                     </div>
                   </div>
@@ -1457,7 +1401,7 @@ export default {
                   <div class="media d-flex justify-content-between">
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
-                        Amount Paid (GH {{ formateAmount(getAmountPaid()) }})
+                        Amount Paid (GHS {{ formateAmount(getAmountPaid()) }})
                       </h5>
                     </div>
                   </div>
@@ -1495,7 +1439,7 @@ export default {
                     <div class="media d-flex justify-content-between">
                       <div class="media-body overflow-hidden">
                         <h5 class="font-size-15 mt-2 mb-1">
-                          Withholding Tax (GH
+                          Withholding Tax (GHS
                           {{ formateAmount(getWithHoldingTax) }})
                         </h5>
                       </div>

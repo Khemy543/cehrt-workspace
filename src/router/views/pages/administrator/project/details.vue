@@ -3,13 +3,14 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import graph from '@/src/msalConfig/graph'
+import File from '@/src/components/file.vue'
 
 export default {
   page: {
     title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, PageHeader },
+  components: { Layout, PageHeader, File },
   data() {
     return {
       loading: true,
@@ -455,27 +456,12 @@ export default {
                       <h5 class="font-size-16 mt-2 mb-1">
                         Contract
                       </h5>
-                      <div v-if="createUrl(contractFile)" class="row">
-                        <a
-                          :href="createUrl(contractFile)"
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2">Contract</div>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                      <div v-if="createUrl(contractFile)">
+                        <File
+                          name="Contract"
+                          type="pdf"
+                          :path="createUrl(contractFile)"
+                        />
                       </div>
 
                       <div v-else>
@@ -520,27 +506,12 @@ export default {
                       <h5 class="font-size-16 mt-2 mb-1">
                         Insurance
                       </h5>
-                      <div v-if="createUrl(insuranceFile)" class="row">
-                        <a
-                          :href="createUrl(insuranceFile)"
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2">Insurance</div>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                      <div v-if="createUrl(insuranceFile)">
+                        <File
+                          type="pdf"
+                          name="Insurance"
+                          :path="createUrl(insuranceFile)"
+                        />
                       </div>
                       <div v-else>
                         <input type="file" @change="handleInsuranceChange" />
@@ -606,32 +577,14 @@ export default {
                         v-if="
                           createUrl(correspondents[index].corespondent_path)
                         "
-                        class="row"
                       >
-                        <a
-                          :href="
+                        <File
+                          :name="`correspondence-${index + 1}`"
+                          type="pdf"
+                          :path="
                             createUrl(correspondents[index].corespondent_path)
                           "
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >correspondence
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                        />
                       </div>
                       <div v-else>
                         <input
@@ -686,27 +639,12 @@ export default {
                       <h5 class="font-size-16 mt-2 mb-1">
                         Permit
                       </h5>
-                      <div v-if="createUrl(permitFile)" class="row">
-                        <a
-                          :href="createUrl(permitFile)"
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2">Permit</div>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                      <div v-if="createUrl(permitFile)">
+                        <File 
+                          name="Permit"
+                          type="pdf"
+                          :path="createUrl(permitFile)"
+                        />
                       </div>
                       <div v-else>
                         <input type="file" @change="handlePermitChange" />
@@ -746,29 +684,12 @@ export default {
                       <h5 class="font-size-16 mt-2 mb-1">
                         Review Comment
                       </h5>
-                      <div v-if="createUrl(reviewFile)" class="row">
-                        <a
-                          :href="createUrl(reviewFile)"
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >Review-comment
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                      <div v-if="createUrl(reviewFile)">
+                        <File 
+                          name="Review-comment"
+                          type="word"
+                          :path="createUrl(reviewFile)"
+                        />
                       </div>
                       <div v-else>
                         <input
