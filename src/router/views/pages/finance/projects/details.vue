@@ -18,6 +18,7 @@ export default {
   data() {
     return {
       loading: true,
+      showEdit: false,
       project: {},
       contractForm: {},
       title: 'Project Overview',
@@ -212,6 +213,9 @@ export default {
     this.getProjectDetials()
   },
   methods: {
+    toggleEdit() {
+      this.showEdit = !this.showEdit
+    },
     daysLeft(date, days) {
       const dueDate = getAddedDate(date, days);
       const daysLeft = dateDifference(dueDate, new Date())
@@ -568,7 +572,7 @@ export default {
 
         if (response) {
           const item = response.data.project;
-          this.deliverables.push({
+          const newDev = {
               deliverable_fee_amount_paid: item.deliverable_fee_amount_paid,
               amount_paid_percentage: item.amount_paid_percentage,
               vat_nhil_get_fund: item.vat_nhil_get_fund,
@@ -576,7 +580,10 @@ export default {
               name: item.name,
               id: item.id,
               deliverable_professional_fees: item.deliverable_professional_fees,
-            })
+          }
+          const index = this.deliverables.findIndex((dev) => dev.id === newDev.id);
+
+          this.$set(this.deliverables, index, newDev)
           this.updateChart()
         }
       } catch (error) {
@@ -946,7 +953,7 @@ export default {
         </div>
       </div>
 
-      <div class="row">
+      <div v-if="!showEdit" class="row">
         <div class="col-12">
           <ProjectSummary
             :project="project"
@@ -955,11 +962,13 @@ export default {
             :contract-amount="contractAmount"
             :amount-paid="getAmountPaid()"
             :expenditure="getExpenditure()"
+            :show-edit="showEdit"
+            @toggle-edit="toggleEdit"
           />
         </div>
       </div>
 
-      <div class="row">
+      <div v-else class="row">
         <div class="col-xl-6">
           <div class="card">
             <div class="card-body">

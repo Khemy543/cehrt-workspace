@@ -1,86 +1,115 @@
 <template>
   <div class="card">
     <div class="card-body">
-      <h6 class="mt-0 header-title">Summary of Project Finances </h6>
-
-      <div class="contact-details mt-2 row">
-        <div class="col-md-6">
-          <h4>Contract Details</h4>
-
-          <ul>
-            <li
-              >Professional Fee - GHS
-              {{ formateMoney(project.contract_amount_profession_fees) }}</li
-            >
-            <li
-              >Reimbursable - GHS
-              {{ formateMoney(project.contract_amount_reimbursable) }}</li
-            >
-            <li
-              >Tax Amount - GHS
-              {{ formateMoney(project.contract_amount_tax_amount) }}</li
-            >
-            <li>Contract Amount - GHS {{ formateMoney(contractAmount) }}</li>
-          </ul>
-        </div>
-        <div class="col-md-6">
-          <h4>Expenditure Details</h4>
-
-          <ul>
-            <li
-              >Professional Fee - GHS
-              {{ formateMoney(totalProfessionalFees) }}</li
-            >
-            <li
-              >Reimbursable - GHS
-              {{ formateMoney(project.expenditure_reimbursable) }}</li
-            >
-            <li
-              >Finder's Fee - GHS
-              {{ formateMoney(project.expenditure_finders_fee) }}</li
-            >
-            <li
-              >Miscellaneous - GHS
-              {{ formateMoney(project.expenditure_miscellaneous) }}</li
-            >
-            <li>Expenditure Amount - GHS {{ formateMoney(expenditure) }}</li>
-          </ul>
-        </div>
+      <div class="d-flex justify-content-between align-items-center">
+        <h6 class="mt-0 header-title">Summary of Project Finances </h6>
+        <button class="btn btn-primary" @click="toggleEdit">Edit</button>
       </div>
 
-      <div class=" mt-5">
-        <h4
-          >Amount Paid By Client
-          <span>({{ formateMoney(amountPaid) }})</span></h4
-        >
+      <div class="contact-details mt-5">
         <div class="table-responsive mb-0">
           <table class="table mb-0">
             <thead class="thead-light table-bordered">
               <tr>
-                <th scope="col" rowspan="2">Deliverable</th>
-                <th scope="col" rowspan="2">Amount</th>
-                <th scope="col" colspan="2" style="text-align:center"
-                  >Taxes Paid</th
-                >
-              </tr>
-              <tr>
-                <th scope="col">VAT/NHIL/GETFUND</th>
-                <th scope="col">Withholding Tax</th>
+                <th scope="col">CONTRACT DETAILS</th>
+                <th scope="col">EXPENDITURE DETAILS</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="deliverable in deliverables"
-                :key="deliverable.id"
-              >
-                <td>{{ deliverable.name }}</td>
-                <td>{{ formateMoney(deliverable.deliverable_fee_amount_paid) || 'N/A' }} ({{deliverable.amount_paid_percentage || 0}}%)</td>
-                <td>{{ deliverable.vat_nhil_get_fund ? `GHS ${formateMoney(deliverable.vat_nhil_get_fund)}` : 'N/A' }}</td>
-                <td>{{ deliverable.with_holding_tax ? `GHS ${formateMoney(deliverable.with_holding_tax)}` : 'N/A' }}</td>
+              <tr>
+                <td
+                  >Professional Fee - GHS
+                  {{
+                    formateMoney(project.contract_amount_profession_fees)
+                  }}</td
+                >
+                <td
+                  >Professional Fee - GHS
+                  {{ formateMoney(totalProfessionalFees) }}</td
+                >
+              </tr>
+              <tr>
+                <td
+                  >Reimbursable - GHS
+                  {{ formateMoney(project.contract_amount_reimbursable) }}</td
+                >
+                <td
+                  >Reimbursable - GHS
+                  {{ formateMoney(project.expenditure_reimbursable) }}</td
+                >
+              </tr>
+              <tr>
+                <td
+                  >Tax Amount - GHS
+                  {{ formateMoney(project.contract_amount_tax_amount) }}</td
+                >
+                <td
+                  >Finder's Fee - GHS
+                  {{ formateMoney(project.expenditure_finders_fee) }}</td
+                >
+              </tr>
+
+              <tr>
+                <td
+                  >Contract Amount - GHS {{ formateMoney(contractAmount) }}</td
+                >
+                <td
+                  >Miscellaneous - GHS
+                  {{ formateMoney(project.expenditure_miscellaneous) }}</td
+                >
+              </tr>
+              <tr>
+                <td></td>
+                <td
+                  >Expenditure Amount - GHS {{ formateMoney(expenditure) }}</td
+                >
               </tr>
             </tbody>
           </table>
         </div>
+      </div>
+
+    <div class=" mt-5">
+      <h4
+        >Amount Paid By Client <span>({{ formateMoney(amountPaid) }})</span></h4
+      >
+      <div class="table-responsive mb-0">
+        <table class="table mb-0">
+          <thead class="thead-light table-bordered">
+            <tr>
+              <th scope="col" rowspan="2">Deliverable</th>
+              <th scope="col" rowspan="2">Amount</th>
+              <th scope="col" colspan="2" style="text-align:center"
+                >Taxes Paid</th
+              >
+            </tr>
+            <tr>
+              <th scope="col">VAT/NHIL/GETFUND</th>
+              <th scope="col">Withholding Tax</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="deliverable in deliverables" :key="deliverable.id">
+              <td>{{ deliverable.name }}</td>
+              <td
+                >{{
+                  formateMoney(deliverable.deliverable_fee_amount_paid) || 'N/A'
+                }}
+                ({{ deliverable.amount_paid_percentage || 0 }}%)</td
+              >
+              <td>{{
+                deliverable.vat_nhil_get_fund
+                  ? `GHS ${formateMoney(deliverable.vat_nhil_get_fund)}`
+                  : 'N/A'
+              }}</td>
+              <td>{{
+                deliverable.with_holding_tax
+                  ? `GHS ${formateMoney(deliverable.with_holding_tax)}`
+                  : 'N/A'
+              }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div class="mt-5">
@@ -98,10 +127,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="deliverable in invoices"
-                :key="deliverable.id"
-              >
+              <tr v-for="deliverable in invoices" :key="deliverable.id">
                 <td>{{ deliverable.name }}</td>
                 <td
                   ><div
@@ -118,11 +144,24 @@
                     }}</div
                   ></td
                 >
-                <td>{{ deliverable.invoice_submitted_date ?  formateDate(deliverable.invoice_submitted_date) : 'N/A'}}</td>
-                <td>{{ daysLeft(deliverable.invoice_submitted_date, deliverable.invoice_days) }}</td>
-                <td>{{ deliverable.invoice_payment_date ? formateDate(deliverable.invoice_payment_date) : 'N/A' }}</td>
+                <td>{{
+                  deliverable.invoice_submitted_date
+                    ? formateDate(deliverable.invoice_submitted_date)
+                    : 'N/A'
+                }}</td>
+                <td>{{
+                  daysLeft(
+                    deliverable.invoice_submitted_date,
+                    deliverable.invoice_days
+                  )
+                }}</td>
+                <td>{{
+                  deliverable.invoice_payment_date
+                    ? formateDate(deliverable.invoice_payment_date)
+                    : 'N/A'
+                }}</td>
                 <td>
-                  <File 
+                  <File
                     v-if="deliverable.invoice"
                     :path="deliverable.invoice"
                     :name="`Invoice - ${deliverable.name}`"
@@ -136,16 +175,21 @@
         </div>
       </div>
     </div>
+    </div>
   </div>
 </template>
 <script>
 import formateAmount from '@src/utils/formate-money.js'
-import { getAddedDate, dateDifference, formateDate } from '@/src/utils/format-date'
+import {
+  getAddedDate,
+  dateDifference,
+  formateDate,
+} from '@/src/utils/format-date'
 import File from '../file.vue'
 
 export default {
   name: 'ProjectSummary',
-  components: {File},
+  components: { File },
   props: {
     project: {
       type: Object,
@@ -165,12 +209,16 @@ export default {
     },
     invoices: {
       type: Array,
-      default: () => ([])
+      default: () => [],
+    },
+    showEdit: {
+      type: Boolean,
+      default: false
     },
     deliverables: {
       type: Array,
-      default: () => ([])
-    }
+      default: () => [],
+    },
   },
   computed: {
     totalProfessionalFees() {
@@ -184,23 +232,26 @@ export default {
     },
   },
   methods: {
+    toggleEdit() {
+      this.$emit('toggle-edit')
+    },
     formateMoney(amount) {
       return formateAmount(amount)
     },
     daysLeft(date, days) {
-      const dueDate = getAddedDate(date, days);
+      const dueDate = getAddedDate(date, days)
       const daysLeft = dateDifference(dueDate, new Date())
-      if(daysLeft > 0) {
+      if (daysLeft > 0) {
         return `${daysLeft} days left`
-      }else if(daysLeft === 0) {
+      } else if (daysLeft === 0) {
         return `Is due today`
-      }else if(!date) {
+      } else if (!date) {
         return 'N/A'
-      }else {
+      } else {
         return `Is due ${Math.abs(daysLeft)} ago`
       }
     },
-    formateDate
+    formateDate,
   },
 }
 </script>

@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <script>
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
@@ -508,7 +509,7 @@ export default {
 
             <h6 class="mt-3 header-title">Service description</h6>
 
-            <p class=" mt-1">{{ project.service_description }}</p>
+            <p class=" mt-1" v-html="project.service_description"/>
 
             <div class="text-muted">
               <div
