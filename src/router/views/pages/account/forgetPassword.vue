@@ -60,12 +60,9 @@ export default {
 							<div class="card-body p-0">
 								<div class="row">
 									<div class="col-6 p-5">
-										<div class="mx-auto mb-5">
-											<a href="/">
-												<img src="@assets/images/logo.png" alt height="24" />
-												<h3 class="d-inline align-middle ml-1 text-logo"
-													>CEHRT WORKSPACE</h3
-												>
+										<div class="d-flex justify-content-center mb-5">
+											<a routerLink="/">
+												<img src="@assets/images/cehrt-logo.png" alt="logo" height="80"/>
 											</a>
 										</div>
 
