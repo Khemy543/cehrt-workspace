@@ -1,34 +1,24 @@
-// https://date-fns.org/docs/parse
-import parseDate from 'date-fns/parse'
 // https://date-fns.org/docs/format
-import { isAfter, addBusinessDays, differenceInCalendarDays, format } from 'date-fns'
-
-export function formatDate(date) {
-  date = parseDate(date)
-  return format(date, 'MMM Do, YYYY')
-}
+import { isAfter, addBusinessDays, differenceInCalendarDays, formatISO9075 } from 'date-fns'
 
 export const dateFormate = (date) => {
-  date = parseDate(date);
-  return format(date, "YYYY-MM-DD")
+  return formatISO9075(new Date(date), { representation: 'date' })
 }
 
 export const calendarFormat = (date) => {
-  date = parseDate(date);
-  return format(date, "YYYY-MM-DDTHH:mm")
+  return formatISO9075(new Date(date))
 }
 
 
 export const dateDifference = (later, earlier) => {
-  later = parseDate(later);
-  earlier = parseDate(earlier);
-  return differenceInCalendarDays(later, earlier)
+  
+  return differenceInCalendarDays(new Date(later), new Date(earlier))
 }
 
 export const isDateAfter = (firstDate, secondDate) => {
-  return isAfter(firstDate, secondDate);
+  return isAfter(new Date(firstDate), new Date(secondDate));
 }
 
 export const getAddedDate = (date, days) => {
-  return addBusinessDays(date, days)
+  return addBusinessDays(new Date(date), days)
 }
