@@ -1,9 +1,7 @@
 // https://date-fns.org/docs/parse
 import parseDate from 'date-fns/parse'
 // https://date-fns.org/docs/format
-import format from 'date-fns/format'
-import differenceInCalendarDays from 'date-fns/difference_in_calendar_days'
-import { isAfter } from 'date-fns'
+import { isAfter, addBusinessDays, differenceInCalendarDays, format } from 'date-fns'
 
 export function formatDate(date) {
   date = parseDate(date)
@@ -29,4 +27,8 @@ export const dateDifference = (later, earlier) => {
 
 export const isDateAfter = (firstDate, secondDate) => {
   return isAfter(firstDate, secondDate);
+}
+
+export const getAddedDate = (date, days) => {
+  return addBusinessDays(date, days)
 }

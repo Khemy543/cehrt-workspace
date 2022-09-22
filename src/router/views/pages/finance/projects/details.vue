@@ -7,6 +7,7 @@ import graph from '@/src/msalConfig/graph'
 import ProjectSummary from '@/src/components/Finance/ProjectSummary.vue'
 import formateAmount from '@src/utils/formate-money.js'
 import File from '@/src/components/file.vue'
+import { getAddedDate, dateDifference } from '@/src/utils/format-date'
 
 export default {
   page: {
@@ -202,10 +203,6 @@ export default {
       const total = Number(profFess) + Number(rem) + Number(tax)
       return total.toFixed(2)
     },
-    getTaxAmount() {
-      const { project_tax_amount: amt } = this.contractForm
-      return Number(amt).toFixed(2)
-    },
     getWithHoldingTax() {
       const { withholding_tax: amt } = this.contractForm
       return Number(amt).toFixed(2)
@@ -215,6 +212,17 @@ export default {
     this.getProjectDetials()
   },
   methods: {
+    daysLeft(date, days) {
+      const dueDate = getAddedDate(date, days);
+      const daysLeft = dateDifference(dueDate, new Date())
+      if(daysLeft > 0) {
+        return `${daysLeft} days left`
+      }else if(daysLeft === 0) {
+        return `Is due today`
+      }else {
+        return `Is due ${Math.abs(daysLeft)} ago`
+      }
+    },
     updateChart() {
       this.expenditure.series = [
         {
@@ -370,6 +378,20 @@ export default {
         }
       }
       return total.toFixed(2)
+    },
+
+    getTaxAmount() {
+      let total = 0
+      for (const n of this.deliverables) {
+        if (n.deliverable_fee_amount_paid) {
+          total = total + Number(n.vat_nhil_get_fund || 0) + Number(n.with_holding_tax || 0)
+        }
+      }
+      return total.toFixed(2)
+    },
+
+    getDelivarbleTax(deliverable) {
+      return Number(deliverable.vat_nhil_get_fund || 0) + Number(deliverable.with_holding_tax || 0)
     },
 
     getSumOfProfessionalFees() {
@@ -578,8 +600,9 @@ export default {
         } else {
           requestData[apiKey] = value
           if (extra) {
-            requestData['invoice_days'] = extra.invoice_days
-            requestData['invoice_status'] = extra.invoice_status
+            for (const [key, value] of Object.entries(extra)) {
+              requestData[key] = value
+            }
           }
         }
         const response = await this.$http.patch(
@@ -673,6 +696,8 @@ export default {
               invoice_status: item.invoice_status || 'unpaid',
               invoice_days: item.invoice_days,
               name: item.name,
+              invoice_payment_date: item.invoice_payment_date,
+              invoice_submitted_date: item.invoice_submitted_date,
               id: item.id,
             })
 
@@ -684,6 +709,9 @@ export default {
 
             this.deliverables.push({
               deliverable_fee_amount_paid: item.deliverable_fee_amount_paid,
+              amount_paid_percentage: item.amount_paid_percentage,
+              vat_nhil_get_fund: item.vat_nhil_get_fund,
+              with_holding_tax: item.with_holding_tax,
               name: item.name,
               id: item.id,
               deliverable_professional_fees: item.deliverable_professional_fees,
@@ -1104,100 +1132,140 @@ export default {
                   >
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-14 mt-2 mb-1">
-                        {{ deliverable.name }}
+                        {{ deliverable.name }} <span v-if="deliverable.invoice_submitted_date && deliverable.invoice_days">({{ daysLeft(deliverable.invoice_submitted_date, deliverable.invoice_days) }})</span>
                       </h5>
-                      <div v-if="createUrl(invoice[index].invoice)">
-                        <File 
-                          :name="`${deliverable.name}-Invoice`"
-                          :path="createUrl(invoice[index].invoice)"
-                          type="pdf"
-                        />
+                      <div class="d-flex justify-content-between">
+                        <div v-if="createUrl(invoice[index].invoice)">
+                          <File
+                            :name="`${deliverable.name}-Invoice`"
+                            :path="createUrl(invoice[index].invoice)"
+                            type="pdf"
+                          />
+                        </div>
+                        <div v-else>
+                          <input
+                            ref="contract"
+                            type="file"
+                            @change="
+                              (e) => handleInvoiceChange(e, deliverable.id)
+                            "
+                          />
+                        </div>
+
+                        <div class="d-flex">
+                          <button
+                            type="button"
+                            class="btn btn-soft-primary btn-sm"
+                            @click="
+                              handleDeliverableFileUpload({
+                                fileName: `${
+                                  deliverable.name
+                                }-Invoice.${invoice[index].invoice.name
+                                  .split('.')
+                                  .pop()}`,
+                                file: invoice[index].invoice,
+                                key: 'invoice',
+                                id: deliverable.id,
+                                extra: {
+                                  invoice_days: deliverable.invoice_days,
+                                  invoice_status: deliverable.invoice_status,
+                                  invoice_payment_date:
+                                    deliverable.invoice_payment_date,
+                                  invoice_submitted_date:
+                                    deliverable.invoice_submitted_date,
+                                },
+                              })
+                            "
+                          >
+                            save
+                          </button>
+                          <button
+                            v-if="invoice[index].invoice"
+                            type="button"
+                            class="btn btn-soft-danger btn-sm mx-2"
+                            @click="
+                              handleDeliverableFileUpload({
+                                fileName: `${deliverable.name}-Invoice.docx`,
+                                file: null,
+                                key: 'invoice',
+                                id: deliverable.id,
+                                extra: {
+                                  invoice_days: deliverable.invoice_days,
+                                  invoice_status: deliverable.invoice_status,
+                                  invoice_payment_date:
+                                    deliverable.invoice_payment_date,
+                                  invoice_submitted_date:
+                                    deliverable.invoice_submitted_date,
+                                },
+                              })
+                            "
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                      <div v-else>
-                        <input
-                          ref="contract"
-                          type="file"
-                          @change="
-                            (e) => handleInvoiceChange(e, deliverable.id)
-                          "
-                        />
-                      </div>
-                      <div class="d-flex mt-3">
+                      <div class="d-flex mt-3 justify-content-between">
                         <b-form-group
-                          id="input-group-1"
-                          label="Status"
+                          id="input-group-3"
+                          class=" mr-4"
+                          label="Submitted Date"
                           label-for="input-1"
                         >
-                          <b-form-select
-                            v-model="deliverable.invoice_status"
-                            class="mb-2"
-                          >
-                            <option
-                              v-for="type in ['unpaid', 'paid']"
-                              :key="type"
-                              :value="type"
-                              >{{ type }}</option
-                            >
-                          </b-form-select>
+                          <b-form-input
+                            id="input-1"
+                            v-model="deliverable.invoice_submitted_date"
+                            type="date"
+                          ></b-form-input>
                         </b-form-group>
+
                         <b-form-group
-                          id="input-group-1"
-                          class=" mx-4"
-                          label="Payment days"
+                          id="input-group-3"
+                          class=" mr-4"
+                          style="max-width:100px"
+                          label="Days"
                           label-for="input-1"
                         >
                           <b-form-input
                             id="input-1"
                             v-model="deliverable.invoice_days"
                             type="number"
-                            required
                             placeholder="Days"
                           ></b-form-input>
                         </b-form-group>
+
+                        <b-form-group
+                          id="input-group-1"
+                          label="Status"
+                          label-for="input-1"
+                          class="mr-4"
+                        >
+                          <b-form-select
+                            v-model="deliverable.invoice_status"
+                            class="mb-2"
+                          >
+                            <option
+                              v-for="statusType in ['unpaid', 'paid']"
+                              :key="statusType"
+                              :value="statusType"
+                              >{{ statusType }}</option
+                            >
+                          </b-form-select>
+                        </b-form-group>
+
+                        <b-form-group
+                          id="input-group-2"
+                          class=""
+                          label="Payment Date"
+                          label-for="input-1"
+                        >
+                          <b-form-input
+                            id="input-1"
+                            v-model="deliverable.invoice_payment_date"
+                            type="date"
+                            required
+                          ></b-form-input>
+                        </b-form-group>
                       </div>
-                    </div>
-                    <div class="d-flex">
-                      <button
-                        type="button"
-                        class="btn btn-soft-primary btn-sm"
-                        @click="
-                          handleDeliverableFileUpload({
-                            fileName: `${deliverable.name}-Invoice.${invoice[
-                              index
-                            ].invoice.name
-                              .split('.')
-                              .pop()}`,
-                            file: invoice[index].invoice,
-                            key: 'invoice',
-                            id: deliverable.id,
-                            extra: {
-                              invoice_days: deliverable.invoice_days,
-                              invoice_status: deliverable.invoice_status,
-                            },
-                          })
-                        "
-                      >
-                        save
-                      </button>
-                      <button
-                        v-if="invoice[index].invoice"
-                        type="button"
-                        class="btn btn-soft-danger btn-sm mx-2"
-                        @click="
-                          handleDeliverableFileUpload({
-                            fileName: `${deliverable.name}-Invoice.docx`,
-                            file: null,
-                            key: 'invoice',
-                            id: deliverable.id,
-                            extra: {
-                              invoice_days: deliverable.invoice_days,
-                              invoice_status: deliverable.invoice_status,
-                            },
-                          })
-                        "
-                      >
-                        Delete
-                      </button>
                     </div>
                   </div>
                 </li>
@@ -1373,25 +1441,66 @@ export default {
                   <div class="media d-flex justify-content-between">
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-15 mt-2 mb-1">
-                        Tax (GHS {{ formateAmount(getTaxAmount) }})
+                        Tax (GHS {{ formateAmount(getTaxAmount()) }})
                       </h5>
                     </div>
                   </div>
-                  <div class="mt-4">
-                    <b-form-group
-                      id="input-group-1"
-                      label="Tax Amount"
-                      label-for="input-1"
+                  <div class="row mt-4">
+                    <div
+                      v-for="deliverable in deliverables"
+                      :key="deliverable.id"
+                      class="col-md-12 mb-4"
                     >
-                      <b-form-input
-                        id="input-1"
-                        v-model="contractForm.project_tax_amount"
-                        type="number"
-                        required
-                        placeholder="Tax amount"
-                        @blur="saveProjectData(false)"
-                      ></b-form-input>
-                    </b-form-group>
+                      <h6 class="font-size-15 mb-2">
+                        {{ deliverable.name }}  -  (GHS {{ formateAmount(getDelivarbleTax(deliverable)) }})
+                      </h6>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <b-form-group
+                            id="input-group-1"
+                            label="VAT/NHIL/GETFUND"
+                            label-for="input-1"
+                          >
+                            <b-form-input
+                              id="input-1"
+                              v-model="deliverable.vat_nhil_get_fund"
+                              type="number"
+                              required
+                              placeholder="VAT/NHIL/GETFUND"
+                              @blur="
+                                handleSaveItem(
+                                  deliverable.vat_nhil_get_fund,
+                                  'vat_nhil_get_fund',
+                                  deliverable.id
+                                )
+                              "
+                            ></b-form-input>
+                          </b-form-group>
+                        </div>
+                        <div class="col-md-6">
+                          <b-form-group
+                            id="input-group-1"
+                            label="Witholding Tax"
+                            label-for="input-1"
+                          >
+                            <b-form-input
+                              id="input-1"
+                              v-model="deliverable.with_holding_tax"
+                              type="number"
+                              required
+                              placeholder="Witholding Tax"
+                              @blur="
+                                handleSaveItem(
+                                  deliverable.with_holding_tax,
+                                  'with_holding_tax',
+                                  deliverable.id
+                                )
+                              "
+                            ></b-form-input>
+                          </b-form-group>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </li>
               </ul>
@@ -1411,27 +1520,54 @@ export default {
                       :key="deliverable.id"
                       class="col-md-6"
                     >
-                      <b-form-group
-                        id="input-group-1"
-                        :label="`Deliverable Fee (${deliverable.name})`"
-                        label-for="input-1"
-                      >
-                        <b-form-input
-                          id="input-1"
-                          v-model="deliverable.deliverable_fee_amount_paid"
-                          type="number"
-                          required
-                          placeholder="Deliverable Fee"
-                          @blur="
-                            handleSaveItem(
-                              deliverable.deliverable_fee_amount_paid,
-                              'deliverable_fee_amount_paid',
-                              deliverable.id
-                            )
-                          "
-                        >
-                        </b-form-input>
-                      </b-form-group>
+                      <div class="row gx-0">
+                        <div class="col-10">
+                          <b-form-group
+                            id="input-group-1"
+                            :label="`Deliverable Fee (${deliverable.name})`"
+                            label-for="input-1"
+                          >
+                            <b-form-input
+                              id="input-1"
+                              v-model="deliverable.deliverable_fee_amount_paid"
+                              type="number"
+                              required
+                              placeholder="Deliverable Fee"
+                              @blur="
+                                handleSaveItem(
+                                  deliverable.deliverable_fee_amount_paid,
+                                  'deliverable_fee_amount_paid',
+                                  deliverable.id
+                                )
+                              "
+                            >
+                            </b-form-input>
+                          </b-form-group>
+                        </div>
+                        <div class="col-2">
+                          <b-form-group
+                            id="input-group-1"
+                            label-for="input-1"
+                            label="(%)"
+                          >
+                            <b-form-input
+                              id="input-1"
+                              v-model="deliverable.amount_paid_percentage"
+                              type="text"
+                              required
+                              placeholder="%"
+                              @blur="
+                                handleSaveItem(
+                                  deliverable.amount_paid_percentage,
+                                  'amount_paid_percentage',
+                                  deliverable.id
+                                )
+                              "
+                            >
+                            </b-form-input>
+                          </b-form-group>
+                        </div>
+                      </div>
                     </div>
                   </div>
 

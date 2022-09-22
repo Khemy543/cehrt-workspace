@@ -74,9 +74,9 @@
                 :key="deliverable.id"
               >
                 <td>{{ deliverable.name }}</td>
-                <td>{{ deliverable.deliverable_fee_amount_paid }} (%)</td>
-                <td>N/A</td>
-                <td>N/A</td>
+                <td>{{ formateMoney(deliverable.deliverable_fee_amount_paid) }} ({{deliverable.amount_paid_percentage}}%)</td>
+                <td>{{ formateMoney(deliverable.vat_nhil_get_fund) }}</td>
+                <td>{{ formateMoney(deliverable.with_holding_tax) }}</td>
               </tr>
             </tbody>
           </table>
@@ -118,19 +118,14 @@
                   ></td
                 >
                 <td>N/A</td>
-                <td>N/A</td>
+                <td>{{ deliverable.invoice_payment_date || 'N/A' }}</td>
                 <td>
-                  <a
+                  <File 
                     v-if="deliverable.invoice"
-                    :href="deliverable.invoice"
-                    target="_blank"
-                  >
-                    <img
-                      :src="getIcon('invoice.pdf')"
-                      alt="invoice file"
-                      class="icon-image"
-                    />
-                  </a>
+                    :path="deliverable.invoice"
+                    :name="`Invoice - ${deliverable.name}`"
+                    type="pdf"
+                  />
                   <span v-else>N/A</span>
                 </td>
               </tr>
