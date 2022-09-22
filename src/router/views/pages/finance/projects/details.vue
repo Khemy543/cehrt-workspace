@@ -567,6 +567,16 @@ export default {
         )
 
         if (response) {
+          const item = response.data.project;
+          this.deliverables.push({
+              deliverable_fee_amount_paid: item.deliverable_fee_amount_paid,
+              amount_paid_percentage: item.amount_paid_percentage,
+              vat_nhil_get_fund: item.vat_nhil_get_fund,
+              with_holding_tax: item.with_holding_tax,
+              name: item.name,
+              id: item.id,
+              deliverable_professional_fees: item.deliverable_professional_fees,
+            })
           this.updateChart()
         }
       } catch (error) {
@@ -618,6 +628,10 @@ export default {
             invoice_status: invoiceStatus,
             id,
             name,
+            // eslint-disable-next-line camelcase
+            invoice_submitted_date,
+            // eslint-disable-next-line camelcase
+            invoice_payment_date
           } = response.data.project
           const index = this.timeSheet.findIndex((item) => item.id === id)
 
@@ -633,6 +647,8 @@ export default {
             invoice_days: invoiceDays,
             name,
             id,
+            invoice_payment_date,
+            invoice_submitted_date
           })
           this.$bvToast.toast('File saved successfully', {
             title: 'Success',
@@ -934,6 +950,8 @@ export default {
         <div class="col-12">
           <ProjectSummary
             :project="project"
+            :invoices="invoice"
+            :deliverables="deliverables"
             :contract-amount="contractAmount"
             :amount-paid="getAmountPaid()"
             :expenditure="getExpenditure()"
@@ -1134,7 +1152,7 @@ export default {
                       <h5 class="font-size-14 mt-2 mb-1">
                         {{ deliverable.name }} <span v-if="deliverable.invoice_submitted_date && deliverable.invoice_days">({{ daysLeft(deliverable.invoice_submitted_date, deliverable.invoice_days) }})</span>
                       </h5>
-                      <div class="d-flex justify-content-between">
+                      <div class="d-flex justify-content-between align-items-center">
                         <div v-if="createUrl(invoice[index].invoice)">
                           <File
                             :name="`${deliverable.name}-Invoice`"
@@ -1153,55 +1171,60 @@ export default {
                         </div>
 
                         <div class="d-flex">
-                          <button
-                            type="button"
-                            class="btn btn-soft-primary btn-sm"
-                            @click="
-                              handleDeliverableFileUpload({
-                                fileName: `${
-                                  deliverable.name
-                                }-Invoice.${invoice[index].invoice.name
-                                  .split('.')
-                                  .pop()}`,
-                                file: invoice[index].invoice,
-                                key: 'invoice',
-                                id: deliverable.id,
-                                extra: {
-                                  invoice_days: deliverable.invoice_days,
-                                  invoice_status: deliverable.invoice_status,
-                                  invoice_payment_date:
-                                    deliverable.invoice_payment_date,
-                                  invoice_submitted_date:
-                                    deliverable.invoice_submitted_date,
-                                },
-                              })
-                            "
-                          >
-                            save
-                          </button>
-                          <button
-                            v-if="invoice[index].invoice"
-                            type="button"
-                            class="btn btn-soft-danger btn-sm mx-2"
-                            @click="
-                              handleDeliverableFileUpload({
-                                fileName: `${deliverable.name}-Invoice.docx`,
-                                file: null,
-                                key: 'invoice',
-                                id: deliverable.id,
-                                extra: {
-                                  invoice_days: deliverable.invoice_days,
-                                  invoice_status: deliverable.invoice_status,
-                                  invoice_payment_date:
-                                    deliverable.invoice_payment_date,
-                                  invoice_submitted_date:
-                                    deliverable.invoice_submitted_date,
-                                },
-                              })
-                            "
-                          >
-                            Delete
-                          </button>
+                          <div>
+                            <button
+                              type="button"
+                              class="btn btn-soft-primary btn-sm"
+                              @click="
+                                handleDeliverableFileUpload({
+                                  ...((deliverable.invoice && typeof deliverable.invoice === 'object') ?
+                                  { fileName: `${
+                                    deliverable.name
+                                  }-Invoice.${invoice[index].invoice.name
+                                    .split('.')
+                                    .pop()}` } : { invoice: invoice[index].invoice }),
+                                  file: invoice[index].invoice,
+                                  key: 'invoice',
+                                  id: deliverable.id,
+                                  extra: {
+                                    invoice_days: deliverable.invoice_days,
+                                    invoice_status: deliverable.invoice_status,
+                                    invoice_payment_date:
+                                      deliverable.invoice_payment_date,
+                                    invoice_submitted_date:
+                                      deliverable.invoice_submitted_date,
+                                  },
+                                })
+                              "
+                            >
+                              save
+                            </button>
+                          </div>
+                          <div>
+                            <button
+                              v-if="invoice[index].invoice"
+                              type="button"
+                              class="btn btn-soft-danger btn-sm mx-2"
+                              @click="
+                                handleDeliverableFileUpload({
+                                  fileName: `${deliverable.name}-Invoice.docx`,
+                                  file: null,
+                                  key: 'invoice',
+                                  id: deliverable.id,
+                                  extra: {
+                                    invoice_days: deliverable.invoice_days,
+                                    invoice_status: deliverable.invoice_status,
+                                    invoice_payment_date:
+                                      deliverable.invoice_payment_date,
+                                    invoice_submitted_date:
+                                      deliverable.invoice_submitted_date,
+                                  },
+                                })
+                              "
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </div>
                       </div>
                       <div class="d-flex mt-3 justify-content-between">
@@ -1521,7 +1544,7 @@ export default {
                       class="col-md-6"
                     >
                       <div class="row gx-0">
-                        <div class="col-10">
+                        <div class="col-9">
                           <b-form-group
                             id="input-group-1"
                             :label="`Deliverable Fee (${deliverable.name})`"
@@ -1544,7 +1567,7 @@ export default {
                             </b-form-input>
                           </b-form-group>
                         </div>
-                        <div class="col-2">
+                        <div class="col-3">
                           <b-form-group
                             id="input-group-1"
                             label-for="input-1"

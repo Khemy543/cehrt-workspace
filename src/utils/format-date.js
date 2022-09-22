@@ -1,8 +1,12 @@
 // https://date-fns.org/docs/format
-import { isAfter, addBusinessDays, differenceInCalendarDays, formatISO9075 } from 'date-fns'
+import { isAfter, addBusinessDays, differenceInCalendarDays, formatISO9075, format } from 'date-fns'
 
 export const dateFormate = (date) => {
   return formatISO9075(new Date(date), { representation: 'date' })
+}
+
+export const formateDate = (date) => {
+  return format(new Date(date), "do MMM yyyy")
 }
 
 export const calendarFormat = (date) => {

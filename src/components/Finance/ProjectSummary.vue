@@ -70,13 +70,13 @@
             </thead>
             <tbody>
               <tr
-                v-for="deliverable in project.deliverables"
+                v-for="deliverable in deliverables"
                 :key="deliverable.id"
               >
                 <td>{{ deliverable.name }}</td>
-                <td>{{ formateMoney(deliverable.deliverable_fee_amount_paid) }} ({{deliverable.amount_paid_percentage}}%)</td>
-                <td>{{ formateMoney(deliverable.vat_nhil_get_fund) }}</td>
-                <td>{{ formateMoney(deliverable.with_holding_tax) }}</td>
+                <td>{{ formateMoney(deliverable.deliverable_fee_amount_paid) || 'N/A' }} ({{deliverable.amount_paid_percentage || 0}}%)</td>
+                <td>{{ deliverable.vat_nhil_get_fund ? `GHS ${formateMoney(deliverable.vat_nhil_get_fund)}` : 'N/A' }}</td>
+                <td>{{ deliverable.with_holding_tax ? `GHS ${formateMoney(deliverable.with_holding_tax)}` : 'N/A' }}</td>
               </tr>
             </tbody>
           </table>
@@ -91,6 +91,7 @@
               <tr>
                 <th scope="col">Deliverable</th>
                 <th scope="col">Status</th>
+                <th scope="col">Submitted Date</th>
                 <th scope="col">Days Left</th>
                 <th scope="col">Date Paid</th>
                 <th scope="col">File</th>
@@ -98,7 +99,7 @@
             </thead>
             <tbody>
               <tr
-                v-for="deliverable in project.deliverables"
+                v-for="deliverable in invoices"
                 :key="deliverable.id"
               >
                 <td>{{ deliverable.name }}</td>
@@ -117,8 +118,9 @@
                     }}</div
                   ></td
                 >
-                <td>N/A</td>
-                <td>{{ deliverable.invoice_payment_date || 'N/A' }}</td>
+                <td>{{ deliverable.invoice_submitted_date ?  formateDate(deliverable.invoice_submitted_date) : 'N/A'}}</td>
+                <td>{{ daysLeft(deliverable.invoice_submitted_date, deliverable.invoice_days) }}</td>
+                <td>{{ deliverable.invoice_payment_date ? formateDate(deliverable.invoice_payment_date) : 'N/A' }}</td>
                 <td>
                   <File 
                     v-if="deliverable.invoice"
@@ -138,10 +140,12 @@
 </template>
 <script>
 import formateAmount from '@src/utils/formate-money.js'
-import { getIcon } from '@/src/utils/helpers.js'
+import { getAddedDate, dateDifference, formateDate } from '@/src/utils/format-date'
+import File from '../file.vue'
 
 export default {
   name: 'ProjectSummary',
+  components: {File},
   props: {
     project: {
       type: Object,
@@ -159,6 +163,14 @@ export default {
       type: String,
       default: null,
     },
+    invoices: {
+      type: Array,
+      default: () => ([])
+    },
+    deliverables: {
+      type: Array,
+      default: () => ([])
+    }
   },
   computed: {
     totalProfessionalFees() {
@@ -175,7 +187,20 @@ export default {
     formateMoney(amount) {
       return formateAmount(amount)
     },
-    getIcon,
+    daysLeft(date, days) {
+      const dueDate = getAddedDate(date, days);
+      const daysLeft = dateDifference(dueDate, new Date())
+      if(daysLeft > 0) {
+        return `${daysLeft} days left`
+      }else if(daysLeft === 0) {
+        return `Is due today`
+      }else if(!date) {
+        return 'N/A'
+      }else {
+        return `Is due ${Math.abs(daysLeft)} ago`
+      }
+    },
+    formateDate
   },
 }
 </script>
