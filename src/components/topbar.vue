@@ -87,14 +87,12 @@ export default {
 	<div class="navbar navbar-expand flex-column flex-md-row navbar-custom">
 		<div class="container-fluid">
 			<!-- LOGO -->
-			<a href="/" class="navbar-brand mr-0 mr-md-2 logo">
+			<router-link to="/" class="navbar-brand mr-0 mr-md-2 logo d-flex align-content-center">
 				<span class="logo-lg">
-					<img src="@assets/images/cehrt-logo.png" alt="logo" height="50px" style="object-fit: cover; object-position: center;"/>
+					<img src="@assets/images/logo.png" alt="logo" height="50px" style="object-fit: cover; object-position: center;"/>
 				</span>
-				<span class="logo-sm">
-					<img src="@assets/images/cehrt-small-logo.png" alt="logo" />
-				</span>
-			</a>
+				<p class="h4 ml-2">CEHRT WORKSPACE</p>
+			</router-link>
 
 			<ul class="navbar-nav bd-navbar-nav flex-row list-unstyled menu-left mb-0">
 				<li class>
@@ -206,4 +204,5 @@ export default {
 .button-menu-mobile {
 	outline: none !important;
 }
+
 </style>
