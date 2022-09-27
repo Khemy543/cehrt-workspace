@@ -1,7 +1,4 @@
 <script>
-/**
- * Messages
- */
 export default {
   props: {
     user: {

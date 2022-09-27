@@ -391,6 +391,14 @@ const adminProjectRoutes = [
     name: "Proposal admin details",
     meta: { authRequired: true },
     component: () => lazyLoadView(import('@views/pages/administrator/proposals/details.vue'))
+  },
+  {
+    path: "/admin/leave-report",
+    name: "Leave Report",
+    meta: { authRequired: true },
+    icon: 'book-open',
+    department: 'Administration',
+    component: () => lazyLoadView(import('@views/pages/administrator/leave/index.vue'))
   }
 ]
 
@@ -399,7 +407,9 @@ const profileRoute = [
     path: '/profile',
     name: 'Profile',
     meta: { authRequired: true },
+    icon: 'book-open',
     component: () => lazyLoadView(import('@views/pages/profile')),
+    props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
 ]
 

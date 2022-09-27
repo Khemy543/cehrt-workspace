@@ -1253,7 +1253,7 @@ export default {
                         <b-form-group
                           id="input-group-3"
                           class=" mr-4"
-                          style="max-width:100px"
+                          style="max-width:60px"
                           label="Days"
                           label-for="input-1"
                         >
@@ -1261,7 +1261,7 @@ export default {
                             id="input-1"
                             v-model="deliverable.invoice_days"
                             type="number"
-                            placeholder="Days"
+                            placeholder=""
                           ></b-form-input>
                         </b-form-group>
 

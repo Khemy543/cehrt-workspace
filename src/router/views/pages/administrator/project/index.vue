@@ -7,17 +7,6 @@
           <div class="row page-title align-items-center">
             <div class="col-md-3 col-xl-6">
             </div>
-<!--            <div class="col-md-9 col-xl-6 text-md-right">-->
-<!--              <div class="mt-4 mt-md-0">-->
-<!--                <div class="btn-group mb-3 mb-sm-0">-->
-<!--                  <button type="button" class="btn btn-primary">All</button>-->
-<!--                </div>-->
-<!--                <div class="btn-group ml-1">-->
-<!--                  <button type="button" class="btn btn-white">Ongoing</button>-->
-<!--                  <button type="button" class="btn btn-white">Finished</button>-->
-<!--                </div>-->
-<!--              </div>-->
-<!--            </div>-->
           </div>
 
           <div v-if="loading" class=" d-flex justify-content-center">

@@ -4,15 +4,8 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 
 import UserCard from './user-card'
-/* import Projects from './projects'
-import Tasks from './tasks' */
 import EditProfile from './edit-profile.vue'
 import ChangePassword from './change-password.vue'
-import { activities, messageData, projectData, tasks } from './data-profile'
-
-/**
- * Profile component
- */
 export default {
   page: {
     title: 'Profile',
@@ -27,10 +20,6 @@ export default {
   },
   data() {
     return {
-      activities: activities,
-      messageData: messageData,
-      projectData: projectData,
-      tasks: tasks,
       title: 'Profile',
       items: [
         {
@@ -67,12 +56,6 @@ export default {
         <div class="card">
           <div class="card-body">
             <b-tabs class="navtab-bg" pills justified>
-              <!-- <b-tab title="Projects" active>
-                <Projects :projects="projectData" />
-              </b-tab>
-              <b-tab title="Tasks">
-                <Tasks :tasks="tasks" />
-              </b-tab> -->
               <b-tab title="Edit Profile" active>
                 <EditProfile :user="user" :initials="initials" />
               </b-tab>

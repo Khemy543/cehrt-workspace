@@ -4,7 +4,7 @@
   <ul id="side-menu" class="metismenu">
     <li v-for="item in menuItems" v-show="department.name === item.department || item.department === 'all'"
       :key="`item-${item.name}`" class="side-nav-title side-nav-item">
-      <p v-if="item.header" class="menu-title mb-0">{{ item.header }}</p>
+      <p v-if="item.header" class="menu-title mb-0">{{ item.header }}</p> 
 
       <a v-if="hasItems(item)" href="javascript:void(0);" class="side-nav-link">
         <feather v-if="item.icon" :type="item.icon"></feather>
@@ -12,9 +12,14 @@
         <span class="menu-arrow"></span>
       </a>
 
-      <router-link v-if="!hasItems(item)" tag="a" :to="`${item.path}`" class="side-nav-link side-nav-link-ref">
+      <router-link v-if="!hasItems(item) && !item.isSupervisor" tag="a" :to="`${item.path}`" class="side-nav-link side-nav-link-ref">
         <feather v-if="item.icon" :type="item.icon"></feather>
         <span class="text-capitalize">{{ item.name.split('-')[0] }}</span>
+      </router-link>
+
+      <router-link v-if="item.isSupervisor && isSupervisor" tag="a" :to="`${item.path}`" class="side-nav-link side-nav-link-ref">
+        <feather v-if="item.icon" :type="item.icon"></feather>
+        <span class="text-capitalize">Requestd Leave</span>
       </router-link>
 
       <ul v-if="hasItems(item)" class="nav-second-level">

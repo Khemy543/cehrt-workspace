@@ -51,11 +51,11 @@ export default {
 				:settings="settings"
 			>
 				<div id="sidebar-menu">
-					<Appmenu :department="department" :is-superviosr="isSupervisor"/>
+					<Appmenu :department="department" :is-supervisor="isSupervisor"/>
 				</div>
 			</VuePerfectScrollbar>
 			<div v-else id="sidebar-menu">
-				<Appmenu :department="department" :is-superviosr="isSupervisor"/>
+				<Appmenu :department="department" :is-supervisor="isSupervisor"/>
 			</div>
 		</div>
 		<!-- Sidebar -left -->

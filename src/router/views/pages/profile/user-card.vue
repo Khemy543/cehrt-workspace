@@ -74,6 +74,10 @@ export default {
           class="badge badge-soft-primary mr-2"
         >{{ department.name }}</label>
       </div>
+      <div class="mt-3 pt-2 border-top">
+        <h4 class="mb-3 font-size-15">Supervisor</h4>
+        <h6 class="text-muted font-weight-normal mt-2 mb-0">{{ user.supervisor }}</h6>
+      </div>
     </div>
   </div>
   <!-- end card -->
