@@ -6,6 +6,9 @@ import PageHeader from '@components/page-header'
 import AddFileToLibrary from '@/src/components/AddFileToLibrary.vue'
 import graph from '@/src/msalConfig/graph'
 import { v4 as uuidv4 } from 'uuid'
+import File from '@/src/components/file.vue'
+import { slashDateFormate } from '@/src/utils/format-date.js'
+import formateAmount from '@src/utils/formate-money.js'
 
 export default {
   page: {
@@ -16,6 +19,7 @@ export default {
     Layout,
     PageHeader,
     AddFileToLibrary,
+    File,
   },
   props: {
     id: {
@@ -80,6 +84,9 @@ export default {
     }
   },
   computed: {
+    regions() {
+      return this.project.regions.map((region) => region.region).join(', ')
+    },
     isConsulting() {
       return this.$store.state.auth.userDepartment.name === 'Consultancy'
     },
@@ -136,6 +143,8 @@ export default {
     this.getProjectDeliverables()
   },
   methods: {
+    slashDateFormate,
+    formateAmount,
     async addFile(form) {
       try {
         this.uploading = true
@@ -205,7 +214,7 @@ export default {
           }
 
           if (this.isFinance) {
-            const { project } = response.data;
+            const { project } = response.data
             this.library = []
             const contract = {
               id: 1,
@@ -503,17 +512,9 @@ export default {
               </div>
             </div>
 
-            <h6 class="mt-0 header-title">Project description</h6>
-
-            <p class=" mt-1">{{ project.description }}</p>
-
-            <h6 class="mt-3 header-title">Service description</h6>
-
-            <p class=" mt-1" v-html="project.service_description"/>
-
             <div class="text-muted">
               <div
-                class="badge badge-soft-primary font-size-13 font-weight-normal ml-1"
+                class="badge badge-soft-primary font-size-13 font-weight-normal"
               >
                 {{ project.project_sector && project.project_sector.name }}
               </div>
@@ -522,17 +523,50 @@ export default {
                 class="badge badge-soft-success font-size-13 font-weight-normal ml-1"
                 >{{ project.project_type && project.project_type.name }}</div
               >
+
+              <div
+                class="badge badge-soft-danger font-size-13 font-weight-normal ml-1"
+                ><i class="uil-user text-danger"></i> Client :
+                {{ project.client }}</div
+              >
             </div>
+            <div class="mt-4 d-flex justify-content-between">
+              <h6 class="header-title">Project Summary</h6>
+              <h6 v-if="isAdmin || isFinance" class="header-title"
+                >Contract Amount: GHS
+                {{ formateAmount(project.contract_amount) }}</h6
+              >
+            </div>
+
+            <p class=" mt-1">{{ project.description }}</p>
+
+            <h6 class="mt-3 header-title">Service Description</h6>
+
+            <p class=" mt-1" v-html="project.service_description" />
 
             <div class="row">
               <div class="col-lg-3 col-md-6">
                 <div class="mt-4">
                   <p class="mb-2">
-                    <i class="uil-user text-danger"></i> Coordinator
+                    <i class="uil-globe text-danger"></i> Country
                   </p>
-                  <h5 class="font-size-16">{{
-                    (project.coordinator && project.coordinator.name) || 'N/A'
-                  }}</h5>
+                  <h5 class="font-size-16">{{ project.country || 'N/A' }}</h5>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="mt-4">
+                  <p class="mb-2">
+                    <i class="uil-user text-danger"></i> Regions
+                  </p>
+                  <h5 class="font-size-16">{{ regions }}</h5>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-6">
+                <div class="mt-4">
+                  <p class="mb-2">
+                    <i class="uil-globe text-danger"></i> District
+                  </p>
+                  <h5 class="font-size-16">{{ project.district || 'N/A' }}</h5>
                 </div>
               </div>
               <div class="col-lg-3 col-md-6">
@@ -540,27 +574,80 @@ export default {
                   <p class="mb-2">
                     <i class="uil-calender text-danger"></i> Start Date
                   </p>
-                  <h5 class="font-size-16">{{ project.start_date }}</h5>
+                  <h5 class="font-size-16">{{
+                    slashDateFormate(project.start_date)
+                  }}</h5>
                 </div>
               </div>
               <div class="col-lg-3 col-md-6">
                 <div class="mt-4">
                   <p class="mb-2">
-                    <i class="uil-calendar-slash text-danger"></i> Due Date
+                    <i class="uil-calendar-slash text-danger"></i> End Date
                   </p>
-                  <h5 class="font-size-16">{{ project.end_date }}</h5>
-                </div>
-              </div>
-
-              <div class="col-lg-3 col-md-6">
-                <div class="mt-4">
-                  <p class="mb-2">
-                    <i class="uil-user text-danger"></i> Client
-                  </p>
-                  <h5 class="font-size-16">{{ project.client }}</h5>
+                  <h5 class="font-size-16">{{
+                    slashDateFormate(project.end_date)
+                  }}</h5>
                 </div>
               </div>
             </div>
+
+            <div class="row mt-4">
+              <div class="col-md-12">
+                <table class="table mb-0">
+                  <thead class="thead-light table-bordered">
+                    <tr>
+                      <th scope="col">CLIENT DETAILS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Name - {{ project.client_name }}</td>
+                    </tr>
+                    <tr>
+                      <td>Address - {{ project.client_address }}</td>
+                    </tr>
+                    <tr>
+                      <td>Contact - {{ project.client_contact }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="row mt-4">
+              <div v-if="project.professional_expects.length > 0" class="col-md-6">
+                <table class="table mb-0">
+                  <thead class="thead-light table-bordered">
+                    <tr>
+                      <th scope="col" colspan="3">PROFESSIONAL EXPERTS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(user) in project.professional_expects" :key="user.id">
+                      <td>{{ user.name }}</td>
+                      <td>{{ user.role }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div v-if="project.associated_consultants.length > 0" class="col-md-6">
+                <table class="table mb-0">
+                  <thead class="thead-light table-bordered">
+                    <tr>
+                      <th scope="col" colspan="3">ASSOCIATED CONSULTANTS</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(user) in project.associated_consultants" :key="user.id">
+                      <td>{{ user.name }}</td>
+                      <td>{{ user.role }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            
           </div>
         </div>
       </div>
@@ -570,31 +657,15 @@ export default {
           <div class="card-body">
             <div v-if="combindedFiles.length > 0" class="mt-5">
               <div class="row mt-4">
-                <a
-                  v-for="n in combindedFiles"
-                  :key="n.id"
-                  :href="n.document_path"
-                  target="_blank"
-                  class="col-md-3"
-                >
-                  <div class="p-2 border rounded mb-4">
-                    <div class="media align-items-center">
-                      <div class="avatar-sm font-weight-bold mr-3">
-                        <span
-                          class="avatar-title rounded bg-soft-primary text-primary"
-                        >
-                          <i class="uil-file-plus-alt font-size-18"></i>
-                        </span>
-                      </div>
-                      <div class="media-body">
-                        <div class="d-inline-block">{{ n.name }}</div>
-                      </div>
-                      <div class="float-right">
-                        <feather type="log-in" class="icons-xs"></feather>
-                      </div>
-                    </div>
-                  </div>
-                </a>
+                <div class="col d-flex flex-wrap">
+                  <File
+                    v-for="n in combindedFiles"
+                    :key="n.id"
+                    :name="n.name"
+                    type="docx"
+                    :path="n.document_path"
+                  />
+                </div>
               </div>
             </div>
 

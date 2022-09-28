@@ -111,14 +111,18 @@ export default {
     },
     async updateProject(form) {
       try {
-        const response = await this.$http.put(`/update/${form.id}/project`, { ...form, coordinator_id: this.$store.state.auth.currentUser.id});
+        const response = await this.$http.patch(`/export/${form.id}/project`, {
+          ...form,
+          coordinator_id: this.$store.state.auth.currentUser.id,
+          regionIds: form.regionIds.map((region) => region.id),
+        })
 
         if (response) {
           const newData = {
             ...response.data.project,
-            district: form.district
+            district: form.district,
           }
-          const index = this.library.findIndex((item) => item.id === form.id);
+          const index = this.library.findIndex((item) => item.id === form.id)
           this.$set(this.library, index, newData)
           this.$bvToast.toast('Project updated successfully', {
             title: 'Success',
@@ -127,8 +131,8 @@ export default {
             variant: 'success',
           })
           this.show = false
-          this.editting = false;
-          this.vProject = null;
+          this.editting = false
+          this.vProject = null
         }
       } catch (error) {
         if (error.response) {

@@ -111,7 +111,7 @@
           >
             <b-form-input
               id="input-1"
-              v-model="form.contract"
+              v-model="form.contract_amount"
               type="text"
               placeholder="Value of service"
             >
@@ -149,7 +149,10 @@
         </div>
         <div class="col-md-6">
           <b-form-group label="Description of Service Provided">
-            <div id="taskDesk" style="height: 100px; position: relative; z-index: 100;">
+            <div
+              id="taskDesk"
+              style="height: 100px; position: relative; z-index: 10;"
+            >
               <vue-editor
                 v-model="form.service_description"
                 :editor-options="editorOptions"
@@ -277,7 +280,11 @@
             </b-form-input>
           </b-form-group>
         </div>
-        <div class="col-md-6">
+        <div
+          :class="
+            form.professional_expects.length > 1 ? 'col-md-5' : 'col-md-6'
+          "
+        >
           <b-form-group id="input-group-1" label-for="input-1">
             <b-form-input
               id="input-1"
@@ -288,6 +295,16 @@
             >
             </b-form-input>
           </b-form-group>
+        </div>
+        <div v-if="form.professional_expects.length > 1" class="col-1">
+          <button
+            type="button"
+            variant="danger"
+            class="btn btn-soft-danger btn-sm"
+            @click="tryDeleteProfExperts(index)"
+          >
+            <i class="uil uil-trash-alt"></i>
+          </button>
         </div>
       </div>
       <div class="d-flex mb-2">
@@ -316,7 +333,11 @@
             </b-form-input>
           </b-form-group>
         </div>
-        <div class="col-md-6">
+        <div
+          :class="
+            form.associated_consultants.length > 1 ? 'col-md-5' : 'col-md-6'
+          "
+        >
           <b-form-group id="input-group-1" label-for="input-1">
             <b-form-input
               id="input-1"
@@ -326,6 +347,16 @@
             >
             </b-form-input>
           </b-form-group>
+        </div>
+        <div v-if="form.associated_consultants.length > 1" class="col-1">
+          <button
+            type="button"
+            variant="danger"
+            class="btn btn-soft-danger btn-sm"
+            @click="tryDeleteAssoConsultants(index)"
+          >
+            <i class="uil uil-trash-alt"></i>
+          </button>
         </div>
       </div>
       <button type="submit" class="btn btn-primary">Submit</button>
@@ -341,7 +372,7 @@ import { dateFormate } from '../utils/format-date'
 export default {
   components: {
     Multiselect,
-    VueEditor
+    VueEditor,
   },
   props: {
     value: {
@@ -557,7 +588,7 @@ export default {
         regionIds: newValue.regions || [],
         start_date: dateFormate(newValue.start_date) || '',
         end_date: dateFormate(newValue.end_date) || '',
-        professional_expects: newValue.professional_expect || [
+        professional_expects: newValue.professional_expects || [
           {
             id: 1,
             name: '',
@@ -580,6 +611,16 @@ export default {
     this.getProjectTypes()
   },
   methods: {
+    tryDeleteAssoConsultants(index) {
+      if (this.form.associated_consultants.length > 1) {
+        this.form.associated_consultants.splice(index, 1)
+      }
+    },
+    tryDeleteProfExperts(index) {
+      if (this.form.professional_expects.length > 1) {
+        this.form.professional_expects.splice(index, 1)
+      }
+    },
     addProfessionalExpert() {
       this.form.professional_expects.push({
         id:
@@ -632,11 +673,11 @@ export default {
 </script>
 
 <style scoped>
-  ::v-deep .quillWrapper .ql-container .ql-editor  {
-    min-height: 100px !important;
-  }
+::v-deep .quillWrapper .ql-container .ql-editor {
+  min-height: 100px !important;
+}
 
-  .quillWrapper {
-    height: 100% !important;
-  }
+.quillWrapper {
+  height: 100% !important;
+}
 </style>

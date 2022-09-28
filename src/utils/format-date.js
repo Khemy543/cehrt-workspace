@@ -13,6 +13,10 @@ export const calendarFormat = (date) => {
   return formatISO9075(new Date(date))
 }
 
+export const slashDateFormate = (date) => {
+  return format(new Date(date), 'dd/MM/yyy')
+}
+
 
 export const dateDifference = (later, earlier) => {
   

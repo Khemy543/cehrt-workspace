@@ -21,7 +21,7 @@
                   <tr>
                     <th>#</th>
                     <th>Staff</th>
-                    <th>Total Leave days</th>
+                    <th>Total Leave Taken</th>
                     <th>Annual Leave</th>
                     <th>Sick Leave</th>
                     <th>Maternity Leave</th>

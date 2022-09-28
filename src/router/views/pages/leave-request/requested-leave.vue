@@ -216,7 +216,7 @@ export default {
                           <th scope="row">{{ index + 1 }}</th>
                           <td>{{ request.user }}</td>
                           <td
-                            >{{ request.supervisor.name }}
+                            >{{ request.supervisor && request.supervisor.name || 'N/A' }}
                             <label
                               class="badge mx-1"
                               :class="{
