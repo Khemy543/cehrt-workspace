@@ -12,7 +12,7 @@
               <div class="d-flex justify-content-between">
                 <div>
                   <h4>View Leave Report</h4>
-                  <p>Lorem ipsum dolor sit amet.</p>
+                  <p>View staff and leaves taken</p>
                 </div>
                 <div></div>
               </div>

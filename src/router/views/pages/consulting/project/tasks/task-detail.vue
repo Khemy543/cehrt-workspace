@@ -45,7 +45,7 @@ export default {
           id: 4,
           name: 'Completed',
           api: 'completed',
-        },
+        }
       ],
     }
   },
@@ -407,7 +407,7 @@ export default {
               <!-- start due date -->
               <p class="mt-2 mb-1 text-muted">Due Date</p>
               <div class="media">
-                <i class="uil uil-schedule font-18 text-success mr-1"></i>
+                <i class="uil uil-schedule font-18 text-success mr-1" :class="{ 'text-danger': task.is_due }"></i>
                 <div class="media-body">
                   <h5 class="mt-1 font-size-14">{{
                     task.formatted_end_date

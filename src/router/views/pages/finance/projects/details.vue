@@ -1308,7 +1308,10 @@ export default {
         <div class="col-xl-6">
           <div class="card">
             <div class="card-body">
-              <h6 class="mt-0 header-title">Project Finances</h6>
+              <div class="d-flex justify-content-between">
+                <h6 class="mt-0 header-title">Project Finances</h6>
+                <button class="btn btn-primary" @click="toggleEdit">View Summary</button>
+              </div>
 
               <ul class="list-unstyled activity-widget">
                 <li class="activity-list">

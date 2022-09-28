@@ -22,7 +22,7 @@ export default {
 
 <template>
   <router-link :to="`/${$route.fullPath.split('/')[1]}/project/${project.id}/details/`" class="col-xl-4 col-lg-6">
-    <div style="height: 380px" class="card border">
+    <div style="height: 380px" class="card border shadow">
       <div class="card-body">
         <slot name="status">
           <div

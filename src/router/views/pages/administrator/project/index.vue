@@ -1,90 +1,139 @@
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <div>
-      <b-tabs>
-        <b-tab title="Projects" active>
-          <div class="row page-title align-items-center">
-            <div class="col-md-3 col-xl-6">
-            </div>
-          </div>
 
-          <div v-if="loading" class=" d-flex justify-content-center">
-            <b-spinner type="grow" size="sm" variant="primary"></b-spinner>
-          </div>
-
-          <div v-else class="row">
-            <OtherProjectCard v-for="project in projectData" :key="project.id" :project="project" />
-          </div>
-
-          <div v-if="links.next" class="row mb-3 mt-2">
-            <div class="col-12">
-              <div class="text-center">
-                <div class="btn btn-white" @click="getProjects(links.next)">
-                  <feather type="loader" class="icon-dual icon-xs mr-2 align-middle"></feather>Load more
-                </div>
-              </div>
-            </div>
-          </div>
-
-
-          <div v-if="!loading && projectData.length <= 0" class=" w-100 d-flex justify-content-center">
-            <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
-          </div>
-        </b-tab>
-        <b-tab title="Project Deletion Request">
-          <div class=" card">
-            <div class="card-body">
-              <div v-if="!loading && requests.length > 0" class="table-responsive">
-                <table class="table mb-0">
-                  <thead class="thead-light">
-                    <tr>
-                      <th scope="col">Project Name</th>
-                      <th scope="col">Coordinator</th>
-                      <th scope="col">Reason</th>
-                      <th scope="col">Requested Date</th>
-                      <th scope="col">Status</th>
-                      <th scope="col">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr v-for="request in requests" :key="request.id">
-                      <td>{{ request.project_name }}</td>
-                      <td>{{
-                          (request.coordinator && request.coordinator.name) ||
-                          'N/A'
-                      }}</td>
-                      <td>{{ request.reason }}</td>
-                      <td>{{ request.created_at }}</td>
-                      <td>{{ request.status }}</td>
-                      <td>
-                        <b-dropdown variant="link" class=" position-absolute" toggle-class="p-0 text-muted arrow-none">
-                          <template v-slot:button-content>
-                            <i class="uil uil-ellipsis-v font-size-14"></i>
-                          </template>
-                          <b-dropdown-item href="javascript: void(0);" variant="success"
-                            @click="acceptRequest(request)">
-                            Accept
-                          </b-dropdown-item>
-                          <b-dropdown-item href="javascript: void(0);" variant="danger"
-                            @click="showRejectModal(request)">
-                            Reject
-                          </b-dropdown-item>
-                        </b-dropdown>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <div v-if="!loading && requests.length <= 0" class=" w-100 d-flex justify-content-center">
-                <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
-              </div>
-            </div>
-          </div>
-        </b-tab>
-      </b-tabs>
+    <div v-if="loading" class=" d-flex justify-content-center">
+      <b-spinner type="grow" size="sm" variant="primary"></b-spinner>
     </div>
-    <RejectProjectDeletionModal :value="show" :request="selectedRequest" @deleteRequest="deleteRequest" />
+    <div v-else class="row">
+      <div class="col">
+        <div class="card">
+          <div class="card-body">
+            <b-tabs pills class="navtab-bg">
+              <b-tab title="Projects" active>
+                <div class="row page-title align-items-center">
+                  <div class="col-md-3 col-xl-6"> </div>
+                </div>
+
+                <div class="row">
+                  <OtherProjectCard
+                    v-for="project in projectData"
+                    :key="project.id"
+                    :project="project"
+                  />
+                </div>
+
+                <div v-if="links.next" class="row mb-3 mt-2">
+                  <div class="col-12">
+                    <div class="text-center">
+                      <div
+                        class="btn btn-white"
+                        @click="getProjects(links.next)"
+                      >
+                        <feather
+                          type="loader"
+                          class="icon-dual icon-xs mr-2 align-middle"
+                        ></feather
+                        >Load more
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  v-if="!loading && projectData.length <= 0"
+                  class=" w-100 d-flex justify-content-center"
+                >
+                  <img
+                    :src="require('@assets/svgs/empty.svg')"
+                    alt="no projects"
+                    style="width:30%"
+                  />
+                </div>
+              </b-tab>
+              <b-tab title="Project Deletion Request">
+                <div class=" card">
+                  <div class="card-body">
+                    <div
+                      v-if="!loading && requests.length > 0"
+                      class="table-responsive"
+                    >
+                      <table class="table mb-0">
+                        <thead class="thead-light">
+                          <tr>
+                            <th scope="col">Project Name</th>
+                            <th scope="col">Coordinator</th>
+                            <th scope="col">Reason</th>
+                            <th scope="col">Requested Date</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="request in requests" :key="request.id">
+                            <td>{{ request.project_name }}</td>
+                            <td>{{
+                              (request.coordinator &&
+                                request.coordinator.name) ||
+                                'N/A'
+                            }}</td>
+                            <td>{{ request.reason }}</td>
+                            <td>{{ request.created_at }}</td>
+                            <td>{{ request.status }}</td>
+                            <td>
+                              <b-dropdown
+                                variant="link"
+                                class=" position-absolute"
+                                toggle-class="p-0 text-muted arrow-none"
+                              >
+                                <template v-slot:button-content>
+                                  <i
+                                    class="uil uil-ellipsis-v font-size-14"
+                                  ></i>
+                                </template>
+                                <b-dropdown-item
+                                  href="javascript: void(0);"
+                                  variant="success"
+                                  @click="acceptRequest(request)"
+                                >
+                                  Accept
+                                </b-dropdown-item>
+                                <b-dropdown-item
+                                  href="javascript: void(0);"
+                                  variant="danger"
+                                  @click="showRejectModal(request)"
+                                >
+                                  Reject
+                                </b-dropdown-item>
+                              </b-dropdown>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div
+                      v-if="!loading && requests.length <= 0"
+                      class=" w-100 d-flex justify-content-center"
+                    >
+                      <img
+                        :src="require('@assets/svgs/empty.svg')"
+                        alt="no projects"
+                        style="width:30%"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </b-tab>
+            </b-tabs>
+          </div>
+        </div>
+      </div>
+    </div>
+    <RejectProjectDeletionModal
+      :value="show"
+      :request="selectedRequest"
+      @deleteRequest="deleteRequest"
+    />
   </Layout>
 </template>
 
@@ -103,7 +152,7 @@ export default {
     Layout,
     PageHeader,
     RejectProjectDeletionModal,
-    OtherProjectCard
+    OtherProjectCard,
   },
   data() {
     return {
@@ -127,7 +176,7 @@ export default {
     }
   },
   created() {
-    this.getDeletionRequest();
+    this.getDeletionRequest()
     this.getProjects()
   },
   methods: {
@@ -222,5 +271,4 @@ export default {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
