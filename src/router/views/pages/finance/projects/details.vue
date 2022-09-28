@@ -265,7 +265,7 @@ export default {
             },
             {
               y: this.contractForm.expenditure_miscellaneous || 0,
-              x: `Misc. - ${(
+              x: `Tax - ${(
                 (this.contractForm.expenditure_miscellaneous /
                   this.getExpenditure()) *
                 100
@@ -1454,7 +1454,7 @@ export default {
                     <div class="col-md-12">
                       <b-form-group
                         id="input-group-1"
-                        label="Miscellaneous"
+                        label="Tax"
                         label-for="input-1"
                       >
                         <b-form-input
