@@ -131,12 +131,10 @@
                 <td>{{ deliverable.name }}</td>
                 <td
                   ><div
-                    class="badge badge-danger"
+                    class="badge badge-success"
                     :class="{
-                      'badge-success':
-                        `${deliverable.invoice_status}` === 'unpaid' ||
-                        `${deliverable.invoice_status}` === null,
-                    }"
+                      'badge-danger':
+                        `${deliverable.invoice_status}` === 'unpaid' }"
                     >{{
                       deliverable.invoice_status
                         ? deliverable.invoice_status
@@ -150,10 +148,11 @@
                     : 'N/A'
                 }}</td>
                 <td>{{
+                  deliverable.invoice_status === 'unpaid' ?
                   daysLeft(
                     deliverable.invoice_submitted_date,
                     deliverable.invoice_days
-                  )
+                  ) : 'N/A'
                 }}</td>
                 <td>{{
                   deliverable.invoice_payment_date

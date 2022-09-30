@@ -217,13 +217,13 @@ export default {
       this.showEdit = !this.showEdit
     },
     daysLeft(date, days) {
-      const dueDate = getAddedDate(date, days);
+      const dueDate = getAddedDate(date, days)
       const daysLeft = dateDifference(dueDate, new Date())
-      if(daysLeft > 0) {
+      if (daysLeft > 0) {
         return `${daysLeft} days left`
-      }else if(daysLeft === 0) {
+      } else if (daysLeft === 0) {
         return `Is due today`
-      }else {
+      } else {
         return `Is due ${Math.abs(daysLeft)} ago`
       }
     },
@@ -388,14 +388,20 @@ export default {
       let total = 0
       for (const n of this.deliverables) {
         if (n.deliverable_fee_amount_paid) {
-          total = total + Number(n.vat_nhil_get_fund || 0) + Number(n.with_holding_tax || 0)
+          total =
+            total +
+            Number(n.vat_nhil_get_fund || 0) +
+            Number(n.with_holding_tax || 0)
         }
       }
       return total.toFixed(2)
     },
 
     getDelivarbleTax(deliverable) {
-      return Number(deliverable.vat_nhil_get_fund || 0) + Number(deliverable.with_holding_tax || 0)
+      return (
+        Number(deliverable.vat_nhil_get_fund || 0) +
+        Number(deliverable.with_holding_tax || 0)
+      )
     },
 
     getSumOfProfessionalFees() {
@@ -571,17 +577,19 @@ export default {
         )
 
         if (response) {
-          const item = response.data.project;
+          const item = response.data.project
           const newDev = {
-              deliverable_fee_amount_paid: item.deliverable_fee_amount_paid,
-              amount_paid_percentage: item.amount_paid_percentage,
-              vat_nhil_get_fund: item.vat_nhil_get_fund,
-              with_holding_tax: item.with_holding_tax,
-              name: item.name,
-              id: item.id,
-              deliverable_professional_fees: item.deliverable_professional_fees,
+            deliverable_fee_amount_paid: item.deliverable_fee_amount_paid,
+            amount_paid_percentage: item.amount_paid_percentage,
+            vat_nhil_get_fund: item.vat_nhil_get_fund,
+            with_holding_tax: item.with_holding_tax,
+            name: item.name,
+            id: item.id,
+            deliverable_professional_fees: item.deliverable_professional_fees,
           }
-          const index = this.deliverables.findIndex((dev) => dev.id === newDev.id);
+          const index = this.deliverables.findIndex(
+            (dev) => dev.id === newDev.id
+          )
 
           this.$set(this.deliverables, index, newDev)
           this.updateChart()
@@ -638,7 +646,7 @@ export default {
             // eslint-disable-next-line camelcase
             invoice_submitted_date,
             // eslint-disable-next-line camelcase
-            invoice_payment_date
+            invoice_payment_date,
           } = response.data.project
           const index = this.timeSheet.findIndex((item) => item.id === id)
 
@@ -655,7 +663,7 @@ export default {
             name,
             id,
             invoice_payment_date,
-            invoice_submitted_date
+            invoice_submitted_date,
           })
           this.$bvToast.toast('File saved successfully', {
             title: 'Success',
@@ -1159,9 +1167,30 @@ export default {
                   >
                     <div class="media-body overflow-hidden">
                       <h5 class="font-size-14 mt-2 mb-1">
-                        {{ deliverable.name }} <span v-if="deliverable.invoice_submitted_date && deliverable.invoice_days">({{ daysLeft(deliverable.invoice_submitted_date, deliverable.invoice_days) }})</span>
+                        {{ deliverable.name }}
+                        <span
+                          v-if="
+                            deliverable.invoice_submitted_date &&
+                              deliverable.invoice_days &&
+                              deliverable.invoice_status === 'unpaid'
+                          "
+                          >({{
+                            daysLeft(
+                              deliverable.invoice_submitted_date,
+                              deliverable.invoice_days
+                            )
+                          }})</span
+                        >
+
+                        <span
+                          v-if="deliverable.invoice_status === 'paid'"
+                          class="badge badge-success"
+                          >paid</span
+                        >
                       </h5>
-                      <div class="d-flex justify-content-between align-items-center">
+                      <div
+                        class="d-flex justify-content-between align-items-center"
+                      >
                         <div v-if="createUrl(invoice[index].invoice)">
                           <File
                             :name="`${deliverable.name}-Invoice`"
@@ -1186,12 +1215,16 @@ export default {
                               class="btn btn-soft-primary btn-sm"
                               @click="
                                 handleDeliverableFileUpload({
-                                  ...((deliverable.invoice && typeof deliverable.invoice === 'object') ?
-                                  { fileName: `${
-                                    deliverable.name
-                                  }-Invoice.${invoice[index].invoice.name
-                                    .split('.')
-                                    .pop()}` } : { invoice: invoice[index].invoice }),
+                                  ...(deliverable.invoice &&
+                                  typeof deliverable.invoice === 'object'
+                                    ? {
+                                        fileName: `${
+                                          deliverable.name
+                                        }-Invoice.${invoice[index].invoice.name
+                                          .split('.')
+                                          .pop()}`,
+                                      }
+                                    : { invoice: invoice[index].invoice }),
                                   file: invoice[index].invoice,
                                   key: 'invoice',
                                   id: deliverable.id,
@@ -1310,7 +1343,9 @@ export default {
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <h6 class="mt-0 header-title">Project Finances</h6>
-                <button class="btn btn-primary" @click="toggleEdit">View Summary</button>
+                <button class="btn btn-primary" @click="toggleEdit"
+                  >View Summary</button
+                >
               </div>
 
               <ul class="list-unstyled activity-widget">
@@ -1487,7 +1522,8 @@ export default {
                       class="col-md-12 mb-4"
                     >
                       <h6 class="font-size-15 mb-2">
-                        {{ deliverable.name }}  -  (GHS {{ formateAmount(getDelivarbleTax(deliverable)) }})
+                        {{ deliverable.name }} - (GHS
+                        {{ formateAmount(getDelivarbleTax(deliverable)) }})
                       </h6>
                       <div class="row">
                         <div class="col-md-6">
