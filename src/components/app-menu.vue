@@ -19,7 +19,7 @@
 
       <router-link v-if="(item.isSupervisor && isSupervisor)  || (item.isSupervisor && department.name === 'Administration')" tag="a" :to="`${item.path}`" class="side-nav-link side-nav-link-ref">
         <feather v-if="item.icon" :type="item.icon"></feather>
-        <span class="text-capitalize">Requestd Leave</span>
+        <span class="text-capitalize">Requested Leave</span>
       </router-link>
 
       <ul v-if="hasItems(item)" class="nav-second-level">

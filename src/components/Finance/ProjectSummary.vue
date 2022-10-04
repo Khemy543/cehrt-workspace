@@ -51,17 +51,17 @@
 
               <tr>
                 <td
-                  >Contract Amount - GHS {{ formateMoney(contractAmount) }}</td
+                  ><b>Contract Amount - GHS {{ formateMoney(contractAmount) }}</b></td
                 >
                 <td
-                  >Miscellaneous - GHS
+                  >Tax - GHS
                   {{ formateMoney(project.expenditure_miscellaneous) }}</td
                 >
               </tr>
               <tr>
                 <td></td>
                 <td
-                  >Expenditure Amount - GHS {{ formateMoney(expenditure) }}</td
+                  ><b>Expenditure Amount - GHS {{ formateMoney(expenditure) }}</b></td
                 >
               </tr>
             </tbody>

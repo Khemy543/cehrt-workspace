@@ -92,9 +92,9 @@ export default {
           this.staff = response.data;
           this.form = {
             ...response.data,
-            consultingRoleId: response.data.position.find(item => item.department_id === this.consultingId) && response.data.position.find(item => item.department_id === this.consultingId).id || "",
-            financeRoleId: response.data.position.find(item => item.department_id === this.financeId) && response.data.position.find(item => item.department_id === this.financeId).id || "",
-            adminRoleId: response.data.position.find(item => item.department_id === this.adiminId) && response.data.position.find(item => item.department_id === this.adiminId).id || "",
+            consultingRoleId: response.data.position.find(item => item.department.id === this.consultingId) && response.data.position.find(item => item.department.id === this.consultingId).id || "",
+            financeRoleId: response.data.position.find(item => item.department.id === this.financeId) && response.data.position.find(item => item.department.id === this.financeId).id || "",
+            adminRoleId: response.data.position.find(item => item.department.id === this.adiminId) && response.data.position.find(item => item.department.id === this.adiminId).id || "",
             supervisor_id: response.data.supervisor && response.data.supervisor && response.data.supervisor.id || '',
             dob: dateFormate(response.data.dob),
             start_date: dateFormate(response.data.start_date)
@@ -105,6 +105,7 @@ export default {
           this.loading = false
         }
       } catch (error) {
+        console.log(error)
         this.$bvToast.toast('Something happend, please try again', {
           title: 'Error',
           autoHideDelay: 5000,
