@@ -187,10 +187,12 @@ export default {
             )
 
             if (respone) {
-              await graph.deleteFolder({ onedriveId: vItem.onedrive_id })
+              if(vItem.onedrive_id) {
+                await graph.deleteFolder({ onedriveId: vItem.onedrive_id })
+              }
               this.projectData = this.projectData.filter(
-                (item) => item.id !== vItem.id
-              )
+                  (item) => item.id !== vItem.id
+                )
               this.$bvToast.toast('Project deleted successfully', {
                 title: 'Success',
                 autoHideDelay: 5000,
