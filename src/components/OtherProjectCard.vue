@@ -40,7 +40,7 @@ export default {
           >{{ project.client }}</p
         >
         <h5 cl>
-          <a href="javascript: void(0)" class="text-dark">{{ project.name }}</a>
+          <a href="javascript: void(0)" class="text-dark title_text">{{ project.name }}</a>
         </h5>
         <p class="text-muted mb-4 description_text">{{ project.description }}</p>
       </div>
@@ -78,5 +78,13 @@ export default {
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.title_text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
