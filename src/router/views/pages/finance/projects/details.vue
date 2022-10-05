@@ -6,6 +6,7 @@ import PageHeader from '@components/page-header'
 import graph from '@/src/msalConfig/graph'
 import ProjectSummary from '@/src/components/Finance/ProjectSummary.vue'
 import formateAmount from '@src/utils/formate-money.js'
+import OutStandingPayments from '@src/components/Finance/OutStandingPayments.vue'
 import File from '@/src/components/file.vue'
 import { getAddedDate, dateDifference } from '@/src/utils/format-date'
 
@@ -14,9 +15,10 @@ export default {
     title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, PageHeader, ProjectSummary, File },
+  components: { Layout, PageHeader, ProjectSummary, File, OutStandingPayments },
   data() {
     return {
+      outstandingPayments: [],
       loading: true,
       showEdit: false,
       project: {},
@@ -210,7 +212,7 @@ export default {
     },
   },
   created() {
-    this.getProjectDetials()
+    this.getProjectDetials();
   },
   methods: {
     toggleEdit() {
@@ -1337,6 +1339,9 @@ export default {
               </ul>
             </div>
           </div>
+
+          <OutStandingPayments />
+
         </div>
         <div class="col-xl-6">
           <div class="card">
