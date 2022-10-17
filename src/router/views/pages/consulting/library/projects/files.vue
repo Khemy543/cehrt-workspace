@@ -544,8 +544,8 @@ export default {
 
             <p class=" mt-1" v-html="project.service_description" />
 
-            <div class="row">
-              <div class="col-lg-3 col-md-6">
+            <div class="d-flex justify-content-between">
+              <div class="">
                 <div class="mt-4">
                   <p class="mb-2">
                     <i class="uil-globe text-danger"></i> Country
@@ -553,7 +553,7 @@ export default {
                   <h5 class="font-size-16">{{ project.country || 'N/A' }}</h5>
                 </div>
               </div>
-              <div class="col-lg-3 col-md-6">
+              <div class="">
                 <div class="mt-4">
                   <p class="mb-2">
                     <i class="uil-user text-danger"></i> Regions
@@ -561,7 +561,7 @@ export default {
                   <h5 class="font-size-16">{{ regions }}</h5>
                 </div>
               </div>
-              <div class="col-lg-3 col-md-6">
+              <div class="">
                 <div class="mt-4">
                   <p class="mb-2">
                     <i class="uil-globe text-danger"></i> District
@@ -569,7 +569,7 @@ export default {
                   <h5 class="font-size-16">{{ project.district || 'N/A' }}</h5>
                 </div>
               </div>
-              <div class="col-lg-3 col-md-6">
+              <div class="">
                 <div class="mt-4">
                   <p class="mb-2">
                     <i class="uil-calender text-danger"></i> Start Date
@@ -579,7 +579,7 @@ export default {
                   }}</h5>
                 </div>
               </div>
-              <div class="col-lg-3 col-md-6">
+              <div class="">
                 <div class="mt-4">
                   <p class="mb-2">
                     <i class="uil-calendar-slash text-danger"></i> End Date

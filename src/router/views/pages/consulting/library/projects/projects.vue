@@ -24,6 +24,9 @@ export default {
   },
   data() {
     return {
+      searchKey: "",
+      pagination: {},
+      currentPage: 1,
       title: 'Library',
       items: [
         {
@@ -50,10 +53,20 @@ export default {
       return this.$store ? this.$store.state.auth.userDepartment : {} || {}
     },
   },
+  watch: {
+    currentPage(newPage) {
+      if (newPage) {
+        this.getProjectsLibrary()
+      }
+    },
+  },
   created() {
     this.getProjectsLibrary()
   },
   methods: {
+    getNumber(index) {
+      return index + this.pagination.from
+    },
     handleAction(form) {
       if (this.editting) {
         return this.updateProject(form)
@@ -61,6 +74,12 @@ export default {
       return this.createProject(form)
     },
     getProjectRegions(regions) {
+      if (regions.length > 2) {
+        return `${regions
+          .slice(0, 2)
+          .map((item) => item.region)
+          .join(', ')}...`
+      }
       return regions.map((item) => item.region).join(', ')
     },
     getIds(regions) {
@@ -158,10 +177,18 @@ export default {
     async getProjectsLibrary() {
       try {
         this.loading = true
-        const response = await this.$http.get(`/fetch/library/projects`)
+        const response = await this.$http.get(
+          `/fetch/library/projects?page=${this.currentPage}`
+        )
 
         if (response) {
-          this.library = response.data.data
+          const { data, meta } = response.data
+          this.pagination = {
+            rows: meta.total,
+            perPage: meta.per_page,
+            from: meta.from,
+          }
+          this.library = data
           this.loading = false
         }
       } catch (error) {
@@ -198,10 +225,19 @@ export default {
       <div class="col-lg-12">
         <div class="card">
           <div class="card-body">
-            <div class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between mb-3 align-items-center">
               <div>
                 <h4 class="header-title mt-0 mb-1">Project Library</h4>
-                <p class="sub-header">view all project files</p>
+              </div>
+
+              <div style="width: 400px;">
+                <b-form-input
+                  id="search"
+                  v-model="searchKey"
+                  type="search"
+                  placeholder="Search..."
+                  class="w-100"
+                ></b-form-input>
               </div>
               <div>
                 <button
@@ -236,14 +272,16 @@ export default {
                     :key="item.id"
                     class="library-row"
                   >
-                    <th scope="row">{{ index + 1 }}</th>
+                    <th scope="row">{{ getNumber(index) }}</th>
                     <td>{{ item.name }}</td>
                     <td>{{ item.country || 'N/A' }}</td>
                     <td>{{ getProjectRegions(item.regions) }}</td>
                     <td>{{ item.district || 'N/A' }}</td>
                     <td>{{ new Date(item.end_date).getFullYear() }}</td>
                     <td>{{ item.client }}</td>
-                    <td>{{ item.project_type.name }}</td>
+                    <td>{{
+                      (item.project_type && item.project_type.name) || 'N/A'
+                    }}</td>
                     <td class="d-flex">
                       <b-dropdown
                         variant="link"
@@ -279,6 +317,22 @@ export default {
                   </tr>
                 </tbody>
               </table>
+              <div class="row mt-3 mr-3">
+                <div class="col">
+                  <div
+                    class="dataTables_paginate paging_simple_numbers float-right"
+                  >
+                    <ul class="pagination pagination-rounded mb-0">
+                      <!-- pagination -->
+                      <b-pagination
+                        v-model="currentPage"
+                        :total-rows="pagination.rows"
+                        :per-page="pagination.per_page"
+                      ></b-pagination>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div v-else class="w-100 d-flex justify-content-center">

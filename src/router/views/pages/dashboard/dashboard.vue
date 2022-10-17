@@ -462,6 +462,7 @@ export default {
                             `${project.status}` === 'overdue',
                            'badge-soft-primary':
                             `${project.status}` === 'active',
+                           'badge-soft-warning': `${project.status}` === 'hold',
                         }"
                         >{{ project.status }}</span
                       >
