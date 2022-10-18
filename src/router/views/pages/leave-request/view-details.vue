@@ -47,11 +47,25 @@ export default {
     isAdmin() {
       return this.$route.query.isadmin === 'true'
     },
+    disabled() {
+      if(this.isAdmin && !this.event.supervisor) {
+        return false
+      }
+      if(this.isAdmin && this.event.supervisor && this.event.status !== 'approved') {
+        return true;
+      }
+      return false
+    }
   },
   created() {
     this.getLeaveRequest()
   },
   methods: {
+    formateEndDate(date) {
+      var newdate = new Date(date)
+      newdate.setDate(newdate.getDate() + 1)
+      return newdate
+    },
     async getLeaveRequest() {
       try {
         const response = await this.$http.get(
@@ -67,7 +81,7 @@ export default {
             title: `${item.user} (${item.type} Leave)`,
             editable: true,
             start: dateFormate(item.start_date),
-            end: dateFormate(item.end_date),
+            end: this.formateEndDate(item.end_date),
             reason: item.reason,
             className:
               item.type === 'Sick'
@@ -294,9 +308,7 @@ export default {
               <div class="col-6">
                 <button
                   class="btn btn-primary w-100"
-                  :disabled="
-                    isAdmin && event.status !== 'approved'
-                  "
+                  :disabled="disabled"
                   @click="approveLeave"
                   >Approve</button
                 >
@@ -304,9 +316,7 @@ export default {
               <div class="col-6">
                 <button
                   class="btn btn-danger w-100"
-                  :disabled="
-                    isAdmin && event.status !== 'approved'
-                  "
+                  :disabled="disabled"
                   @click="rejectLeave"
                   >Reject</button
                 >

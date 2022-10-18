@@ -9,7 +9,7 @@
     :no-close-on-backdrop="loading"
     :no-close-on-esc="loading"
   >
-    <form @submit.prevent="action({ ...deliverable, ...form, file, filename })">
+    <form @submit.prevent="({ ...deliverable, ...form, file, filename })">
       <b-form-group
         id="input-group-1"
         label="Deliverable deadline"
@@ -34,7 +34,14 @@
           @change="onFileChange"
         />
       </b-form-group>
-      <button v-if="!loading" type="submit" class="btn btn-primary">Submit</button>
+      <File 
+        v-if="editting"
+        :name="title"
+        :path="path"
+        @delete="deleteFile"
+      />
+
+      <button v-if="!loading" type="submit" class="btn btn-primary" :class="editting ? 'mt-4' : ''">Submit</button>
       <button v-else class="btn btn-primary" disabled
         ><b-spinner small variant="white"></b-spinner> Creating Deliverable</button
       >
@@ -44,65 +51,71 @@
 
 <script>
 import { dateFormate } from '@utils/format-date'
+import File from './file.vue'
 export default {
-  props: {
-    value: {
-      type: Boolean,
-      required: true
+    components: { File },
+    props: {
+        value: {
+            type: Boolean,
+            required: true
+        },
+        action: {
+            type: Function,
+            required: true,
+        },
+        deliverable: {
+            type: Object,
+            default: () => { }
+        },
+        editting: {
+            type: Boolean,
+            default: false
+        },
+        loading: {
+            type: Boolean,
+            default: false
+        }
     },
-    action: {
-      type: Function,
-      required: true,
+    data() {
+        return {
+            form: {},
+            file: "",
+            filename: ""
+        };
     },
-    deliverable: {
-      type: Object,
-      default: () =>{}
+    computed: {
+        show: {
+            get() {
+                return this.value;
+            },
+            set(val) {
+                this.$emit("input", val);
+            }
+        },
+        title() {
+            return this.deliverable && this.deliverable.deliverable_name ||
+                this.deliverable && this.deliverable.report_title ||
+                this.deliverable && this.deliverable.project_type_deliverable && this.deliverable.project_type_deliverable.deliverable_name;
+        },
+        path() {
+          return this.deliverable && this.deliverable.document_path || ''
+        }
     },
-    editting: {
-      type: Boolean,
-      default: false
+    watch: {
+        deliverable(newValue) {
+            this.form = {
+                ...newValue,
+                deadline: newValue.deadline ? dateFormate(newValue.deadline) : ""
+            };
+        }
     },
-    loading: {
-      type: Boolean,
-      default: false 
+    methods: {
+      deleteFile() {},
+        onFileChange(e) {
+            this.file = e.target.files[0];
+            this.filename = e.target.files[0].name;
+        },
     }
-  },
-  data() {
-    return {
-      form: {},
-      file: "",
-      filename: ''
-    }
-  },
-  computed: {
-    show: {
-      get() {
-        return this.value
-      },
-      set(val) {
-        this.$emit('input', val)
-      }
-    },
-    title() {
-      return this.deliverable && this.deliverable.deliverable_name ||
-      this.deliverable && this.deliverable.report_title ||
-      this.deliverable && this.deliverable.project_type_deliverable && this.deliverable.project_type_deliverable.deliverable_name
-    }
-  },
-  watch: {
-    deliverable(newValue) {
-      this.form = {
-        ...newValue,
-        deadline: newValue.deadline ? dateFormate(newValue.deadline) : ''
-      }
-    }
-  },
-  methods: {
-    onFileChange(e) {
-      this.file = e.target.files[0];
-      this.filename = e.target.files[0].name;
-    },
-  },
 }
 </script>
 

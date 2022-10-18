@@ -143,6 +143,28 @@ export default {
     this.getProjectDeliverables()
   },
   methods: {
+    deleteFile(file) {
+      this.$swal({
+        title: 'Are you sure you want to delete file?',
+        showDenyButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.delete(`/delete/${file.id}/deliverable`);
+
+            if(response) {
+              
+            }
+          } catch (error) {
+            
+          }
+        }
+      })
+    },
     slashDateFormate,
     formateAmount,
     async addFile(form) {
@@ -615,7 +637,10 @@ export default {
             </div>
 
             <div class="row mt-4">
-              <div v-if="project.professional_expects.length > 0" class="col-md-6">
+              <div
+                v-if="project.professional_expect.length > 0"
+                class="col-md-6"
+              >
                 <table class="table mb-0">
                   <thead class="thead-light table-bordered">
                     <tr>
@@ -623,14 +648,20 @@ export default {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(user) in project.professional_expects" :key="user.id">
+                    <tr
+                      v-for="user in project.professional_expects"
+                      :key="user.id"
+                    >
                       <td>{{ user.name }}</td>
                       <td>{{ user.role }}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
-              <div v-if="project.associated_consultants.length > 0" class="col-md-6">
+              <div
+                v-if="project.associated_consultants.length > 0"
+                class="col-md-6"
+              >
                 <table class="table mb-0">
                   <thead class="thead-light table-bordered">
                     <tr>
@@ -638,7 +669,10 @@ export default {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(user) in project.associated_consultants" :key="user.id">
+                    <tr
+                      v-for="user in project.associated_consultants"
+                      :key="user.id"
+                    >
                       <td>{{ user.name }}</td>
                       <td>{{ user.role }}</td>
                     </tr>
@@ -646,8 +680,6 @@ export default {
                 </table>
               </div>
             </div>
-
-            
           </div>
         </div>
       </div>
@@ -660,10 +692,12 @@ export default {
                 <div class="col d-flex flex-wrap">
                   <File
                     v-for="n in combindedFiles"
+                    :id="n.id"
                     :key="n.id"
                     :name="n.name"
                     type="docx"
                     :path="n.document_path"
+                    @delete="deleteFile"
                   />
                 </div>
               </div>

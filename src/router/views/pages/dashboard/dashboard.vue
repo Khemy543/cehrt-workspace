@@ -492,8 +492,7 @@ export default {
                     <th scope="col" style="max-width: 200px;">Proposal Name</th>
                     <th scope="col">Client</th>
                     <th scope="col">Proposal Type</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Status</th>
+                    <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -501,21 +500,7 @@ export default {
                     <td>{{ index + 1 }}</td>
                     <td>{{ proposal.title }}</td>
                     <td>{{ proposal.client }}</td>
-                    <td>{{ proposal.project_type }}</td>
-                    <td><span
-                        class="badge"
-                        :class="{
-                          'badge-soft-warning':
-                            `${proposal.status}` === 'pending',
-                          'badge-soft-success':
-                            `${proposal.status}` === 'completed',
-                          'badge-soft-danger':
-                            `${proposal.status}` === 'overdue',
-                           'badge-soft-primary':
-                            `${proposal.status}` === 'active',
-                        }"
-                    >{{ proposal.status }}</span
-                    ></td>
+                    <td>{{ proposal.project_type && proposal.project_type.name }}</td>
                     <td>
                        <router-link :to="`proposals/details/${proposal.id}`"
                         >View</router-link

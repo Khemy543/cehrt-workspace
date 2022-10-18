@@ -6,7 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import bootstrapPlugin from '@fullcalendar/bootstrap'
 import listPlugin from '@fullcalendar/list'
 import { required } from 'vuelidate/lib/validators'
-import { dateFormate } from '@src/utils/format-date.js'
+import { dateFormate, dateDifference } from '@src/utils/format-date.js'
 
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
@@ -41,6 +41,7 @@ export default {
       ],
       themeSystem: 'bootstrap',
       calendarEvents: [],
+      userLeaveRequest: [],
       createModal: false,
       showmodal: false,
       eventModal: false,
@@ -90,32 +91,42 @@ export default {
   },
   computed: {
     annualCount() {
-      return this.calendarEvents.filter(
-        (evt) =>
-          evt.type === 'Annual' &&
-          (evt.status === 'pending' || evt.status === 'approved')
-      ).length
+      return this.userLeaveRequest
+        .filter((evt) => evt.type === 'Annual' && evt.status === 'approved')
+        .map((evt) => this.getDifference(evt.end, evt.start))
+        .reduce((accumlator, evt) => {
+          return accumlator + evt
+        }, 0)
     },
     totalLeave() {
-      return this.calendarEvents.filter(
-        (evt) => evt.status === 'pending' || evt.status === 'approved'
-      ).length
+      return this.userLeaveRequest
+        .filter((evt) => evt.status === 'approved')
+        .map((evt) => this.getDifference(evt.end, evt.start))
+        .reduce((accumlator, evt) => {
+          return accumlator + evt
+        }, 0)
     },
     totalSickLeave() {
-      return this.calendarEvents.filter(
-        (evt) =>
-          evt.type === 'Sick' &&
-          (evt.status === 'pending' || evt.status === 'approved')
-      ).length
+      return this.userLeaveRequest
+        .filter((evt) => evt.type === 'Sick' && evt.status === 'approved')
+        .map((evt) => this.getDifference(evt.end, evt.start))
+        .reduce((accumlator, evt) => {
+          return accumlator + evt
+        }, 0)
     },
     totalOthers() {
-      return this.calendarEvents.filter(
-        (evt) =>
-          (evt.type === 'Maternity' ||
-            evt.type === 'Others' ||
-            evt.type === 'Compassionate') &&
-          (evt.status === 'pending' || evt.status === 'approved')
-      ).length
+      return this.userLeaveRequest
+        .filter(
+          (evt) =>
+            (evt.type === 'Maternity' ||
+              evt.type === 'Others' ||
+              evt.type === 'Compassionate') &&
+            evt.status === 'approved'
+        )
+        .map((evt) => this.getDifference(evt.end, evt.start))
+        .reduce((accumlator, evt) => {
+          return accumlator + evt
+        }, 0)
     },
   },
   created() {
@@ -123,6 +134,14 @@ export default {
     this.getLeaveRequests()
   },
   methods: {
+    formateEndDate(date) {
+      var newdate = new Date(date)
+      newdate.setDate(newdate.getDate() + 1)
+      return newdate
+    },
+    getDifference(later, earlier) {
+      return dateDifference(later, earlier)
+    },
     async getLeaveRequests() {
       try {
         const response = await this.$http.get(`/fetch/leave/requests`)
@@ -136,7 +155,7 @@ export default {
                 title: `${item.user} (${item.type} Leave)`,
                 editable: true,
                 start: dateFormate(item.start_date),
-                end: dateFormate(item.end_date),
+                end: this.formateEndDate(item.end_date),
                 reason: item.reason,
                 status: item.status,
                 type: item.type,
@@ -152,9 +171,11 @@ export default {
                     : 'bg-soft-secondary text-secondary',
               }
             })
+          this.userLeaveRequest = requestedLeaves
           this.calendarEvents = [...this.calendarEvents, ...requestedLeaves]
         }
       } catch (error) {
+        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -177,7 +198,7 @@ export default {
               id: item.id,
               title: `${item.user} (${item.type})`,
               start: dateFormate(item.start_date),
-              end: dateFormate(item.end_date),
+              end: this.formateEndDate(item.end_date),
               reason: item.reason,
               status: item.status,
               type: item.type,
@@ -226,7 +247,7 @@ export default {
             id,
             title: `${user} (${type})`,
             start: dateFormate(startDate),
-            end: dateFormate(endDate),
+            end: this.formateEndDate(endDate),
             editable: true,
             allDay: false,
             reason,
@@ -410,9 +431,10 @@ export default {
           (item) => item.id === Number(this.edit.id)
         )
         this.editevent = {
+          id: this.edit.id,
           type: this.edit.title.split('(')[1].split(' ')[0],
-          start_date: dateFormate(this.edit.start),
-          end_date: dateFormate(this.edit.end),
+          start_date: this.formateEndDate(this.edit.start),
+          end_date: this.formateEndDate(this.edit.end),
           reason: this.calendarEvents[index].reason,
         }
         this.eventModal = true
@@ -594,10 +616,10 @@ export default {
                 >
                   <option value>Select leave type</option>
                   <option
-                    v-for="type in categories"
-                    :key="type.id"
-                    :value="type.type"
-                    >{{ type.type }}</option
+                    v-for="vtype in categories"
+                    :key="vtype.id"
+                    :value="vtype.type"
+                    >{{ vtype.type }}</option
                   >
                 </b-form-select>
               </b-form-group>
@@ -660,7 +682,7 @@ export default {
       title-class="text-black font-18"
       hide-footer
     >
-      <form @submit.prevent="editEvent">
+      <form @submit.prevent="editSubmit">
         <div class="row">
           <div class="col-12">
             <div class="form-group">
@@ -677,10 +699,10 @@ export default {
                 >
                   <option value>Select leave type</option>
                   <option
-                    v-for="type in categories"
-                    :key="type.id"
-                    :value="type.type"
-                    >{{ type.type }}</option
+                    v-for="vtype in categories"
+                    :key="vtype.id"
+                    :value="vtype.type"
+                    >{{ vtype.type }}</option
                   >
                 </b-form-select>
               </b-form-group>

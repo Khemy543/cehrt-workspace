@@ -265,6 +265,14 @@ export default {
     }
   },
 
+  async deleteFile({ onedriveId }) {
+    let resp = await deleteGraph(`/drives/${driveId}/items/${onedriveId}`);
+
+    if(resp) {
+      return resp
+    }
+  },
+
   //
   // Get user's photo and return as a blob object URL
   // https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL

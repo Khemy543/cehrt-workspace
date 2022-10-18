@@ -480,7 +480,6 @@ export default {
      * Modal open for edit event
      */
     editEvent(info) {
-      console.log(info)
       if (info.event.startEditable) {
         this.edit = info.event
         this.editableEvent = {

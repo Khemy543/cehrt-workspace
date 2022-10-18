@@ -7,6 +7,23 @@
         </div>
       </div>
       <h4 class="mt-1">{{ name }}</h4>
+      <b-dropdown
+        v-if="deletable"
+        variant="link"
+        class=" position-absolute drop"
+        toggle-class="p-0 text-muted arrow-none"
+      >
+        <template v-slot:button-content>
+          <i class="uil uil-ellipsis-v font-size-14"></i>
+        </template>
+        <b-dropdown-item
+          href="javascript: void(0);"
+          variant="danger"
+          @click="deleteFile"
+        >
+          <i class="uil uil-trash-alt mr-2"></i>Delete
+        </b-dropdown-item>
+      </b-dropdown>
     </div>
   </a>
 </template>
@@ -17,6 +34,10 @@ import excel from '../assets/svgs/excel.svg'
 export default {
   name: 'File',
   props: {
+    id: {
+      type: Number,
+      default: null,
+    },
     name: {
       type: String,
       default: null,
@@ -28,6 +49,10 @@ export default {
     path: {
       type: String,
       default: null,
+    },
+    deletable: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {
@@ -44,15 +69,34 @@ export default {
       }
     },
   },
+  methods: {
+    deleteFile() {
+      this.$emit('delete', { id: this.id, webUrl: this.path })
+    },
+  },
 }
 </script>
 <style scoped lang="scss">
+a {
+  display: contents;
+}
 .icon-wrapper {
   width: 154px;
   border-radius: 5px;
   padding: 20px 4px;
+  position: relative;
+
+  .drop {
+    position: absolute;
+    display: none;
+    top: 10px;
+    right: 10px;
+  }
   &:hover {
-    background:#edeff4;
+    .drop {
+      display: block;
+    }
+    background: #edeff4;
   }
   h4 {
     font-size: 11px;
