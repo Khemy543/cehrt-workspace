@@ -9,7 +9,7 @@
     :no-close-on-backdrop="loading"
     :no-close-on-esc="loading"
   >
-    <form @submit.prevent="({ ...deliverable, ...form, file, filename })">
+    <form @submit.prevent="action({ ...deliverable, ...form, file, filename })">
       <b-form-group
         id="input-group-1"
         label="Deliverable deadline"
