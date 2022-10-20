@@ -68,6 +68,7 @@ export default {
         variant="link"
         class="float-right"
         toggle-class="p-0 text-muted arrow-none"
+        right
       >
         <template v-slot:button-content>
           <i class="uil uil-ellipsis-v font-size-14"></i>
@@ -96,11 +97,6 @@ export default {
       <span v-else class="badge badge-soft-success">Low</span>
 
       <p class="mb-0 mt-4">
-        <!-- <img
-          :src="task.user"
-          alt="user-img"
-          class="avatar-xs rounded-circle mr-2"
-        /> -->
 
         <span v-if="task.assignee.id" class="avatar-xs rounded-circle mr-2 bg-primary mb-2 p-2 text-white">
           {{initals}}
@@ -111,15 +107,6 @@ export default {
         </span>
         <br />
         <br/>
-        <!-- <span class="text-nowrap align-middle font-size-13 mr-2">
-          <i class="uil uil-comments-alt text-muted mr-1"></i
-          >{{ task.comments || 0 }}
-        </span>
-
-        <span class="text-nowrap align-middle font-size-13">
-          <i class="uil uil-check-square mr-1 text-muted"></i
-          >{{ task.subTasks || 0 }}
-        </span> -->
         <small class="float-right text-muted">
           <i class="uil uil-calendar-alt text-muted mr-1"></i
           >{{ task.formatted_end_date }}

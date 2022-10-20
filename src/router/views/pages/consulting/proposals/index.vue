@@ -261,20 +261,24 @@ export default {
                   v-for="vProposal in proposals"
                   :key="vProposal.id"
                   class="col-xl-4 col-lg-6"
+                  style="height: 356px"
                 >
-                  <div class="card border">
+                  <div class="card border h-100">
                     <div class="card-body">
                       <div
                         class="d-flex justify-content-between align-items-center"
                       >
-                        <p
-                          class="text-uppercase font-size-12 mb-2 text-primary"
-                          >{{ vProposal.client }}</p
-                        >
+                        
 
+                      <h5>
+                            <a href="javascript: void(0)" class="text-dark">{{
+                              vProposal.title
+                            }}</a>
+                          </h5>
                         <b-dropdown
                           variant="link"
                           toggle-class="p-0 text-muted arrow-none"
+                          right
                         >
                           <template v-slot:button-content>
                             <i class="uil uil-ellipsis-v font-size-14"></i>
@@ -296,28 +300,30 @@ export default {
                         </b-dropdown>
                       </div>
                       <router-link :to="`/proposals/details/${vProposal.id}`">
-                        <div style="height: 250px">
-                          <h5>
-                            <a href="javascript: void(0)" class="text-dark">{{
-                              vProposal.title
-                            }}</a>
-                          </h5>
-                          <!-- <div
-                            class="text-uppercase font-size-12 mb-2 text-primary"
-                            >{{ vProposal.client }}</div
-                          > -->
-                          <p class="text-muted mb-4 description_text">{{
-                            vProposal.project_type.name
-                          }}</p>
+                        <div class="h-100">
+                          <div class="d-flex my-3">
+                            <i class="uil-user text-danger mr-1"></i>
+                            <p
+                            class="text-uppercase font-size-12 text-primary"
+                            >{{ vProposal.client }}</p
+                          >
+                          </div>
 
                           <div
-                            class="badge badge-soft-primary font-size-13 font-weight-normal"
+                            class="badge badge-soft-primary font-size-13 font-weight-normal mr-3"
                             >{{ vProposal.funding_option }}</div
+                          >
+                          <div
+                            class="badge badge-soft-success font-size-13 font-weight-normal"
+                            >{{ vProposal.project_type.name }}</div
                           >
                         </div>
                       </router-link>
                     </div>
-                    <div class="card-body position-absolute" style="bottom: 0; left: 0; right: 0">
+                    <div
+                      class="card-body position-absolute"
+                      style="bottom: 0; left: 0; right: 0"
+                    >
                       <div class="border-top py-2">
                         Click to view details
                       </div>

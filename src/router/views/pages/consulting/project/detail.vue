@@ -363,11 +363,6 @@ export default {
 
           this.vDeliverable = null
           this.vloading = false
-
-          /* await this.updateDeliverableWithPathName({
-            ...response.data.deliverable,
-            document_path: data.webUrl,
-          }) */
         }
       } catch (error) {
         if (error.response) {

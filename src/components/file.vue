@@ -7,23 +7,9 @@
         </div>
       </div>
       <h4 class="mt-1">{{ name }}</h4>
-      <b-dropdown
-        v-if="deletable"
-        variant="link"
-        class=" position-absolute drop"
-        toggle-class="p-0 text-muted arrow-none"
-      >
-        <template v-slot:button-content>
-          <i class="uil uil-ellipsis-v font-size-14"></i>
-        </template>
-        <b-dropdown-item
-          href="javascript: void(0);"
-          variant="danger"
-          @click="deleteFile"
-        >
-          <i class="uil uil-trash-alt mr-2"></i>Delete
-        </b-dropdown-item>
-      </b-dropdown>
+      <div v-if="deletable" class="bg-white drop">
+        <i class="uil uil-trash-alt text-danger" />
+      </div>
     </div>
   </a>
 </template>
@@ -89,12 +75,27 @@ a {
   .drop {
     position: absolute;
     display: none;
-    top: 10px;
-    right: 10px;
+    top: 5px;
+    right: 5px;
+    width: 30px;
+    height: 30px;
+    border-radius: 100px;
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    i {
+      display: none;
+    }
   }
   &:hover {
     .drop {
-      display: block;
+      display: flex;
+      
+      i{
+        display: inline-block;
+      }
     }
     background: #edeff4;
   }

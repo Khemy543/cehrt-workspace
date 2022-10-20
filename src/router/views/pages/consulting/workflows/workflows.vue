@@ -256,6 +256,7 @@ export default {
                     }}</td>
                     <td class=" d-flex">
                       <b-dropdown
+                        left
                         variant="link"
                         class=" position-absolute"
                         toggle-class="p-0 text-muted arrow-none"

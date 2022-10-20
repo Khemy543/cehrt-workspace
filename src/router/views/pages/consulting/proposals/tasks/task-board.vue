@@ -6,6 +6,7 @@ import PageHeader from '@components/page-header'
 import CreateTaskModal from '@components/CreateTaskModal.vue'
 
 import Task from './board-task'
+import File from '@/src/components/file.vue'
 
 export default {
   page: {
@@ -18,6 +19,7 @@ export default {
     PageHeader,
     Task,
     CreateTaskModal,
+    File,
   },
   data() {
     return {
@@ -67,7 +69,7 @@ export default {
   },
   methods: {
     openFile() {
-     window.open(this.reportDetails.report_path,'_blank');
+      window.open(this.reportDetails.report_path, '_blank')
     },
     async getReportDetails() {
       try {
@@ -327,32 +329,13 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="row align-items-center">
-              <div class="mb-2 shadow-none border">
-                <div class="p-1 px-2" style="cursor: pointer;" @click="openFile">
-                  <div
-                    class="row align-items-center"
-                  >
-                    <div class="col-auto">
-                      <div class="avatar-sm font-weight-bold mr-3">
-                        <span
-                          class="avatar-title rounded bg-soft-primary text-primary"
-                        >
-                          <i class="uil-file-plus-alt font-size-18"></i>
-                        </span>
-                      </div>
-                    </div>
-                    <div class="col pl-0">
-                      <div
-                        class="text-muted font-weight-bold"
-                        >{{
-                          reportDetails.proposal_type &&
-                            reportDetails.proposal_type.report_title
-                        }}</div
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <File
+                :name="
+                  reportDetails.proposal_type &&
+                    reportDetails.proposal_type.report_title
+                "
+                :path="reportDetails.report_path"
+              />
 
               <div class="col text-right">
                 <button

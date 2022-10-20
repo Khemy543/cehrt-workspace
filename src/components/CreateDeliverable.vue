@@ -38,6 +38,7 @@
         v-if="editting"
         :name="title"
         :path="path"
+        :deletable="true"
         @delete="deleteFile"
       />
 
@@ -95,7 +96,8 @@ export default {
         title() {
             return this.deliverable && this.deliverable.deliverable_name ||
                 this.deliverable && this.deliverable.report_title ||
-                this.deliverable && this.deliverable.project_type_deliverable && this.deliverable.project_type_deliverable.deliverable_name;
+                this.deliverable && this.deliverable.project_type_deliverable && this.deliverable.project_type_deliverable.deliverable_name 
+              || this.deliverable && this.deliverable.proposal_type.report_title
         },
         path() {
           return this.deliverable && this.deliverable.document_path || ''

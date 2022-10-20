@@ -12,7 +12,7 @@
               <div class="row align-items-center">
                 <div class="col-12">
                   <div class="mt-4 mt-lg-0">
-                    <div class="row">
+                    <div class="row align-items-center">
                       <div class="col-md-6">
                         <h5 class="mt-0 mb-1 font-weight-bold">
                           {{ proposal.title }}
@@ -64,123 +64,100 @@
                       </div>
                     </div>
 
-                    <div class="d-flex items-align-center mt-4">
-                      <div>
-                        <div
-                          class="badge badge-soft-primary font-size-13 font-weight-normal"
-                        >
-                          {{
-                            proposal.project_type && proposal.project_type.name
-                          }}
-                        </div>
+                    <div class="row mt-5">
+                      <div class="col-xl-4 col-sm-6">
+                        <p class="mb-1">
+                          <i class="uil-user text-danger"></i> Client
+                        </p>
+                        <h5 class="font-size-16">{{ proposal.client }}</h5>
                       </div>
-                      <div>
-                        <div
-                          class="badge badge-soft-success font-size-13 font-weight-normal ml-5"
-                          >{{ proposal.funding_option }}</div
-                        >
+
+                      <div class="col-xl-4 col-sm-6">
+                        <p class="mb-1">
+                          <i class="uil-user text-danger"></i> Project Type
+                        </p>
+                        <h5 class="font-size-16">{{
+                          proposal.project_type && proposal.project_type.name
+                        }}</h5>
                       </div>
-                    </div>
-                    <div class="row">
-                      <div class="col-md-12 d-flex mt-4">
-                        <div class="">
-                          <p class="mb-2">
-                            <i class="uil-user text-danger"></i> Client
-                          </p>
-                          <h5 class="font-size-16">{{ proposal.client }}</h5>
-                        </div>
-                        <div>
-                        <div class="shadow-none border ml-5">
-                          <div
-                            class="p-1 px-2"
-                            style="cursor: pointer;"
-                            @click="openFile"
-                          >
-                            <div class="row align-items-center">
-                              <div class="col-auto">
-                                <div class="avatar-sm font-weight-bold mr-3">
-                                  <span
-                                    class="avatar-title rounded bg-soft-success text-success"
-                                  >
-                                    <i
-                                      class="uil-file-plus-alt font-size-18"
-                                    ></i>
-                                  </span>
-                                </div>
-                              </div>
-                              <div class="col pl-0">
-                                <div class="text-muted font-weight-bold">World bank renumeration calculator.xlsx</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+
+                      <div class="col-xl-4 col-sm-6">
+                        <p class="mb-1">
+                          <i class="uil-user text-danger"></i> Funding
+                        </p>
+                        <h5 class="font-size-16">{{
+                          proposal.funding_option
+                        }}</h5>
                       </div>
                     </div>
 
+                    <hr />
 
                     <div class="row">
-                    <div
-                      v-if="proposal.request_for_eol"
-                      class="col-md-4"
-                    >
-                      <a :href="proposal.request_for_eol" target="_blank">
-                        <div class="p-2 border rounded mb-3">
-                          <div class="media">
-                            <div class="avatar-sm font-weight-bold mr-3">
-                              <span
-                                class="avatar-title rounded bg-soft-primary text-primary"
-                              >
-                                <i class="uil-file-plus-alt font-size-18"></i>
-                              </span>
-                            </div>
-                            <div class="media-body">
-                              <div href="#" class="d-inline-block mt-2">Request For EOI</div>
-                            </div>
-                            <div class="float-right mt-1">
-                              <a :href="proposal.request_for_eol" target="_blank">
-                                <feather
-                                  type="log-in"
-                                  class="icons-xs"
-                                ></feather>
-                              </a>
-                            </div>
+                      <!-- Widget -->
+
+                      <div class="col-xl-3 col-sm-6">
+                        <!-- stat 1 -->
+                        <div class="media p-3">
+                          <feather
+                            type="grid"
+                            class="align-self-center icon-dual icon-lg mr-4"
+                          ></feather>
+                          <div class="media-body">
+                            <h4 class="mt-0 mb-0">0</h4>
+                            <span class="text-muted">Total Task</span>
                           </div>
                         </div>
-                      </a>
-                    </div>
+                      </div>
 
-                    <div
-                      v-if="proposal.request_for_proposal"
-                      class="col-md-4"
-                    >
-                      <a :href="proposal.request_for_proposal" target="_blank">
-                        <div class="p-2 border rounded mb-3">
-                          <div class="media">
-                            <div class="avatar-sm font-weight-bold mr-3">
-                              <span
-                                class="avatar-title rounded bg-soft-primary text-primary"
-                              >
-                                <i class="uil-file-plus-alt font-size-18"></i>
-                              </span>
-                            </div>
-                            <div class="media-body">
-                              <div href="#" class="d-inline-block mt-2">Request For Proposal</div>
-                            </div>
-                            <div class="float-right mt-1">
-                              <a :href="proposal.request_for_proposal" target="_blank">
-                                <feather
-                                  type="log-in"
-                                  class="icons-xs"
-                                ></feather>
-                              </a>
-                            </div>
+                      <div class="col-xl-3 col-sm-6">
+                        <!-- stat 1 -->
+                        <div class="media p-3">
+                          <feather
+                            type="check-square"
+                            class="align-self-center icon-dual icon-lg mr-4"
+                          ></feather>
+                          <div class="media-body">
+                            <h4 class="mt-0 mb-0">
+                              0
+                            </h4>
+                            <span class="text-muted"
+                              >Total Tasks Completed</span
+                            >
                           </div>
                         </div>
-                      </a>
-                    </div>
-                  </div>
+                      </div>
 
+                      <div class="col-xl-3 col-sm-6">
+                        <!-- stat 1 -->
+                        <div class="media p-3">
+                          <feather
+                            type="clock"
+                            class="align-self-center icon-dual icon-lg mr-4"
+                          ></feather>
+                          <div class="media-body">
+                            <h4 class="mt-0 mb-0">
+                              0
+                            </h4>
+                            <span class="text-muted">Total Pending Task</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-xl-3 col-sm-6">
+                        <!-- stat 1 -->
+                        <div class="media p-3">
+                          <feather
+                            type="users"
+                            class="align-self-center icon-dual icon-lg mr-4"
+                          ></feather>
+                          <div class="media-body">
+                            <h4 class="mt-0 mb-0">0</h4>
+                            <span class="text-muted">Total Assignees</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -191,109 +168,169 @@
         </div>
 
         <div class="col-12 mt-2">
-          <h5>Proposal Types</h5>
-          <div v-if="!loading && reports.length > 0" class="row mt-4">
-            <router-link
-              v-for="report in reports"
-              :key="report.id"
-              :to="`/proposal/${proposal.id}/report/${report.id}`"
-              class="col-md-4"
-            >
-              <div class="card" style="min-height: 180px;">
-                <div class="card-body position-relative">
-                  <div class="p-2  rounded mb-3">
-                    <div class="">
-                      <div class="">
-                        <div class="d-inline-block mt-2 font-size-15">{{
-                          report.proposal_type &&
-                            report.proposal_type.report_title
-                        }}</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class=" position-absolute" style="bottom: 5px;">
-                    <ul class="list-inline">
-                      <li class="list-inline-item pr-1">
-                        <a
-                          :id="`date-tooltip-${report.id}`"
-                          href="javascript: void(0)"
-                          class="text-muted d-inline-block bg-transparent"
-                        >
-                          <b-tooltip
-                            :target="`date-tooltip-${report.id}`"
-                            triggers="hover"
-                            placement="top"
-                            >Due date
-                          </b-tooltip>
-                          <i class="uil uil-calender mr-1"></i>
-                          {{ report.deadline }}
-                        </a>
-                      </li>
-                      <li class="list-inline-item pr-1">
-                        <a
-                          :id="`task-tooltip-${report.id}`"
-                          href="javascript: void(0)"
-                          class="text-muted d-inline-block bg-transparent"
-                        >
-                          <b-tooltip
-                            :target="`task-tooltip-${report.id}`"
-                            triggers="hover"
-                            placement="top"
-                            >Tasks
-                          </b-tooltip>
-                          <i class="uil uil-bars mr-1"></i>
-                          {{ report.tasks || 0 }}
-                        </a>
-                      </li>
-                      <li class="list-inline-item">
-                        <a
-                          :id="`comment-tooltip-${report.id}`"
-                          href="javascript: void(0)"
-                          class="text-muted d-inline-block bg-transparent"
-                        >
-                          <b-tooltip
-                            :target="`comment-tooltip-${report.id}`"
-                            triggers="hover"
-                            placement="top"
-                          >
-                            Comments</b-tooltip
-                          >
-                          <i class="uil uil-comments-alt mr-1"></i>
-                          {{ report.comments || 0 }}
-                        </a>
-                      </li>
-                      <li class="list-inline-item pr-2">
-                        <a
-                          :id="`date-tooltip-${report.id}`"
-                          href="javascript: void(0)"
-                          class="text-muted d-inline-block bg-transparent"
-                        >
-                          <b-tooltip
-                            :target="`date-tooltip-${report.progress}`"
-                            triggers="hover"
-                            placement="top"
-                          >
-                          </b-tooltip>
-                          <i class="uil uil-check-square mr-1"></i>
-                          {{ report.progress || 0 }}%
-                        </a>
+          <div class="row">
+            <div class="col-md-7">
+              <div v-if="!loading && reports.length > 0">
+                <!-- <div> </div> -->
+                <div class="card">
+                  <div class="card-body py-0">
+                    <ul class="list-unstyled activity-widget row">
+                      <li
+                        v-for="report in reports"
+                        :key="report.id"
+                        class="activity-list col-md-12"
+                      >
+                        <div class="card shadow-none">
+                          <div class="card-body py-0">
+                            <div
+                              class="media d-flex justify-content-between align-items-center"
+                            >
+                              <router-link
+                                :to="
+                                  `/proposal/${$route.params.id}/report/${report.id}`
+                                "
+                                class="text-dark"
+                              >
+                                <div class="media-body overflow-hidden">
+                                  <h5 class="font-size-15 mb-3">
+                                    {{
+                                      report.proposal_type &&
+                                        report.proposal_type.report_title
+                                    }}
+                                  </h5>
+                                  <div class="d-flex">
+                                    <div>
+                                      <router-link
+                                        :id="`task-tooltip-${report.id}`"
+                                        :to="
+                                          `/proposal/${$route.params.id}/report/${report.id}`
+                                        "
+                                        class="text-muted d-inline-block bg-transparent"
+                                      >
+                                        <b-tooltip
+                                          :target="`task-tooltip-${report.id}`"
+                                          triggers="hover"
+                                          placement="top"
+                                          >Tasks
+                                        </b-tooltip>
+                                        <i
+                                          class="uil uil-bars mr-1 text-primary"
+                                        ></i>
+                                        {{ report.tasks_count || 0 }} task(s)
+                                      </router-link>
+                                    </div>
+                                    <div class=" mx-2">
+                                      <router-link
+                                        :id="`deadline-tooltip-${report.id}`"
+                                        :to="
+                                          `/proposal/${$route.params.id}/report/${report.id}`
+                                        "
+                                        class="text-muted d-inline-block bg-transparent"
+                                      >
+                                        <b-tooltip
+                                          :target="
+                                            `deadline-tooltip-${report.id}`
+                                          "
+                                          triggers="hover"
+                                          placement="top"
+                                          >Due Date
+                                        </b-tooltip>
+                                        <i
+                                          class="uil-calendar-slash mr-1 text-danger"
+                                        ></i>
+                                        {{ report.deadline }}
+                                      </router-link>
+                                    </div>
+                                  </div>
+                                </div>
+                              </router-link>
+
+                              <div>
+                                <File
+                                  :name="
+                                    report.proposal_type &&
+                                      report.proposal_type.report_title
+                                  "
+                                  type="word"
+                                  :path="report.report_path"
+                                />
+                              </div>
+                              <div class="d-flex">
+                                <button
+                                  type="button"
+                                  class="btn btn-soft-secondary btn-sm"
+                                  @click="showUpdateReport(report)"
+                                >
+                                  <i class="uil uil-edit"></i>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  class="btn btn-soft-danger ml-2 btn-sm"
+                                  @click="deleteReport(report)"
+                                >
+                                  <i class="uil uil-trash-alt"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <hr />
                       </li>
                     </ul>
                   </div>
                 </div>
               </div>
-            </router-link>
-          </div>
 
-          <div
-            v-if="!loading && reports.length <= 0"
-            class=" w-100 d-flex justify-content-center"
-          >
-            <img
-              :src="require('@assets/svgs/empty.svg')"
-              alt="no projects"
-              style="width:30%"
-            />
+              <div
+                v-if="!loading && reports.length <= 0"
+                class=" w-100 d-flex justify-content-center"
+              >
+                <img
+                  :src="require('@assets/svgs/empty.svg')"
+                  alt="no projects"
+                  style="width:30%"
+                />
+              </div>
+            </div>
+            <div class="col-md-5">
+              <div class="card">
+                <div class="card-body">
+                  <b-tabs pills class="navtab-bg">
+                    <b-tab title="Renumeration Calculator" active>
+                      <div>
+                        <File
+                          type="excel"
+                          name="Renumeration Calulator"
+                          :path="proposal.proposal_path"
+                        />
+                      </div>
+                    </b-tab>
+                    <b-tab title="Proposal Request">
+                      <div class="row">
+                        <div v-if="proposal.request_for_eol" class="col-md-4">
+                          <File
+                            type="pdf"
+                            name="Request For EOI"
+                            :path="proposal.request_for_eol"
+                          />
+                        </div>
+                        <div
+                          v-if="proposal.request_for_proposal"
+                          class="col-md-4"
+                        >
+                          <File
+                            type="pdf"
+                            name="Request For Proposal"
+                            :path="proposal.request_for_proposal"
+                          />
+                        </div>
+                      </div>
+                    </b-tab>
+                  </b-tabs>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -301,12 +338,13 @@
           :value="show"
           :action="createReport"
           :deliverable="vReport"
+          :editting="editting"
           @input="show = $event"
         />
 
         <CreateProjectModal
           :value="showCreateProject"
-          :action="createProjectFromDeliverable"
+          :action="createProjectFromProposal"
           :project="proposal"
           form-title="Create Project"
           @input="showCreateProject = $event"
@@ -323,6 +361,7 @@ import PageHeader from '@components/page-header'
 import CreateDeliverable from '@/src/components/CreateDeliverable.vue'
 import CreateProjectModal from '@/src/components/CreateProjectModal.vue'
 import graph from '@/src/msalConfig/graph'
+import File from '@/src/components/file.vue'
 export default {
   page: {
     title: 'Proposal',
@@ -333,6 +372,7 @@ export default {
     PageHeader,
     CreateDeliverable,
     CreateProjectModal,
+    File,
   },
   data() {
     return {
@@ -357,6 +397,7 @@ export default {
       reports: [],
       vReport: null,
       show: false,
+      editting: false,
       showCreateProject: false,
     }
   },
@@ -379,9 +420,6 @@ export default {
   methods: {
     extension(file) {
       return file.name.split('.').pop()
-    },
-    openFile() {
-     window.open(this.proposal.proposal_path,'_blank');
     },
     exportToLibrary() {
       this.$swal({
@@ -483,9 +521,16 @@ export default {
     },
     openModal(report) {
       this.vReport = report
+      this.editting = false
       this.show = true
     },
-    async createProjectFromDeliverable(form) {
+
+    showUpdateReport(report) {
+      this.vReport = report;
+      this.editting = true;
+      this.show = true;
+    },
+    async createProjectFromProposal(form) {
       try {
         const response = await this.$http.post(`/create/project`, {
           ...form,
@@ -521,6 +566,29 @@ export default {
           variant: 'danger',
         })
       }
+    },
+    async deleteReport(report) {
+      this.$swal({
+        title: 'Delete Deliverable',
+        text: `Delete ${report.proposal_type &&
+          report.proposal_type.report_title}`,
+        showDenyButton: true,
+        confirmButtonText: 'Delete',
+        denyButtonText: `Cancel`,
+        confirmButtonColor: '#ff5c75',
+        denyButtonColor: '#4b4b5a',
+      }).then(async ({ isConfirmed, isDenied }) => {
+        if (isConfirmed) {
+          try {
+            const response = await this.$http.delete(
+              `/delete/${report.id}/proposal-report`
+            )
+
+            if (response) {
+            }
+          } catch (error) {}
+        }
+      })
     },
     async createReport(report) {
       try {

@@ -638,7 +638,7 @@ export default {
 
             <div class="row mt-4">
               <div
-                v-if="project.professional_expect.length > 0"
+                v-if="project.professional_expects.length > 0"
                 class="col-md-6"
               >
                 <table class="table mb-0">

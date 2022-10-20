@@ -17,6 +17,7 @@
               class="position-absolute"
               style="right: 5px"
               toggle-class="p-0 text-muted arrow-none"
+              right
             >
               <template v-slot:button-content>
                 <i class="uil uil-ellipsis-v font-size-14"></i>
