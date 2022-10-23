@@ -389,7 +389,7 @@ export default {
       try {
         let uploadData = null;
 
-        if (form.file && form.filename) {
+        if (form.file) {
           const data = await graph.uploadProjectFile({
             fileName: `${form.deliverable_name}.${this.extension(form.file)}`,
             fileContent: form.file,

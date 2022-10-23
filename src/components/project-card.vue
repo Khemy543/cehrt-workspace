@@ -46,6 +46,7 @@ export default {
 
 <template>
   <router-link
+    :tag="isProjectPage ? 'a' : 'div'"
     :to="isProjectPage ? `details/${project.id}` : '#'"
     class="col-xl-4 col-lg-6"
   >

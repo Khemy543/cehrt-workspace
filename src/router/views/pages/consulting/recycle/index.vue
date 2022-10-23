@@ -25,14 +25,14 @@
               <b-dropdown-item
                 href="javascript: void(0);"
                 variant="secondary"
-                @click="restoreProject(project)"
+                @click.prevent="restoreProject(project)"
                 >Restore</b-dropdown-item
               >
               <b-dropdown-divider></b-dropdown-divider>
               <b-dropdown-item
                 href="javascript: void(0);"
                 variant="danger"
-                @click="deleteProject(project)"
+                @click.prevent="deleteProject(project)"
               >
                 Delete
               </b-dropdown-item>

@@ -650,8 +650,9 @@ export default {
 
     async updateReport(report) {
       try {
+        console.log(report)
         let uploadData = null
-        if (report.file && report.filename) {
+        if (report.file) {
           const data = await graph.uploadProposalFile({
             fileName: `${report.report_title}.${this.extension(report.file)}`,
             fileContent: report.file,
