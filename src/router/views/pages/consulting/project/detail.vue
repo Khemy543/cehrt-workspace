@@ -391,11 +391,32 @@ export default {
 
     async EditDeliverable(form) {
       try {
+        let uploadData = null;
+
+        if (form.file && form.filename) {
+          const data = await graph.uploadProjectFile({
+            fileName: `${form.deliverable_name}.${this.extension(form.file)}`,
+            fileContent: form.file,
+            folder: this.project.name,
+          })
+  
+          uploadData = await graph.uploadFileInChunk({
+            fileName: `${form.deliverable_name}.${this.extension(form.file)}`,
+            fileContent: form.file,
+            uploadUrl: data.uploadUrl,
+          })
+        }
+
+        if(!uploadData && !form.document_path) {
+          await graph.deleteFile({ onedriveId: form.delete_file_url});
+        }
+
         const response = await this.$http.put(
           `/update/${form.id}/deliverable`,
           {
             ...form,
             project_type_deliverable_id: form.project_type_deliverable.id,
+            document_path: uploadData ? uploadData.webUrl : form.document_path
           }
         )
 
@@ -1034,7 +1055,10 @@ export default {
       :deliverable="vDeliverable"
       :editting="editting"
       :loading="vloading"
-      @input="showCreateDeliverable = $event"
+      @input="($event) => { 
+        showCreateDeliverable = $event;
+        vDeliverable = null
+      }"
     />
 
     <ProjectDeletionModal

@@ -7,7 +7,7 @@
         </div>
       </div>
       <h4 class="mt-1">{{ name }}</h4>
-      <div v-if="deletable" class="bg-white drop">
+      <div v-if="deletable" class="bg-white drop" @click="deleteFile">
         <i class="uil uil-trash-alt text-danger" />
       </div>
     </div>
@@ -56,7 +56,8 @@ export default {
     },
   },
   methods: {
-    deleteFile() {
+    deleteFile(e) {
+      e.preventDefault();
       this.$emit('delete', { id: this.id, webUrl: this.path })
     },
   },

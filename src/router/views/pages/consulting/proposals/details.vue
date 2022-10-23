@@ -173,109 +173,102 @@
               <div v-if="!loading && reports.length > 0">
                 <!-- <div> </div> -->
                 <div class="card">
-                  <div class="card-body py-0">
+                  <div class="card-body py-0 px-5">
                     <ul class="list-unstyled activity-widget row">
                       <li
                         v-for="report in reports"
                         :key="report.id"
                         class="activity-list col-md-12"
                       >
-                        <div class="card shadow-none">
-                          <div class="card-body py-0">
-                            <div
-                              class="media d-flex justify-content-between align-items-center"
-                            >
-                              <router-link
-                                :to="
-                                  `/proposal/${$route.params.id}/report/${report.id}`
-                                "
-                                class="text-dark"
-                              >
-                                <div class="media-body overflow-hidden">
-                                  <h5 class="font-size-15 mb-3">
-                                    {{
-                                      report.proposal_type &&
-                                        report.proposal_type.report_title
-                                    }}
-                                  </h5>
-                                  <div class="d-flex">
-                                    <div>
-                                      <router-link
-                                        :id="`task-tooltip-${report.id}`"
-                                        :to="
-                                          `/proposal/${$route.params.id}/report/${report.id}`
-                                        "
-                                        class="text-muted d-inline-block bg-transparent"
-                                      >
-                                        <b-tooltip
-                                          :target="`task-tooltip-${report.id}`"
-                                          triggers="hover"
-                                          placement="top"
-                                          >Tasks
-                                        </b-tooltip>
-                                        <i
-                                          class="uil uil-bars mr-1 text-primary"
-                                        ></i>
-                                        {{ report.tasks_count || 0 }} task(s)
-                                      </router-link>
-                                    </div>
-                                    <div class=" mx-2">
-                                      <router-link
-                                        :id="`deadline-tooltip-${report.id}`"
-                                        :to="
-                                          `/proposal/${$route.params.id}/report/${report.id}`
-                                        "
-                                        class="text-muted d-inline-block bg-transparent"
-                                      >
-                                        <b-tooltip
-                                          :target="
-                                            `deadline-tooltip-${report.id}`
-                                          "
-                                          triggers="hover"
-                                          placement="top"
-                                          >Due Date
-                                        </b-tooltip>
-                                        <i
-                                          class="uil-calendar-slash mr-1 text-danger"
-                                        ></i>
-                                        {{ report.deadline }}
-                                      </router-link>
-                                    </div>
-                                  </div>
-                                </div>
-                              </router-link>
-
-                              <div>
-                                <File
-                                  :name="
-                                    report.proposal_type &&
-                                      report.proposal_type.report_title
-                                  "
-                                  type="word"
-                                  :path="report.report_path"
-                                />
-                              </div>
+                        <div
+                          class="media d-flex justify-content-between align-items-center"
+                        >
+                          <router-link
+                            :to="
+                              `/proposal/${$route.params.id}/report/${report.id}`
+                            "
+                            class="text-dark"
+                          >
+                            <div class="media-body overflow-hidden">
+                              <h5 class="font-size-15 mb-3">
+                                {{
+                                  report.proposal_type &&
+                                    report.proposal_type.report_title
+                                }}
+                              </h5>
                               <div class="d-flex">
-                                <button
-                                  type="button"
-                                  class="btn btn-soft-secondary btn-sm"
-                                  @click="showUpdateReport(report)"
-                                >
-                                  <i class="uil uil-edit"></i>
-                                </button>
-
-                                <button
-                                  type="button"
-                                  class="btn btn-soft-danger ml-2 btn-sm"
-                                  @click="deleteReport(report)"
-                                >
-                                  <i class="uil uil-trash-alt"></i>
-                                </button>
+                                <div>
+                                  <router-link
+                                    :id="`task-tooltip-${report.id}`"
+                                    :to="
+                                      `/proposal/${$route.params.id}/report/${report.id}`
+                                    "
+                                    class="text-muted d-inline-block bg-transparent"
+                                  >
+                                    <b-tooltip
+                                      :target="`task-tooltip-${report.id}`"
+                                      triggers="hover"
+                                      placement="top"
+                                      >Tasks
+                                    </b-tooltip>
+                                    <i
+                                      class="uil uil-bars mr-1 text-primary"
+                                    ></i>
+                                    {{ report.tasks_count || 0 }} task(s)
+                                  </router-link>
+                                </div>
+                                <div class=" mx-2">
+                                  <router-link
+                                    :id="`deadline-tooltip-${report.id}`"
+                                    :to="
+                                      `/proposal/${$route.params.id}/report/${report.id}`
+                                    "
+                                    class="text-muted d-inline-block bg-transparent"
+                                  >
+                                    <b-tooltip
+                                      :target="`deadline-tooltip-${report.id}`"
+                                      triggers="hover"
+                                      placement="top"
+                                      >Due Date
+                                    </b-tooltip>
+                                    <i
+                                      class="uil-calendar-slash mr-1 text-danger"
+                                    ></i>
+                                    {{ report.deadline }}
+                                  </router-link>
+                                </div>
                               </div>
                             </div>
+                          </router-link>
+
+                          <div>
+                            <File
+                              :name="
+                                report.proposal_type &&
+                                  report.proposal_type.report_title
+                              "
+                              type="word"
+                              :path="report.report_path"
+                            />
+                          </div>
+                          <div class="d-flex">
+                            <button
+                              type="button"
+                              class="btn btn-soft-secondary btn-sm"
+                              @click="showUpdateReport(report)"
+                            >
+                              <i class="uil uil-edit"></i>
+                            </button>
+
+                            <button
+                              type="button"
+                              class="btn btn-soft-danger ml-2 btn-sm"
+                              @click="deleteReport(report)"
+                            >
+                              <i class="uil uil-trash-alt"></i>
+                            </button>
                           </div>
                         </div>
-                        <hr />
                       </li>
                     </ul>
                   </div>
@@ -336,10 +329,10 @@
 
         <CreateDeliverable
           :value="show"
-          :action="createReport"
+          :action="handleSubmit"
           :deliverable="vReport"
           :editting="editting"
-          @input="show = $event"
+          @input="setShow"
         />
 
         <CreateProjectModal
@@ -418,6 +411,16 @@ export default {
     this.getProposalReports()
   },
   methods: {
+    setShow(value) {
+      this.vReport = null
+      this.show = value
+    },
+    handleSubmit(form) {
+      if (this.vReport) {
+        return this.updateReport(form)
+      }
+      return this.createReport(form)
+    },
     extension(file) {
       return file.name.split('.').pop()
     },
@@ -526,9 +529,9 @@ export default {
     },
 
     showUpdateReport(report) {
-      this.vReport = report;
-      this.editting = true;
-      this.show = true;
+      this.vReport = report
+      this.editting = true
+      this.show = true
     },
     async createProjectFromProposal(form) {
       try {
@@ -643,6 +646,37 @@ export default {
           variant: 'danger',
         })
       }
+    },
+
+    async updateReport(report) {
+      try {
+        let uploadData = null
+        if (report.file && report.filename) {
+          const data = await graph.uploadProposalFile({
+            fileName: `${report.report_title}.${this.extension(report.file)}`,
+            fileContent: report.file,
+            folder: this.proposal.title,
+          })
+
+          uploadData = await graph.uploadFileInChunk({
+            fileName: `${report.report_title}.${this.extension(report.file)}`,
+            fileContent: report.file,
+            uploadUrl: data.uploadUrl,
+          })
+        }
+
+        const response = await this.$http.patch(
+          `/update/${this.$route.params.id}/proposal-report`,
+          {
+            report_path: uploadData ? uploadData.webUrl : report.report_path,
+            proposal_report_type_id: report.id,
+            deadline: report.deadline,
+          }
+        )
+
+        if (response) {
+        }
+      } catch (error) {}
     },
   },
 }

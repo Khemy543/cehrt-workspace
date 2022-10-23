@@ -261,7 +261,7 @@ export default {
                   v-for="vProposal in proposals"
                   :key="vProposal.id"
                   class="col-xl-4 col-lg-6"
-                  style="height: 356px"
+                  style="height: 356px; margin-bottom: 20px;"
                 >
                   <div class="card border h-100">
                     <div class="card-body">
