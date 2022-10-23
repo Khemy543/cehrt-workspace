@@ -35,6 +35,7 @@
         id="input-group-1"
         label="Upload Deliverable File"
         label-for="input-1"
+        required
       >
         <input id="input-1" type="file" @change="onFileChange" />
       </b-form-group>

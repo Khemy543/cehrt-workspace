@@ -67,11 +67,6 @@ export default {
         },
         {
           id: 3,
-          name: 'Completed',
-          api: 'completed',
-        },
-        {
-          id: 4,
           name: 'On hold',
           api: 'hold',
         },
@@ -365,6 +360,7 @@ export default {
           this.vloading = false
         }
       } catch (error) {
+        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -405,10 +401,6 @@ export default {
             fileContent: form.file,
             uploadUrl: data.uploadUrl,
           })
-        }
-
-        if(!uploadData && !form.document_path) {
-          await graph.deleteFile({ onedriveId: form.delete_file_url});
         }
 
         const response = await this.$http.put(
@@ -1032,7 +1024,7 @@ export default {
 
           <div class="card">
             <div class="card-body">
-              <h6 class="mt-0 header-title">View and Upload Project Media</h6>
+              <h6 class="mt-0 header-title">View and upload project media and documents</h6>
 
               <div class="wrapper">
                 <a

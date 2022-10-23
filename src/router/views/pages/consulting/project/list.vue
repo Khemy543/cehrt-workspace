@@ -147,13 +147,13 @@ export default {
           >
             <i class="uil-plus mr-1"></i> Create Project
           </button>
-          <div class="btn-group mb-3 mb-sm-0">
+          <!-- <div class="btn-group mb-3 mb-sm-0">
             <button type="button" class="btn" :class="status === '' ? 'btn-primary' : 'btn-white'" @click="getProjects(null, '')">All</button>
           </div>
           <div class="btn-group ml-1">
             <button type="button" class="btn" :class="status === 'active' ? 'btn-primary' : 'btn-white'" @click="getProjects(null, 'active')">Ongoing</button>
             <button type="button" class="btn" :class="status === 'completed' ? 'btn-primary' : 'btn-white'" @click="getProjects(null, 'completed')">Finished</button>
-          </div>
+          </div> -->
           <div class="btn-group ml-2 d-none d-sm-inline-block">
             <button type="button" class="btn btn-sm" :class="!gridView ? 'btn-white' : 'btn-primary'" @click="gridView = true">
               <i class="uil uil-apps"></i>

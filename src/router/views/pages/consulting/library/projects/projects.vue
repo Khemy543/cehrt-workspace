@@ -24,7 +24,7 @@ export default {
   },
   data() {
     return {
-      searchKey: "",
+      searchKey: '',
       pagination: {},
       currentPage: 1,
       title: 'Library',
@@ -178,7 +178,7 @@ export default {
       try {
         this.loading = true
         const response = await this.$http.get(
-          `/fetch/library/projects?page=${this.currentPage}`
+          `/fetch/library/projects?page=${this.currentPage}&search_key=${this.searchKey}`
         )
 
         if (response) {
@@ -230,7 +230,7 @@ export default {
                 <h4 class="header-title mt-0 mb-1">Project Library</h4>
               </div>
 
-              <div style="width: 400px;">
+              <form style="width: 400px;" @submit.prevent="getProjectsLibrary">
                 <b-form-input
                   id="search"
                   v-model="searchKey"
@@ -238,7 +238,7 @@ export default {
                   placeholder="Search..."
                   class="w-100"
                 ></b-form-input>
-              </div>
+              </form>
               <div>
                 <button
                   v-if="department.name === 'Consultancy'"

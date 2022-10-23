@@ -416,7 +416,7 @@ export default {
       this.show = value
     },
     handleSubmit(form) {
-      if (this.vReport) {
+      if (this.editting) {
         return this.updateReport(form)
       }
       return this.createReport(form)
@@ -675,8 +675,43 @@ export default {
         )
 
         if (response) {
+          if (response) {
+            const index = this.reports.findIndex(
+              (item) => item.id === report.id
+            )
+
+            this.$set(this.reports, index, response.data.report)
+
+            this.$bvToast.toast('Proposal report updated successfully', {
+              title: 'Success',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'success',
+            })
+
+            this.show = false
+          }
         }
-      } catch (error) {}
+      } catch (error) {
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
     },
   },
 }
