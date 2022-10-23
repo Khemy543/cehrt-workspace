@@ -665,7 +665,7 @@ export default {
           })
         }
 
-        const response = await this.$http.patch(
+        const response = await this.$http.put(
           `/update/${this.$route.params.id}/proposal-report`,
           {
             report_path: uploadData ? uploadData.webUrl : report.report_path,
