@@ -46,6 +46,7 @@ export default {
       vProject: null,
       showProjectDeletionModal: false,
       projectId: null,
+      vloading: false
     }
   },
   computed: {
@@ -90,6 +91,7 @@ export default {
       this.projectId = id
     },
     async createProject(form) {
+      this.vloading = true;
       try {
         const response = await this.$http.post(`/save/old/project`, {
           ...form,
@@ -106,6 +108,7 @@ export default {
           })
 
           this.show = false
+          this.vloading = false
         }
       } catch (error) {
         if (error.response) {
@@ -126,10 +129,12 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
+        this.vloading = false
       }
     },
     async updateProject(form) {
       try {
+        this.vloading = true;
         const response = await this.$http.patch(`/export/${form.id}/project`, {
           ...form,
           coordinator_id: this.$store.state.auth.currentUser.id,
@@ -152,6 +157,7 @@ export default {
           this.show = false
           this.editting = false
           this.vProject = null
+          this.vloading = false;
         }
       } catch (error) {
         if (error.response) {
@@ -172,6 +178,7 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
+        this.vloading = false
       }
     },
     async getProjectsLibrary() {
@@ -351,6 +358,7 @@ export default {
         :value="show"
         title="Add Project To Library"
         :project="vProject"
+        :loading="vloading"
         @input="show = $event"
       />
     </div>

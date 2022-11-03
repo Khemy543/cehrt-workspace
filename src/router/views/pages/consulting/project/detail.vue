@@ -237,6 +237,7 @@ export default {
     },
     async editProject(form) {
       try {
+        this.vloading = true;
         const response = await this.$http.put(
           `/update/${this.project.id}/project`,
           form
@@ -249,7 +250,8 @@ export default {
           })
           this.project = response.data.project
 
-          this.show = false
+          this.show = false;
+          this.vloading = false
 
           this.$bvToast.toast('Project edited successfully', {
             title: 'Success',
@@ -277,6 +279,7 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
+        this.vloading = false
       }
     },
 
@@ -360,7 +363,6 @@ export default {
           this.vloading = false
         }
       } catch (error) {
-        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -375,6 +377,7 @@ export default {
         }
         this.showCreateDeliverable = false
         this.vDeliverable = null
+        this.vloading = false
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -382,10 +385,10 @@ export default {
           variant: 'danger',
         })
       }
-      this.vloading = false
     },
 
     async EditDeliverable(form) {
+      this.vloading = true;
       try {
         let uploadData = null;
 
@@ -427,6 +430,7 @@ export default {
           })
 
           this.showCreateDeliverable = false
+          this.vloading = false
         }
       } catch (error) {
         this.showCreateDeliverable = false
@@ -437,6 +441,7 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
+      this.vloading = false
       }
     },
 
@@ -530,6 +535,7 @@ export default {
     },
     async exportToLibrary(form) {
       try {
+        this.vloading = true;
         const { associated_consultants: consultants } = form
 
         let newFormData = { ...form }
@@ -553,6 +559,7 @@ export default {
             appendToast: false,
             variant: 'success',
           })
+          this.vloading = false;
           this.$router.push('/project/list')
         }
       } catch (error) {
@@ -574,6 +581,7 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
+        this.vloading = false
       }
     },
   },
@@ -583,13 +591,6 @@ export default {
 <template>
   <Layout>
     <PageHeader :title="title" :items="items" />
-    <CreateProjectModal
-      :value="show"
-      :form-title="formtitle"
-      :action="editProject"
-      :project="project"
-      @input="show = $event"
-    />
     <div v-if="loading" class="d-flex justify-content-center">
       <b-spinner type="grow" variant="primary"></b-spinner>
     </div>
@@ -1063,7 +1064,16 @@ export default {
       :value="showExport"
       :action="exportToLibrary"
       :project="project"
+      :loading="vloading"
       @input="showExport = $event"
+    />
+    <CreateProjectModal
+      :value="show"
+      :form-title="formtitle"
+      :action="editProject"
+      :project="project"
+      :loading="vloading"
+      @input="show = $event"
     />
   </Layout>
 </template>

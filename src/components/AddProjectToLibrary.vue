@@ -5,6 +5,10 @@
     title-class="font-18"
     hide-footer
     size="lg"
+    :cancel-disabled="loading"
+    :hide-header-close="loading"
+    :no-close-on-backdrop="loading"
+    :no-close-on-esc="loading"
   >
     <form @submit.prevent="action(form)">
       <b-form-group
@@ -359,7 +363,16 @@
           </button>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button
+        v-if="!loading"
+        type="submit"
+        class="btn btn-primary"
+        :class="editting ? 'mt-4' : ''"
+        >Submit</button
+      >
+      <button v-else class="btn btn-primary" disabled
+        ><b-spinner small variant="white"></b-spinner> Uploading...</button
+      >
     </form>
   </b-modal>
 </template>
@@ -391,6 +404,10 @@ export default {
       type: Object,
       default: null,
     },
+    loading: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {

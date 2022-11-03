@@ -43,6 +43,7 @@ export default {
       show: false,
       formTitle: 'Add New Project Type',
       viewShow: false,
+      vloading: false
     }
   },
   computed: {
@@ -82,6 +83,7 @@ export default {
 
     async createProjectType(form) {
       try {
+        this.vloading = true;
         const respoonse = await this.$http.post('/create/project/type', {
           ...form,
           deliverable_names: form.deliverables.map((dev) => ({
@@ -92,6 +94,7 @@ export default {
         if (respoonse) {
           this.workFlows.push(respoonse.data.workflow)
           this.show = false
+          this.vloading = false;
           this.$bvToast.toast('Work flow created successfully', {
             title: 'Success',
             autoHideDelay: 5000,
@@ -114,6 +117,7 @@ export default {
             appendToast: false,
             variant: 'danger',
           })
+          this.vloading = false;
         }
       }
     },
@@ -133,6 +137,7 @@ export default {
 
     async updateProjectType(pType) {
       try {
+        this.vloading = true;
         const response = await this.$http.put(
           `/update/${this.projectType.id}/project/type`,
           {
@@ -151,7 +156,8 @@ export default {
           this.projectType = null
           this.formTitle = 'Create Project Type'
           this.show = false
-          this.$set(this.projectTypes, index, response.data.projectType)
+          this.$set(this.projectTypes, index, response.data.projectType);
+          this.vloading = false
 
           this.$bvToast.toast('Project type updated successfully', {
             title: 'Success',
@@ -174,7 +180,8 @@ export default {
             autoHideDelay: 5000,
             appendToast: false,
             variant: 'danger',
-          })
+          });
+          this.vloading = false;
         }
       }
     },
@@ -336,6 +343,7 @@ export default {
       :value="show"
       :project-type="projectType"
       :form-title="formTitle"
+      :loading="vloading"
       @input="show = $event"
     />
 

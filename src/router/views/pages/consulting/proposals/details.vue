@@ -332,6 +332,7 @@
           :action="handleSubmit"
           :deliverable="vReport"
           :editting="editting"
+          :loading="vloading"
           @input="setShow"
         />
 
@@ -392,6 +393,7 @@ export default {
       show: false,
       editting: false,
       showCreateProject: false,
+      vloading: false
     }
   },
   computed: {
@@ -594,6 +596,7 @@ export default {
       })
     },
     async createReport(report) {
+      this.vloading = true
       try {
         const data = await graph.uploadProposalFile({
           fileName: `${report.report_title}.${this.extension(report.file)}`,
@@ -625,6 +628,7 @@ export default {
             variant: 'success',
           })
           this.show = false
+          this.vloading = false
         }
       } catch (error) {
         if (error.response) {
@@ -645,10 +649,12 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
+      this.vloading = false
       }
     },
 
     async updateReport(report) {
+      this.vloading = true
       try {
         let uploadData = null
         if (report.file) {
@@ -694,6 +700,7 @@ export default {
             })
 
             this.show = false
+            this.vloading = false
           }
         }
       } catch (error) {
@@ -715,6 +722,7 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
+        this.vloading = false
       }
     },
   },

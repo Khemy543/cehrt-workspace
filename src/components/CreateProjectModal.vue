@@ -120,7 +120,7 @@
         >Submit</button
       >
       <button v-else class="btn btn-primary" disabled
-        ><b-spinner small variant="white"></b-spinner> Creating Project</button
+        ><b-spinner small variant="white"></b-spinner> Uploading...</button
       >
     </form>
   </b-modal>

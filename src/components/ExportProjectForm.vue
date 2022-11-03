@@ -5,6 +5,10 @@
     title-class="font-18"
     hide-footer
     size="lg"
+    :cancel-disabled="loading"
+    :hide-header-close="loading"
+    :no-close-on-backdrop="loading"
+    :no-close-on-esc="loading"
   >
     <form @submit.prevent="action(form)">
       <b-form-group
@@ -332,6 +336,10 @@ export default {
       type: String,
       default: 'Export Project To Library',
     },
+    loading: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {

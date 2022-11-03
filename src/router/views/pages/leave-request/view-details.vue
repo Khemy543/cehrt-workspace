@@ -251,7 +251,7 @@ export default {
                   <p class="mb-2">
                     <i class="uil-calendar-slash text-primary"></i> End Date
                   </p>
-                  <h5 class="font-size-16">{{ event.end_date }}</h5>
+                  <h5 class="font-size-16">{{ event.end_date  || event.start_date}}</h5>
                 </div>
               </div>
 

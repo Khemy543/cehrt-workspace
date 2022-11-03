@@ -33,7 +33,7 @@
                   <tr v-for="(leave, index) in leaveData" :key="leave.id">
                     <th>{{ index + 1 }}</th>
                     <td>{{ leave.name }}</td>
-                    <td>{{ leave.leave_requests.length }}</td>
+                    <td>{{ getTotalLeave(leave.leave_requests) }}</td>
                     <td>{{ leaveCount(leave.leave_requests, 'Annual') }}</td>
                     <td>{{ leaveCount(leave.leave_requests, 'Sick') }}</td>
                     <td>{{ leaveCount(leave.leave_requests, 'Maternity') }}</td>
@@ -52,6 +52,7 @@
 <script>
 import PageHeader from '@components/page-header'
 import Layout from '@layouts/main.vue'
+import { getDifferenceInBusinessDays } from '@/src/utils/format-date';
 export default {
   components: {
     PageHeader,
@@ -93,10 +94,37 @@ export default {
     },
     leaveCount(leaves, type) {
       if(Array.isArray(leaves)) {
-        return leaves.filter((leave) => leave.type === type).length
+        const allLeave =  leaves.filter((leave) => leave.type === type);
+        
+        let totalDays = 0;
+
+        for (const leave of allLeave) {
+          
+          const newEndDate = leave.end_date || leave.start_date
+
+          totalDays = totalDays + getDifferenceInBusinessDays(newEndDate, leave.start_date) + 1
+        }
+
+        return totalDays;
+
       }
       return 0;
     },
+
+    getTotalLeave(leaves) {
+      if(Array.isArray(leaves)) {
+        let totalDays = 0;
+
+        for (const leave of leaves) {
+          
+          const newEndDate = leave.end_date || leave.start_date
+
+          totalDays = totalDays + getDifferenceInBusinessDays(newEndDate, leave.start_date) + 1
+        }
+
+        return totalDays;
+      }
+    }
   },
 }
 </script>

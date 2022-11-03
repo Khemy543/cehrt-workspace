@@ -6,7 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction'
 import bootstrapPlugin from '@fullcalendar/bootstrap'
 import listPlugin from '@fullcalendar/list'
 import { required } from 'vuelidate/lib/validators'
-import { dateFormate, dateDifference } from '@src/utils/format-date.js'
+import { dateFormate, getDifferenceInBusinessDays } from '@src/utils/format-date.js'
 
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
@@ -90,26 +90,30 @@ export default {
     },
   },
   computed: {
+    username() {
+      const user = this.$store.state.auth.currentUser
+      return `${user.firstname} ${user.lastname}`;
+    },
     annualCount() {
       return this.userLeaveRequest
-        .filter((evt) => evt.type === 'Annual' && evt.status === 'approved')
-        .map((evt) => this.getDifference(evt.end, evt.start))
+        .filter((evt) => evt.type === 'Annual' && evt.user === this.username)
+        .map((evt) => this.getDifference(evt.end_date, evt.start_date) + 1)
         .reduce((accumlator, evt) => {
           return accumlator + evt
         }, 0)
     },
     totalLeave() {
       return this.userLeaveRequest
-        .filter((evt) => evt.status === 'approved')
-        .map((evt) => this.getDifference(evt.end, evt.start))
+        .filter((evt) => evt.user === this.username )
+        .map((evt) => this.getDifference(evt.end_date, evt.start_date) + 1)
         .reduce((accumlator, evt) => {
           return accumlator + evt
         }, 0)
     },
     totalSickLeave() {
       return this.userLeaveRequest
-        .filter((evt) => evt.type === 'Sick' && evt.status === 'approved')
-        .map((evt) => this.getDifference(evt.end, evt.start))
+        .filter((evt) => evt.type === 'Sick' && evt.user === this.username)
+        .map((evt) => this.getDifference(evt.end, evt.start) + 1)
         .reduce((accumlator, evt) => {
           return accumlator + evt
         }, 0)
@@ -121,9 +125,9 @@ export default {
             (evt.type === 'Maternity' ||
               evt.type === 'Others' ||
               evt.type === 'Compassionate') &&
-            evt.status === 'approved'
+            evt.user === this.username
         )
-        .map((evt) => this.getDifference(evt.end, evt.start))
+        .map((evt) => this.getDifference(evt.end_date, evt.start_date))
         .reduce((accumlator, evt) => {
           return accumlator + evt
         }, 0)
@@ -135,12 +139,16 @@ export default {
   },
   methods: {
     formateEndDate(date) {
-      var newdate = new Date(date)
-      newdate.setDate(newdate.getDate() + 1)
-      return newdate
+      if(date) {
+        var newdate = new Date(date)
+        newdate.setDate(newdate.getDate() + 1)
+        return newdate
+      }
+      return ""
     },
     getDifference(later, earlier) {
-      return dateDifference(later, earlier)
+      const newEndDate = later || earlier;
+      return getDifferenceInBusinessDays(newEndDate, earlier)
     },
     async getLeaveRequests() {
       try {
@@ -171,11 +179,9 @@ export default {
                     : 'bg-soft-secondary text-secondary',
               }
             })
-          this.userLeaveRequest = requestedLeaves
           this.calendarEvents = [...this.calendarEvents, ...requestedLeaves]
         }
       } catch (error) {
-        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -193,6 +199,7 @@ export default {
         )
 
         if (response) {
+         this.userLeaveRequest = response.data
           const approvedLeaves = response.data.map((item) => {
             return {
               id: item.id,
@@ -433,8 +440,8 @@ export default {
         this.editevent = {
           id: this.edit.id,
           type: this.edit.title.split('(')[1].split(' ')[0],
-          start_date: this.formateEndDate(this.edit.start),
-          end_date: this.formateEndDate(this.edit.end),
+          start_date: dateFormate(this.edit.start),
+          end_date: this.edit.end && dateFormate(this.edit.end) || "",
           reason: this.calendarEvents[index].reason,
         }
         this.eventModal = true
@@ -678,7 +685,7 @@ export default {
     <!-- Edit Modal -->
     <b-modal
       v-model="eventModal"
-      title="Edit Leave request"
+      title="Edit Leave Request"
       title-class="text-black font-18"
       hide-footer
     >

@@ -80,12 +80,6 @@ export default {
           '@microsoft.graph.conflictBehavior': 'replace',
         })
 
-        console.log(
-          `https://onedrive.live.com/edit.aspx?resid=${
-            data.id.split('!')[0]
-          }!${Number(data.id.split('!')[1]) + 1}&ithint=file%2cxlsx`
-        )
-
         graph.copyRenumirationFileToProposal({
           parentReference: { id: data.id },
           name: 'World bank renumeration calculator.xlsx',
@@ -100,7 +94,6 @@ export default {
         })
 
         if (response) {
-          console.log('here')
           this.proposals.push(response.data.proposal)
           this.show = false
           this.$bvToast.toast('Proposal created successfully', {

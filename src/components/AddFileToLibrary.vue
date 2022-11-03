@@ -52,7 +52,7 @@
         >Submit</button
       >
       <button v-else class="btn btn-primary" disabled
-        ><b-spinner small variant="white"></b-spinner> uploading</button
+        ><b-spinner small variant="white"></b-spinner> uploading...</button
       >
     </form>
   </b-modal>

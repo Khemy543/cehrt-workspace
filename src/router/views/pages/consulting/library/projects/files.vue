@@ -330,7 +330,6 @@ export default {
           this.show = false
         }
       } catch (error) {
-        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {

@@ -1,11 +1,16 @@
 <template>
-  <b-modal v-model="show" :title="formTitle" title-class="font-18" hide-footer>
+  <b-modal
+    v-model="show"
+    :title="formTitle"
+    title-class="font-18"
+    hide-footer
+    :cancel-disabled="loading"
+    :hide-header-close="loading"
+    :no-close-on-backdrop="loading"
+    :no-close-on-esc="loading"
+  >
     <form @submit.prevent="action(form)">
-      <b-form-group
-        id="input-group-1"
-        label="Title"
-        label-for="input-1"
-      >
+      <b-form-group id="input-group-1" label="Title" label-for="input-1">
         <b-form-input
           id="input-1"
           v-model="form.name"
@@ -76,6 +81,10 @@ export default {
       type: String,
       required: true,
     },
+    loading: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {
@@ -103,7 +112,7 @@ export default {
   watch: {
     projectType(newValue) {
       this.form.name = (newValue && newValue.name) || ''
-      if(newValue.deliverables && newValue.deliverables.length > 0) {
+      if (newValue.deliverables && newValue.deliverables.length > 0) {
         this.form.deliverables = newValue.deliverables
       } else {
         this.form.deliverables = [
@@ -140,15 +149,15 @@ export default {
         )
 
         if (response) {
-          const { deliverables } = this.form;
+          const { deliverables } = this.form
 
-          if(deliverables.length <= 1) {
+          if (deliverables.length <= 1) {
             this.form.deliverables = [
               {
                 fake_id: 1,
                 deliverable_name: '',
               },
-            ];
+            ]
           } else {
             this.form.deliverables = deliverables.filter(
               (item) => item.id !== deliverable.id
@@ -183,7 +192,9 @@ export default {
         return this.deleteDeliverable(deliverable)
       } else {
         const { deliverables } = this.form
-        this.form.tadeliverablessks = deliverables.filter((item) => item !== deliverable)
+        this.form.tadeliverablessks = deliverables.filter(
+          (item) => item !== deliverable
+        )
       }
     },
   },
