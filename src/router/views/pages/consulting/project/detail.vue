@@ -391,13 +391,13 @@ export default {
 
         if (form.file) {
           const data = await graph.uploadProjectFile({
-            fileName: `${form.deliverable_name}.${this.extension(form.file)}`,
+            fileName: `${form.project_type_deliverable.deliverable_name}.${this.extension(form.file)}`,
             fileContent: form.file,
             folder: this.project.name,
           })
   
           uploadData = await graph.uploadFileInChunk({
-            fileName: `${form.deliverable_name}.${this.extension(form.file)}`,
+            fileName: `${form.project_type_deliverable.deliverable_name}.${this.extension(form.file)}`,
             fileContent: form.file,
             uploadUrl: data.uploadUrl,
           })

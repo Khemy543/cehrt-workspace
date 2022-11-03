@@ -653,13 +653,17 @@ export default {
         let uploadData = null
         if (report.file) {
           const data = await graph.uploadProposalFile({
-            fileName: `${report.proposal_type.report_title}.${this.extension(report.file)}`,
+            fileName: `${report.proposal_type.report_title}.${this.extension(
+              report.file
+            )}`,
             fileContent: report.file,
             folder: this.proposal.title,
           })
 
           uploadData = await graph.uploadFileInChunk({
-            fileName: `${report.proposal_type.report_title}.${this.extension(report.file)}`,
+            fileName: `${report.proposal_type.report_title}.${this.extension(
+              report.file
+            )}`,
             fileContent: report.file,
             uploadUrl: data.uploadUrl,
           })
@@ -669,7 +673,7 @@ export default {
           `/update/${report.id}/proposal-report`,
           {
             report_path: uploadData ? uploadData.webUrl : report.report_path,
-            proposal_report_type_id: report.id,
+            proposal_report_type_id: report.proposal_type.id,
             deadline: report.deadline,
           }
         )
