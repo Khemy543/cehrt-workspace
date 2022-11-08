@@ -12,7 +12,7 @@
     <form @submit.prevent="action({ ...form, file, filename })">
       <b-form-group
         id="input-group-1"
-        label="Project File Name"
+        label="File Name"
         label-for="input-1"
       >
         <b-form-select
@@ -22,7 +22,7 @@
         >
           <option value="" disabled>Select file name</option>
           <option v-for="dev in deliverables" :key="dev.id" :value="dev.id">{{
-            dev.deliverable_name
+            dev.deliverable_name || dev.report_title
           }}</option>
         </b-form-select>
 

@@ -3,13 +3,14 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import graph from '@/src/msalConfig/graph'
+import File from '@/src/components/file.vue'
 
 export default {
   page: {
     title: 'Proposals',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, PageHeader },
+  components: { Layout, PageHeader, File },
   data() {
     return {
       loading: true,
@@ -188,7 +189,7 @@ export default {
       }
 
       if (file && typeof file === 'string') {
-        return `${process.env.API_BASE_URL}${file.replace('/', '')}`
+        return file
       }
       return null
     },
@@ -242,7 +243,8 @@ export default {
     async deleteCorrespondent(id) {
       try {
         const response = await this.$http.delete(
-          `/admin/delete/proposal/${id}/files`)
+          `/admin/delete/proposal/${id}/files`
+        )
         if (response) {
           return response
         }
@@ -295,53 +297,45 @@ export default {
         <div class="col-12">
           <div class="card">
             <div class="card-body">
-              <div
-                class="card-title border-bottom p-3 mb-0 w-100 d-flex justify-content-between"
-              >
-                <div class="page-title" style="padding:0">
+              <div class="row align-items-center">
+                <div class="col-12">
                   <div class="mt-4 mt-lg-0">
-                    <h5 class="mt-0 mb-1 font-weight-bold">
-                      {{ proposal.title }}
-                    </h5>
-
-                    <div class="d-flex items-align-center mt-4">
-                      <div>
-                        <div
-                          class="badge badge-soft-primary font-size-13 font-weight-normal"
-                        >
-                          {{
-                            proposal.project_type && proposal.project_type.name
-                          }}
-                        </div>
-                      </div>
-                      <div>
-                        <div
-                          class="badge badge-soft-success font-size-13 font-weight-normal ml-5"
-                        >
-                          {{ proposal.funding_option }}</div
-                        >
+                    <div class="row align-items-center">
+                      <div class="col-md-6">
+                        <h5 class="mt-0 mb-1 font-weight-bold">
+                          {{ proposal.title }}
+                        </h5>
                       </div>
                     </div>
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="mt-4">
-                          <p class="mb-2">
-                            <i class="uil-user text-danger"></i> Client
-                          </p>
-                          <h5 class="font-size-16">{{ proposal.client }}</h5>
-                        </div>
+
+                    <div class="row mt-5">
+                      <div class="col-xl-4 col-sm-6">
+                        <p class="mb-1">
+                          <i class="uil-user text-danger"></i> Client
+                        </p>
+                        <h5 class="font-size-16">{{ proposal.client }}</h5>
+                      </div>
+
+                      <div class="col-xl-4 col-sm-6">
+                        <p class="mb-1">
+                          <i class="uil-user text-danger"></i> Project Type
+                        </p>
+                        <h5 class="font-size-16">{{
+                          proposal.project_type && proposal.project_type.name
+                        }}</h5>
+                      </div>
+
+                      <div class="col-xl-4 col-sm-6">
+                        <p class="mb-1">
+                          <i class="uil-user text-danger"></i> Funding
+                        </p>
+                        <h5 class="font-size-16">{{
+                          proposal.funding_option
+                        }}</h5>
                       </div>
                     </div>
                   </div>
                 </div>
-                <!-- <div>
-                  <button
-                    type="button"
-                    class="btn btn-primary"
-                    @click="saveProjectData"
-                    >Save Changes</button
-                  >
-                </div> -->
               </div>
             </div>
             <!-- end card body-->
@@ -364,29 +358,11 @@ export default {
                       <h5 class="font-size-16 mt-2 mb-1">
                         Award of Contract
                       </h5>
-                      <div v-if="createUrl(awardOfContractFile)" class="row">
-                        <a
-                          :href="createUrl(awardOfContractFile)"
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >Award-of-contract</div
-                                >
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                      <div v-if="createUrl(awardOfContractFile)">
+                        <File
+                          name="Award of Contract"
+                          :path="createUrl(awardOfContractFile)"
+                        />
                       </div>
 
                       <div v-else>
@@ -407,7 +383,9 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: `Award of contract.${extension(awardOfContractFile)}`,
+                            fileName: `Award of contract.${extension(
+                              awardOfContractFile
+                            )}`,
                             file: awardOfContractFile,
                             key: 'award_of_contract',
                           })
@@ -434,29 +412,11 @@ export default {
                       <h5 class="font-size-16 mt-2 mb-1">
                         Request for EOl
                       </h5>
-                      <div v-if="createUrl(requestForEol)" class="row">
-                        <a
-                          :href="createUrl(requestForEol)"
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >Request-for-EOL</div
-                                >
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                      <div v-if="createUrl(requestForEol)">
+                        <File
+                          name="Request for EOl"
+                          :path="createUrl(requestForEol)"
+                        />
                       </div>
                       <div v-else>
                         <input
@@ -474,7 +434,9 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: `Request for EOI.${extension(requestForEol)}`,
+                            fileName: `Request for EOI.${extension(
+                              requestForEol
+                            )}`,
                             file: requestForEol,
                             key: 'request_for_eol',
                           })
@@ -501,29 +463,11 @@ export default {
                       <h5 class="font-size-16 mt-2 mb-1">
                         Request For Proposal
                       </h5>
-                      <div v-if="createUrl(requestForProposal)" class="row">
-                        <a
-                          :href="createUrl(requestForProposal)"
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >Request-For-Proposal</div
-                                >
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                      <div v-if="createUrl(requestForProposal)">
+                        <File
+                          name="Request For Proposal"
+                          :path="createUrl(requestForProposal)"
+                        />
                       </div>
                       <div v-else>
                         <input
@@ -542,7 +486,9 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: `Request for Proposal.${extension(requestForProposal)}`,
+                            fileName: `Request for Proposal.${extension(
+                              requestForProposal
+                            )}`,
                             file: requestForProposal,
                             key: 'request_for_proposal',
                           })
@@ -593,32 +539,11 @@ export default {
                         v-if="
                           createUrl(correspondents[index].correspondent_path)
                         "
-                        class="row"
                       >
-                        <a
-                          :href="
-                            createUrl(correspondents[index].correspondent_path)
-                          "
-                          target="_blank"
-                          class="col-6"
-                        >
-                          <div class="p-2 border rounded mb-4">
-                            <div class="media">
-                              <div class="avatar-sm font-weight-bold mr-3">
-                                <span
-                                  class="avatar-title rounded bg-soft-primary text-primary"
-                                >
-                                  <i class="uil-file-plus-alt font-size-18"></i>
-                                </span>
-                              </div>
-                              <div class="media-body">
-                                <div class="d-inline-block mt-2"
-                                  >correspondent
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </a>
+                        <File
+                          :name="`Correspondent-${index + 1}`"
+                          :path="createUrl(correspondents[index].correspondent_path)"
+                        />
                       </div>
                       <div v-else>
                         <input
@@ -645,7 +570,9 @@ export default {
                         class="btn btn-soft-primary btn-sm mx-2"
                         @click="
                           handleFileUpload({
-                            fileName: `Correspondent${index + 1}.${extension(correspondents[index].correspondent_path)}`,
+                            fileName: `Correspondent${index + 1}.${extension(
+                              correspondents[index].correspondent_path
+                            )}`,
                             file: correspondents[index].correspondent_path,
                             key: 'correspondents',
                           })

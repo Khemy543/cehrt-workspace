@@ -181,7 +181,7 @@ export default {
 
         const extension = form.file.name.split('.').pop()
 
-        const data = await graph.createUploadSession({
+        const data = await graph.createProjectUploadSession({
           fileName: `${(deliverable && deliverable.deliverable_name) ||
             fileName}.${extension}`,
           fileContent: form.file,

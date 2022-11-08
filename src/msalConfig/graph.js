@@ -164,9 +164,27 @@ export default {
     }
   },
 
-  async createUploadSession({ fileName, fileContent, folder }) {
+  async createProjectUploadSession({ fileName, fileContent, folder }) {
     let resp = await postGraph(
       `/drives/${driveId}/items/${libraryId}:/Projects/${folder}/${fileName}:/createUploadSession`,
+      {
+        item: {
+          '@microsoft.graph.conflictBehavior': 'replace',
+          name: fileName,
+        },
+        deferCommit: false,
+      }
+    )
+
+    if (resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
+  async createProposalUploadSession({ fileName, fileContent, folder }) {
+    let resp = await postGraph(
+      `/drives/${driveId}/items/${libraryId}:/Proposal/${folder}/${fileName}:/createUploadSession`,
       {
         item: {
           '@microsoft.graph.conflictBehavior': 'replace',

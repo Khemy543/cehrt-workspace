@@ -10,37 +10,49 @@
           <div class="card">
             <div class="card-body">
               <div class="row align-items-center">
-                <div class="col-xl-12 col-lg-12">
+                <div class="col-12">
                   <div class="mt-4 mt-lg-0">
-                    <h5 class="mt-0 mb-1 font-weight-bold">
-                      {{ proposal.title }}
-                    </h5>
-
-                    <div class="d-flex items-align-center mt-4">
-                      <div>
-                        <div
-                          class="badge badge-soft-primary font-size-13 font-weight-normal"
-                        >
-                          {{
-                            proposal.project_type && proposal.project_type.name
-                          }}
-                        </div>
+                    <div class="row align-items-center justify-content-between">
+                      <div class="col-md-6">
+                        <h5 class="mt-0 mb-1 font-weight-bold">
+                          {{ proposal.title }}
+                        </h5>
                       </div>
                       <div>
-                        <div
-                          class="badge badge-soft-success font-size-13 font-weight-normal ml-5"
-                          >{{ proposal.funding_option }}</div
+                        <button
+                          type="button"
+                          class="btn btn-danger mr-4 mb-3 mb-sm-0"
+                          @click="openModal"
                         >
+                          <i class="uil-plus mr-1"></i> Add File
+                        </button>
                       </div>
                     </div>
-                    <div class="row">
-                      <div class="col-md-6">
-                        <div class="mt-4">
-                          <p class="mb-2">
-                            <i class="uil-user text-danger"></i> Client
-                          </p>
-                          <h5 class="font-size-16">{{ proposal.client }}</h5>
-                        </div>
+
+                    <div class="row mt-5">
+                      <div class="col-xl-4 col-sm-6">
+                        <p class="mb-1">
+                          <i class="uil-user text-danger"></i> Client
+                        </p>
+                        <h5 class="font-size-16">{{ proposal.client }}</h5>
+                      </div>
+
+                      <div class="col-xl-4 col-sm-6">
+                        <p class="mb-1">
+                          <i class="uil-user text-danger"></i> Project Type
+                        </p>
+                        <h5 class="font-size-16">{{
+                          proposal.project_type && proposal.project_type.name
+                        }}</h5>
+                      </div>
+
+                      <div class="col-xl-4 col-sm-6">
+                        <p class="mb-1">
+                          <i class="uil-user text-danger"></i> Funding
+                        </p>
+                        <h5 class="font-size-16">{{
+                          proposal.funding_option
+                        }}</h5>
                       </div>
                     </div>
                   </div>
@@ -53,48 +65,54 @@
         </div>
 
         <div class="col-12 mt-2">
-          <h5>Proposal Reports</h5>
-          <div class="row mt-4">
-            <router-link
-              v-for="report in reports"
-              :key="report.id"
-              :to="`/proposal/${proposal.id}/report/${report.id}`"
-              class="col-md-4"
-            >
-              <div class="card">
-                <div class="card-body">
-                  <div class="p-2 border rounded mb-3">
-                    <div class="media">
-                      <div class="avatar-sm font-weight-bold mr-3">
-                        <span
-                          class="avatar-title rounded bg-soft-primary text-primary"
-                        >
-                          <i class="uil-file-plus-alt font-size-18"></i>
-                        </span>
-                      </div>
-                      <div class="media-body">
-                        <div class="d-inline-block mt-2"
-                          >{{
-                            report.name
-                          }}</div
-                        >
-                      </div>
-                    </div>
+          <div class="card">
+            <div class="card-body">
+              <div v-if="reports.length > 0">
+                <div class="row">
+                  <div class="col d-flex flex-wrap">
+                    <File
+                      v-for="report in reports"
+                      :key="report.id"
+                      :name="report.proposal_type.report_title"
+                      :path="report.report_path"
+                    />
                   </div>
                 </div>
               </div>
-            </router-link>
+
+              <div v-else class="w-100 d-flex justify-content-center mt-4">
+                <img
+                  :src="require('@assets/svgs/empty.svg')"
+                  alt="no projects"
+                  style="width:30%"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </Layout>
+
+    <AddFileToLibrary
+      :action="addFile"
+      :deliverables="formattedReportFiles"
+      :admin-files="formattedAdminFiles"
+      :value="show"
+      :loading="uploading"
+      title="Add Proposal File"
+      @input="show = $event"
+    />
   </div>
 </template>
 
 <script>
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
+import File from '@/src/components/file.vue'
 import PageHeader from '@components/page-header'
+import AddFileToLibrary from '@/src/components/AddFileToLibrary.vue'
+import graph from '@/src/msalConfig/graph'
+import { v4 as uuidv4 } from 'uuid'
 export default {
   page: {
     title: 'Proposal',
@@ -103,6 +121,8 @@ export default {
   components: {
     Layout,
     PageHeader,
+    File,
+    AddFileToLibrary,
   },
   data() {
     return {
@@ -125,16 +145,272 @@ export default {
       loading: false,
       reportTypes: [],
       reports: [],
+      uploading: false,
+      adminFiles: [
+        {
+          id: 'award_of_contract',
+          name: 'Award of Contract',
+        },
+        {
+          id: 'request_for_eol',
+          name: 'Request of EOl',
+        },
+        {
+          id: 'request_for_proposal',
+          name: 'Request For Proposal',
+        },
+      ],
       vReport: null,
       show: false,
       showCreateProject: false,
     }
   },
+  computed: {
+    isConsulting() {
+      return this.$store.state.auth.userDepartment.name === 'Consultancy'
+    },
+    isAdmin() {
+      return this.$store.state.auth.userDepartment.name === 'Administration'
+    },
+    isFinance() {
+      return this.$store.state.auth.userDepartment.name === 'Finance'
+    },
+    formattedReportFiles() {
+      if (this.isConsulting) {
+        return this.reportTypes.filter(
+          (item) =>
+            !this.reports.some((report) => report.proposal_type.id === item.id)
+        )
+      }
+      return []
+    },
+    formattedAdminFiles() {
+      if (this.isAdmin) {
+        return this.adminFiles.filter(
+          (item) => !this.reports.some((report) => report.name === item.name)
+        )
+      }
+      return []
+    },
+  },
   created() {
     this.getProposal()
     this.getProposalReports()
+    this.getReportTypes()
   },
   methods: {
+    openModal() {
+      this.show = true
+    },
+    async addFile(form) {
+      try {
+        this.uploading = true
+        const report = this.formattedReportFiles.find(
+          (item) => item.id === form.project_type_deliverable_id
+        )
+
+        const fileName = form.file_key
+          .split('_')
+          .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
+          .join(' ')
+
+        const extension = form.file.name.split('.').pop()
+
+        const data = await graph.createProposalUploadSession({
+          fileName: `${(report && report.report_title) ||
+            fileName}.${extension}`,
+          fileContent: form.file,
+          folder: this.proposal.title,
+        })
+        const uploadData = await graph.uploadFileInChunk({
+          fileName: `${(report && report.report_title) ||
+            fileName}.${extension}`,
+          fileContent: form.file,
+          uploadUrl: data.uploadUrl,
+        })
+
+        let requestData = {}
+        let method = 'POST'
+        let url = `/create/${this.$route.params.id}/proposal-report`
+        if (form.file_key) {
+          if (form.file_key === 'corespondents') {
+            requestData[form.file_key] = [uploadData.webUrl]
+          } else {
+            requestData[form.file_key] = uploadData.webUrl
+          }
+        }
+
+        if (this.isAdmin) {
+          method = 'PATCH'
+          url = `/admin/add/project/${this.$route.params.id}/corespondents`
+        }
+
+        if (this.isFinance) {
+          method = 'PATCH'
+          url = `/finance/update/${this.$route.params.id}/project`
+        }
+
+        const response = await this.$http({
+          method,
+          url,
+          data: {
+            ...form,
+            report_path: uploadData.webUrl,
+            proposal_report_type_id: form.project_type_deliverable_id,
+            ...requestData,
+          },
+        })
+
+        if (response) {
+          if (this.isConsulting) {
+            const file = response.data.deliverable
+            this.library.push({
+              id: file.id,
+              name:
+                file.project_type_deliverable &&
+                file.project_type_deliverable.deliverable_name,
+              file: file.document_path,
+              project_type_deliverable: file.project_type_deliverable,
+              document_path: file.document_path,
+            })
+          }
+
+          if (this.isFinance) {
+            const { project } = response.data
+            this.library = []
+            const contract = {
+              id: 1,
+              name: 'Contract',
+              document_path: project.contract,
+            }
+
+            const insurance = {
+              id: 2,
+              name: 'Insurance',
+              document_path: project.insurance,
+            }
+
+            if (project.contract) {
+              this.library.push(contract)
+            }
+
+            if (project.insurance) {
+              this.library.push(insurance)
+            }
+            project.deliverables.forEach((item) => {
+              this.library.push({
+                id: uuidv4(),
+                name: `Invoice (${item.name})`,
+                document_path: item.invoice,
+              })
+
+              this.library.push({
+                id: uuidv4(),
+                name: `Time Sheet (${item.name})`,
+                document_path: item.timesheet,
+              })
+            })
+          }
+
+          if (this.isAdmin) {
+            this.correspondents = []
+            const { corespondent } = response.data
+            const contract = {
+              id: 1,
+              name: 'Contract',
+              document_path: corespondent.contract,
+            }
+            const insurance = {
+              id: 2,
+              name: 'Insurance',
+              document_path: corespondent.insurance,
+            }
+            const permit = {
+              id: 3,
+              name: 'Permit',
+              document_path: corespondent.permit,
+            }
+            const reviewComment = {
+              id: 4,
+              name: 'Review Comments',
+              document_path: corespondent.review_comment,
+            }
+
+            if (response.data.contract) {
+              this.library.push(contract)
+            }
+
+            if (response.data.insurance) {
+              this.library.push(insurance)
+            }
+            if (response.data.permit) {
+              this.library.push(permit)
+            }
+            if (response.data.review_comment) {
+              this.library.push(reviewComment)
+            }
+
+            // this.library = [contract, insurance, permit, reviewComment];
+
+            corespondent.corespondents.forEach((file, index) => {
+              this.correspondents.push({
+                id: uuidv4(),
+                name: `Correspondent (${index + 1})`,
+                document_path: file.corespondent_path,
+              })
+            })
+          }
+          this.$bvToast.toast('Project file created successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
+
+          this.show = false
+        }
+      } catch (error) {
+        console.log(error)
+        if (error.response) {
+          const { status, data } = error.response
+          if (status === 422) {
+            const { errors } = data
+            return this.$bvToast.toast(errors[Object.keys(errors)[0]], {
+              title: 'Error',
+              autoHideDelay: 5000,
+              appendToast: false,
+              variant: 'danger',
+            })
+          }
+        }
+        this.showCreateDeliverable = false
+        this.vDeliverable = null
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      } finally {
+        this.uploading = false
+      }
+    },
+    async getReportTypes() {
+      try {
+        const response = await this.$http.get(`/fetch/proposal/report/types`)
+
+        if (response) {
+          this.reportTypes = response.data
+        }
+      } catch (error) {
+        this.$bvToast.toast('Something happened, Please try again later', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+    },
     async getProposal() {
       try {
         this.loading = true
@@ -164,8 +440,6 @@ export default {
         const url =
           department.name === 'Administration'
             ? `/admin/fetch/${this.$route.params.id}/proposal`
-            : department.name === 'Finance'
-            ? `/finance/fetch/${this.$route.params.id}/project`
             : `/fetch/proposal/${this.$route.params.id}/reports`
         const response = await this.$http.get(url)
 
@@ -173,7 +447,7 @@ export default {
           if (department.name === 'Consultancy') {
             this.reports = response.data.map((item) => ({
               ...item,
-              name: item.proposal_type && item.proposal_type.report_title
+              name: item.proposal_type && item.proposal_type.report_title,
             }))
           }
 
