@@ -428,7 +428,7 @@ const recycleRoutes = [
 const leaveRequestRoutes = [
   {
     path: '/leave-request',
-    name: 'Leave Request',
+    name: 'Leave',
     meta: { authRequired: true },
     icon: 'send',
     department: 'all',
@@ -447,7 +447,7 @@ const leaveRequestRoutes = [
   },
   {
     path: '/request/:id/details',
-    name: 'Leave',
+    name: 'Leave-details',
     meta: { authRequired: true },
     component: () =>
       lazyLoadView(import('@views/pages/leave-request/view-details.vue')),

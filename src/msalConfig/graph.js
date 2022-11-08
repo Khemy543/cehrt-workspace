@@ -184,7 +184,7 @@ export default {
 
   async createProposalUploadSession({ fileName, fileContent, folder }) {
     let resp = await postGraph(
-      `/drives/${driveId}/items/${libraryId}:/Proposal/${folder}/${fileName}:/createUploadSession`,
+      `/drives/${driveId}/items/${libraryId}:/Proposals/${folder}/${fileName}:/createUploadSession`,
       {
         item: {
           '@microsoft.graph.conflictBehavior': 'replace',

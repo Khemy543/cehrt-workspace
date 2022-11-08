@@ -67,14 +67,14 @@
         <div class="col-12 mt-2">
           <div class="card">
             <div class="card-body">
-              <div v-if="reports.length > 0">
+              <div v-if="combindedFiles.length > 0">
                 <div class="row">
                   <div class="col d-flex flex-wrap">
                     <File
-                      v-for="report in reports"
+                      v-for="report in combindedFiles"
                       :key="report.id"
-                      :name="report.proposal_type.report_title"
-                      :path="report.report_path"
+                      :name="report.name"
+                      :path="report.path"
                     />
                   </div>
                 </div>
@@ -159,13 +159,21 @@ export default {
           id: 'request_for_proposal',
           name: 'Request For Proposal',
         },
+        {
+          id: 'corespondents',
+          name: 'Corespondents',
+        },
       ],
       vReport: null,
       show: false,
       showCreateProject: false,
+      correspondents: [],
     }
   },
   computed: {
+    combindedFiles() {
+      return [...this.reports, ...this.correspondents]
+    },
     isConsulting() {
       return this.$store.state.auth.userDepartment.name === 'Consultancy'
     },
@@ -242,12 +250,7 @@ export default {
 
         if (this.isAdmin) {
           method = 'PATCH'
-          url = `/admin/add/project/${this.$route.params.id}/corespondents`
-        }
-
-        if (this.isFinance) {
-          method = 'PATCH'
-          url = `/finance/update/${this.$route.params.id}/project`
+          url = `/admin/update/${this.$route.params.id}/proposal`
         }
 
         const response = await this.$http({
@@ -257,106 +260,54 @@ export default {
             ...form,
             report_path: uploadData.webUrl,
             proposal_report_type_id: form.project_type_deliverable_id,
+            deadline: new Date(),
             ...requestData,
           },
         })
 
         if (response) {
           if (this.isConsulting) {
-            const file = response.data.deliverable
-            this.library.push({
-              id: file.id,
-              name:
-                file.project_type_deliverable &&
-                file.project_type_deliverable.deliverable_name,
-              file: file.document_path,
-              project_type_deliverable: file.project_type_deliverable,
-              document_path: file.document_path,
-            })
-          }
-
-          if (this.isFinance) {
-            const { project } = response.data
-            this.library = []
-            const contract = {
-              id: 1,
-              name: 'Contract',
-              document_path: project.contract,
-            }
-
-            const insurance = {
-              id: 2,
-              name: 'Insurance',
-              document_path: project.insurance,
-            }
-
-            if (project.contract) {
-              this.library.push(contract)
-            }
-
-            if (project.insurance) {
-              this.library.push(insurance)
-            }
-            project.deliverables.forEach((item) => {
-              this.library.push({
-                id: uuidv4(),
-                name: `Invoice (${item.name})`,
-                document_path: item.invoice,
-              })
-
-              this.library.push({
-                id: uuidv4(),
-                name: `Time Sheet (${item.name})`,
-                document_path: item.timesheet,
-              })
+            const file = response.data.report
+            this.reports.push({
+              ...file,
+              name: file.proposal_type.report_title,
+              path: file.report_path,
             })
           }
 
           if (this.isAdmin) {
             this.correspondents = []
             const { corespondent } = response.data
-            const contract = {
-              id: 1,
-              name: 'Contract',
-              document_path: corespondent.contract,
+            const awardOfContractFile = {
+              id: uuidv4(),
+              path: corespondent.award_of_contract,
+              name: 'Award Of Contract',
             }
-            const insurance = {
-              id: 2,
-              name: 'Insurance',
-              document_path: corespondent.insurance,
+            const requestForEol = {
+              id: uuidv4(),
+              path: corespondent.request_for_eol,
+              name: 'Request For EOL',
             }
-            const permit = {
-              id: 3,
-              name: 'Permit',
-              document_path: corespondent.permit,
+            const requestForProposal = {
+              id: uuidv4(),
+              path: corespondent.request_for_proposal,
+              name: 'Request For Proposal',
             }
-            const reviewComment = {
-              id: 4,
-              name: 'Review Comments',
-              document_path: corespondent.review_comment,
+            if (corespondent.award_of_contract) {
+              this.reports.push(awardOfContractFile)
             }
-
-            if (response.data.contract) {
-              this.library.push(contract)
+            if (corespondent.request_for_eol) {
+              this.reports.push(requestForEol)
             }
 
-            if (response.data.insurance) {
-              this.library.push(insurance)
+            if (corespondent.request_for_proposal) {
+              this.reports.push(requestForProposal)
             }
-            if (response.data.permit) {
-              this.library.push(permit)
-            }
-            if (response.data.review_comment) {
-              this.library.push(reviewComment)
-            }
-
-            // this.library = [contract, insurance, permit, reviewComment];
-
             corespondent.corespondents.forEach((file, index) => {
               this.correspondents.push({
                 id: uuidv4(),
                 name: `Correspondent (${index + 1})`,
-                document_path: file.corespondent_path,
+                path: file.corespondent_path,
               })
             })
           }
@@ -447,30 +398,28 @@ export default {
           if (department.name === 'Consultancy') {
             this.reports = response.data.map((item) => ({
               ...item,
-              name: item.proposal_type && item.proposal_type.report_title,
+              path: item.report_path,
+              name: item.proposal_type && item.proposal_type.report_title
             }))
           }
 
           if (department.name === 'Administration') {
-            this.awardOfContractFile = response.data.award_of_contract
-            this.requestForEol = response.data.request_for_eol
-            this.requestForProposal = response.data.request_for_proposal
             const awardofcontract = {
-              id: 1,
+              id: uuidv4(),
               name: 'Award of contract',
-              file: response.data.award_of_contract,
+              path: response.data.award_of_contract,
             }
 
             const requestforeol = {
-              id: 2,
+              id: uuidv4(),
               name: 'Request for EOL',
-              file: response.data.request_for_eol,
+              path: response.data.request_for_eol,
             }
 
             const requestforproposal = {
-              id: 3,
+              id: uuidv4(),
               name: 'Request for Proposal',
-              file: response.data.request_for_proposal,
+              path: response.data.request_for_proposal,
             }
             if (response.data.award_of_contract) {
               this.reports.push(awardofcontract)
@@ -481,6 +430,15 @@ export default {
             if (response.data.request_for_proposal) {
               this.reports.push(requestforproposal)
             }
+            
+            response.data.correspondents.forEach((file, index) => {
+              this.correspondents.push({
+                id: file.id,
+                name: `Correspondent (${index + 1})`,
+                path: file.corespondent_path,
+              })
+            })
+
           }
         }
       } catch (error) {
