@@ -400,10 +400,8 @@ export default {
     },
 
     getDelivarbleTax(deliverable) {
-      return (
-        Number(deliverable.vat_nhil_get_fund || 0) +
-        Number(deliverable.with_holding_tax || 0)
-      )
+      const total = Number(deliverable.vat_nhil_get_fund || 0) + Number(deliverable.with_holding_tax || 0)
+      return total.toFixed(2)
     },
 
     getSumOfProfessionalFees() {
@@ -1373,6 +1371,7 @@ export default {
                         id="input-1"
                         v-model="contractForm.contract_amount_profession_fees"
                         type="number"
+                        step="0.001"
                         required
                         placeholder="Professional Fees"
                         @blur="saveProjectData(false)"
@@ -1390,6 +1389,7 @@ export default {
                           id="input-1"
                           v-model="contractForm.contract_amount_reimbursable"
                           type="number"
+                          step="0.001"
                           required
                           placeholder="Reimbursable"
                           @blur="saveProjectData(false)"
@@ -1407,6 +1407,7 @@ export default {
                           id="input-1"
                           v-model="contractForm.contract_amount_tax_amount"
                           type="number"
+                          step="0.001"
                           required
                           placeholder="Tax"
                           @blur="saveProjectData(false)"
@@ -1442,6 +1443,7 @@ export default {
                             id="input-1"
                             v-model="deliverable.deliverable_professional_fees"
                             type="number"
+                            step="0.001"
                             required
                             placeholder="Professional Fees"
                             @blur="
@@ -1468,6 +1470,7 @@ export default {
                           id="input-1"
                           v-model="contractForm.expenditure_reimbursable"
                           type="number"
+                          step="0.001"
                           required
                           placeholder="Reimbursable"
                           @blur="saveProjectData(false)"
@@ -1485,6 +1488,7 @@ export default {
                           id="input-1"
                           v-model="contractForm.expenditure_finders_fee"
                           type="number"
+                          step="0.001"
                           required
                           placeholder="Finder's Fee"
                           @blur="saveProjectData(false)"
@@ -1501,6 +1505,7 @@ export default {
                           id="input-1"
                           v-model="contractForm.expenditure_miscellaneous"
                           type="number"
+                          step="0.001"
                           required
                           placeholder="Miscellaneous"
                           @blur="saveProjectData(false)"
@@ -1541,6 +1546,7 @@ export default {
                               id="input-1"
                               v-model="deliverable.vat_nhil_get_fund"
                               type="number"
+                              step="0.001"
                               required
                               placeholder="VAT/NHIL/GETFUND"
                               @blur="
@@ -1563,6 +1569,7 @@ export default {
                               id="input-1"
                               v-model="deliverable.with_holding_tax"
                               type="number"
+                              step="0.001"
                               required
                               placeholder="Witholding Tax"
                               @blur="
@@ -1607,6 +1614,7 @@ export default {
                               id="input-1"
                               v-model="deliverable.deliverable_fee_amount_paid"
                               type="number"
+                              step="0.001"
                               required
                               placeholder="Deliverable Fee"
                               @blur="
@@ -1630,6 +1638,7 @@ export default {
                               id="input-1"
                               v-model="deliverable.amount_paid_percentage"
                               type="text"
+                              step="0.001"
                               required
                               placeholder="%"
                               @blur="
@@ -1666,6 +1675,7 @@ export default {
                         id="input-1"
                         v-model="contractForm.withholding_tax"
                         type="number"
+                        step="0.001"
                         required
                         placeholder="Withholding Tax"
                         @blur="saveProjectData(false)"
