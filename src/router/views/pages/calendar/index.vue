@@ -29,16 +29,38 @@ export default {
           active: true,
         },
       ],
-      calendarWeekends: true,
-      calendarPlugins: [
-        dayGridPlugin,
-        timeGridPlugin,
-        interactionPlugin,
-        bootstrapPlugin,
-        listPlugin,
-      ],
-      themeSystem: 'bootstrap',
-      calendarEvents: [],
+      calendarOptions: {
+        initialView: 'dayGridMonth',
+        eventTimeFormat: {
+          hour: 'numeric',
+          minute: '2-digit',
+          meridiem: 'short',
+        },
+        weekends: true,
+        events: [],
+        plugins: [
+          dayGridPlugin,
+          timeGridPlugin,
+          interactionPlugin,
+          bootstrapPlugin,
+          listPlugin,
+        ],
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+        },
+        'button-text': {
+          today: 'Today',
+          month: 'Month',
+          week: 'Week',
+          day: 'Day',
+          list: 'List',
+          prev: 'Prev',
+          next: 'Next',
+        },
+        // themeSystem: 'bootstrap',
+      },
       createModal: false,
       showmodal: false,
       eventModal: false,
@@ -131,7 +153,10 @@ export default {
                     : `${color}-secondary`,
               }
             })
-          this.calendarEvents = [...this.calendarEvents, ...requestedLeaves]
+          this.calendarOptions.events = [
+            ...this.calendarOptions.events,
+            ...requestedLeaves,
+          ]
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -161,7 +186,10 @@ export default {
               className: 'bg-danger text-white',
             }
           })
-          this.calendarEvents = [...this.calendarEvents, ...vEvents]
+          this.calendarOptions.events = [
+            ...this.calendarOptions.events,
+            ...vEvents,
+          ]
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -191,7 +219,7 @@ export default {
           const vReviewTasks = reviewTask.map((item) => {
             return {
               id: `review-task-${item.id}`,
-              display:'list-item',
+              display: 'list-item',
               title: item.name,
               url: `/project/task/${item.id}/details?hasSubTask=${item.has_subtask}&subtask=false`,
               start: isDateAfter(item.start_date, item.end_date)
@@ -199,14 +227,13 @@ export default {
                 : item.start_date,
               end: this.formateEndDate(item.end_date),
               editable: false,
-              className: 'bg-info text-white',
             }
           })
 
           const vSubTaskReview = reviewSubTask.map((item) => {
             return {
               id: `review-subtask-${item.id}`,
-              display:'list-item',
+              display: 'list-item',
               title: item.name,
               url: `/project/task/${item.id}/details?hasSubTask=false&subtask=true`,
               start: isDateAfter(item.start_date, item.end_date)
@@ -223,7 +250,7 @@ export default {
               return (
                 {
                   id: `subtask-${item.id}`,
-                  display:'list-item',
+                  display: 'list-item',
                   title: `${item.name} ( ${item.status})`,
                   editable: false,
                   url: `/project/task/${item.id}/details?hasSubTask=false&subtask=true`,
@@ -241,7 +268,7 @@ export default {
             tasks.map((item) => {
               return {
                 id: `task-${item.id}`,
-                display:'list-item',
+                display: 'list-item',
                 title: `${item.name} ( ${item.status} )`,
                 editable: false,
                 url: `/project/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
@@ -258,7 +285,7 @@ export default {
             proposalTasks.map((item) => {
               return {
                 id: `proposal-task-${item.id}`,
-                display:'list-item',
+                display: 'list-item',
                 title: `${item.name} ( ${item.status} )`,
                 editable: false,
                 url: `/proposal/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
@@ -275,7 +302,7 @@ export default {
             proposalSubtask.map((item) => {
               return {
                 id: `proposal-subtask-${item.id}`,
-                display:'list-item',
+                display: 'list-item',
                 title: `${item.name} ( ${item.status} )`,
                 editable: false,
                 url: `/proposal/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
@@ -287,8 +314,8 @@ export default {
               }
             })
 
-          this.calendarEvents = [
-            ...this.calendarEvents,
+          this.calendarOptions.events = [
+            ...this.calendarOptions.events,
             ...vSubtasks,
             ...vTasks,
             ...vReviewTasks,
@@ -322,7 +349,7 @@ export default {
           } = response.data.event
           var date = new Date(endDate)
           date.setDate(date.getDate() + 1)
-          this.calendarEvents = this.calendarEvents.concat({
+          this.events = this.events.concat({
             id: `event-${id}`,
             title: name,
             start: startDate,
@@ -381,10 +408,10 @@ export default {
         )
 
         if (response) {
-          const index = this.calendarEvents.findIndex(
+          const index = this.events.findIndex(
             (event) => event.id === `event-${this.editableEvent.id}`
           )
-          this.$set(this.calendarEvents, index, {
+          this.$set(this.events, index, {
             id: `event-${this.editableEvent.id}`,
             title: this.editableEvent.name,
             start: this.editableEvent.start_date,
@@ -446,7 +473,7 @@ export default {
             )
 
             if (response) {
-              this.calendarEvents = this.calendarEvents.filter(
+              this.events = this.events.filter(
                 (x) => '' + x.id !== '' + this.edit.id
               )
               this.eventModal = false
@@ -499,7 +526,7 @@ export default {
     },
     selectUser(user) {
       this.selectedUser = user
-      this.calendarEvents = []
+      this.events = []
       this.getDashboardData()
       this.getEvents()
       this.getLeaveRequests()
@@ -585,32 +612,7 @@ export default {
         <div class="card">
           <div class="card-body">
             <div class="app-calendar">
-              <FullCalendar
-                ref="fullCalendar"
-                default-view="dayGridMonth"
-                :header="{
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                }"
-                :button-text="{
-                  today: 'Today',
-                  month: 'Month',
-                  week: 'Week',
-                  day: 'Day',
-                  list: 'List',
-                  prev: 'Prev',
-                  next: 'Next',
-                }"
-                :bootstrap-font-awesome="false"
-                :droppable="true"
-                :plugins="calendarPlugins"
-                :events="calendarEvents"
-                :theme-system="themeSystem"
-                :weekends="calendarWeekends"
-                @dateClick="dateClicked"
-                @eventClick="editEvent"
-              />
+              <FullCalendar ref="fullCalendar" :options="calendarOptions" />
             </div>
           </div>
         </div>
