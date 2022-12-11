@@ -18,10 +18,7 @@ export const slashDateFormate = (date) => {
 }
 
 
-export const dateDifference = (later, earlier) => {
-  
-  return differenceInCalendarDays(new Date(later), new Date(earlier))
-}
+export const dateDifference = (later, earlier) => differenceInCalendarDays(new Date(later), new Date(earlier))
 
 export const isDateAfter = (firstDate, secondDate) => {
   return isAfter(new Date(firstDate), new Date(secondDate));

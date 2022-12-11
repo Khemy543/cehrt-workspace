@@ -17,7 +17,7 @@ import {
   salesDonutChart,
   ordersData,
 } from './data'
-import { calendarFormat } from "@utils/format-date";
+import { calendarFormat } from '@utils/format-date'
 
 /**
  * Dashboard-1 Component
@@ -34,16 +34,41 @@ export default {
   },
   data() {
     return {
-      calendarWeekends: true,
-      calendarPlugins: [
-        dayGridPlugin,
-        timeGridPlugin,
-        interactionPlugin,
-        bootstrapPlugin,
-        listPlugin,
-      ],
-      themeSystem: 'bootstrap',
-      calendarEvents: [],
+      calendarOptions: {
+        initialView: 'dayGridMonth',
+        dayMaxEventRows: true,
+        eventTimeFormat: {
+          hour: 'numeric',
+          minute: '2-digit',
+          meridiem: 'short',
+        },
+        weekends: true,
+        events: [],
+        plugins: [
+          dayGridPlugin,
+          timeGridPlugin,
+          interactionPlugin,
+          bootstrapPlugin,
+          listPlugin,
+        ],
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+        },
+        'button-text': {
+          today: 'Today',
+          month: 'Month',
+          week: 'Week',
+          day: 'Day',
+          list: 'List',
+          prev: 'Prev',
+          next: 'Next',
+        },
+        eventClick: (e) => this.editEvent(e),
+        dateClick: (e) => this.dateClicked(e)
+        // themeSystem: 'bootstrap',
+      },
       createModal: false,
       showModal: false,
       eventModal: false,
@@ -92,7 +117,7 @@ export default {
         },
       ],
       projectData: [],
-      proposalData: []
+      proposalData: [],
     }
   },
   computed: {
@@ -102,21 +127,21 @@ export default {
   },
 
   created() {
-    this.getCompanyEvents();
+    this.getCompanyEvents()
     this.getDashData()
   },
   methods: {
     dateClicked(info) {
-      if(this.$store.state.auth.userDepartment.name !== 'Administration') {
-        return;
+      if (this.$store.state.auth.userDepartment.name !== 'Administration') {
+        return
       }
       this.newEventData = info
       this.showModal = true
       this.event.start_date = info.dateStr
     },
     editEvent(info) {
-      if(this.$store.state.auth.userDepartment.name !== 'Administration') {
-        return;
+      if (this.$store.state.auth.userDepartment.name !== 'Administration') {
+        return
       }
       if (info.event.startEditable) {
         this.edit = info.event
@@ -131,32 +156,50 @@ export default {
     },
     async getDashData() {
       try {
-        const response = await this.$http.get(`/fetch/dashboard-stats`);
+        const response = await this.$http.get(`/fetch/dashboard-stats`)
 
-        if(response) {
-          const { projects, tasks, project_list: projectList, proposal_list: proposalList, deliverable, total_task_assigned: totalTaskAssigned, proposal_report:proposalReport } = response.data
-          this.statChart[0].value = projects;
-          this.statChart[1].value = totalTaskAssigned;
-          this.statChart[2].value = tasks.find(item => item.status === 'completed') && tasks.find(item => item.status === 'completed').count || 0;
-          this.statChart[3].value = tasks.find(item => item.status === 'pending') && tasks.find(item => item.status === 'pending').count || 0;
-          this.projectData = projectList;
-          this.proposalData = proposalList;
+        if (response) {
+          const {
+            projects,
+            tasks,
+            project_list: projectList,
+            proposal_list: proposalList,
+            deliverable,
+            total_task_assigned: totalTaskAssigned,
+            proposal_report: proposalReport,
+          } = response.data
+          this.statChart[0].value = projects
+          this.statChart[1].value = totalTaskAssigned
+          this.statChart[2].value =
+            (tasks.find((item) => item.status === 'completed') &&
+              tasks.find((item) => item.status === 'completed').count) ||
+            0
+          this.statChart[3].value =
+            (tasks.find((item) => item.status === 'pending') &&
+              tasks.find((item) => item.status === 'pending').count) ||
+            0
+          this.projectData = projectList
+          this.proposalData = proposalList
           const vDeliverables = deliverable.map((item) => ({
             id: `deliverable${item.id}`,
             title: `${item.project_name} (${item.deliverable_name})`,
             start: item.deadline,
             editable: false,
             className: 'bg-danger text-white',
-            allDay: true
+            allDay: true,
           }))
           const vProjectTypes = proposalReport.map((item) => ({
             id: `projectType${item.id}`,
             title: `${item.proposal_title} (${item.proposal_type.report_title})`,
             start: calendarFormat(item.deadline),
             className: 'bg-success text-white',
-            allDay: true
+            allDay: true,
           }))
-          this.calendarEvents = [...this.calendarEvents, ...vDeliverables, ...vProjectTypes]
+          this.calendarOptions.events = [
+            ...this.calendarOptions.events,
+            ...vDeliverables,
+            ...vProjectTypes,
+          ]
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -180,10 +223,10 @@ export default {
               end: item.end_date,
               editable: false,
               className: 'bg-primary text-white',
-              allDay: false
+              allDay: false,
             }
           })
-          this.calendarEvents = [...this.calendarEvents, ...vEvents]
+          this.calendarOptions.events = [...this.calendarOptions.events, ...vEvents]
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -198,21 +241,23 @@ export default {
     async editSubmit() {
       try {
         const response = await this.$http.put(
-            `/update/${this.editableEvent.id}/company/event`,
-            this.editableEvent
+          `/update/${this.editableEvent.id}/company/event`,
+          this.editableEvent
         )
 
         if (response) {
-          const index = this.calendarEvents.findIndex(event => event.id === `event-${this.editableEvent.id}`);
+          const index = this.calendarOptions.events.findIndex(
+            (event) => event.id === `event-${this.editableEvent.id}`
+          )
 
-          this.$set(this.calendarEvents, index,  {
+          this.$set(this.calendarOptions.events, index, {
             id: `event-${this.editableEvent.id}`,
             title: this.editableEvent.name,
             start: this.editableEvent.start_date,
             end: this.editableEvent.end_date,
             editable: false,
             className: 'bg-primary text-white',
-            allDay: false
+            allDay: false,
           })
           this.eventModal = false
 
@@ -248,24 +293,27 @@ export default {
 
     async handleSubmit() {
       try {
-        const response = await this.$http.post(`/company/event/create`, this.event)
+        const response = await this.$http.post(
+          `/company/event/create`,
+          this.event
+        )
         if (response) {
           const {
             name,
             start_date: startDate,
             end_date: endDate,
             id,
-          } = response.data.event;
-          const date = new Date(endDate);
-          date.setDate(date.getDate() + 1);
-          this.calendarEvents = this.calendarEvents.concat({
+          } = response.data.event
+          const date = new Date(endDate)
+          date.setDate(date.getDate() + 1)
+          this.calendarOptions.events = this.calendarOptions.events.concat({
             id: `event-${id}`,
             title: name,
             start: startDate,
             end: date,
             editable: false,
             className: 'bg-danger text-white',
-            allDay: false
+            allDay: false,
           })
           this.event = {}
           this.$bvToast.toast('Event created successfully', {
@@ -311,12 +359,12 @@ export default {
           try {
             const deleteId = this.edit.id.split('-')[1]
             const response = await this.$http.delete(
-                `delete/${deleteId}/company/event`
+              `delete/${deleteId}/company/event`
             )
 
             if (response) {
-              this.calendarEvents = this.calendarEvents.filter(
-                  (x) => '' + x.id !== '' + this.edit.id
+              this.calendarOptions.events = this.calendarOptions.events.filter(
+                (x) => '' + x.id !== '' + this.edit.id
               )
               this.eventModal = false
               this.$bvToast.toast('Event deleted successfully', {
@@ -343,17 +391,17 @@ export default {
       this.event = {}
     },
 
-    createProjectUrl(id){
-      if(this.department.name === 'Administration') {
-        return `/admin/project/${id}/details`;
+    createProjectUrl(id) {
+      if (this.department.name === 'Administration') {
+        return `/admin/project/${id}/details`
       }
 
-      if(this.department.name === 'Finance') {
-        return `/finance/project/${id}/details`;
+      if (this.department.name === 'Finance') {
+        return `/finance/project/${id}/details`
       }
 
-      return `/project/details/${id}`;
-    }
+      return `/project/details/${id}`
+    },
   },
 }
 </script>
@@ -390,29 +438,7 @@ export default {
               <div style="height: 60vh; overflow:scroll;">
                 <FullCalendar
                   ref="fullCalendar"
-                  default-view="dayGridMonth"
-                  :header="{
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                  }"
-                  :button-text="{
-                    today: 'Today',
-                    month: 'Month',
-                    week: 'Week',
-                    day: 'Day',
-                    list: 'List',
-                    prev: 'Prev',
-                    next: 'Next',
-                  }"
-                  :bootstrap-font-awesome="false"
-                  :droppable="true"
-                  :plugins="calendarPlugins"
-                  :events="calendarEvents"
-                  :weekends="calendarWeekends"
-                  :theme-system="themeSystem"
-                  @dateClick="dateClicked"
-                  @eventClick="editEvent"
+                  :options="calendarOptions"
                 />
               </div>
             </div>
@@ -439,10 +465,7 @@ export default {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr
-                    v-for="(project, index) in projectData"
-                    :key="project.id"
-                  >
+                  <tr v-for="(project, index) in projectData" :key="project.id">
                     <td>{{ index + 1 }}</td>
                     <td>{{ project.name }}</td>
                     <td>{{ project.client }}</td>
@@ -459,9 +482,9 @@ export default {
                             `${project.status}` === 'completed',
                           'badge-soft-danger':
                             `${project.status}` === 'overdue',
-                           'badge-soft-primary':
+                          'badge-soft-primary':
                             `${project.status}` === 'active',
-                           'badge-soft-warning': `${project.status}` === 'hold',
+                          'badge-soft-warning': `${project.status}` === 'hold',
                         }"
                         >{{ project.status }}</span
                       >
@@ -495,13 +518,18 @@ export default {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="(proposal, index) in proposalData" :key="proposal.name">
+                  <tr
+                    v-for="(proposal, index) in proposalData"
+                    :key="proposal.name"
+                  >
                     <td>{{ index + 1 }}</td>
                     <td>{{ proposal.title }}</td>
                     <td>{{ proposal.client }}</td>
-                    <td>{{ proposal.project_type && proposal.project_type.name }}</td>
+                    <td>{{
+                      proposal.project_type && proposal.project_type.name
+                    }}</td>
                     <td>
-                       <router-link :to="`proposals/details/${proposal.id}`"
+                      <router-link :to="`proposals/details/${proposal.id}`"
                         >View</router-link
                       >
                     </td>
@@ -515,10 +543,10 @@ export default {
     </div>
 
     <b-modal
-        v-model="showModal"
-        title="Add New Event"
-        title-class="text-black font-18"
-        hide-footer
+      v-model="showModal"
+      title="Add New Event"
+      title-class="text-black font-18"
+      hide-footer
     >
       <form @submit.prevent="handleSubmit">
         <div class="row">
@@ -526,12 +554,12 @@ export default {
             <div class="form-group">
               <label for="name">Event Name</label>
               <input
-                  id="name"
-                  v-model="event.name"
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter name"
-                  required
+                id="name"
+                v-model="event.name"
+                type="text"
+                class="form-control"
+                placeholder="Enter name"
+                required
               />
             </div>
           </div>
@@ -541,12 +569,12 @@ export default {
                 <div class="form-group">
                   <label for="name">Start Date</label>
                   <input
-                      id="name"
-                      v-model="event.start_date"
-                      type="datetime-local"
-                      class="form-control"
-                      placeholder="Enter start date"
-                      required
+                    id="name"
+                    v-model="event.start_date"
+                    type="datetime-local"
+                    class="form-control"
+                    placeholder="Enter start date"
+                    required
                   />
                 </div>
               </div>
@@ -554,11 +582,11 @@ export default {
                 <div class="form-group">
                   <label for="name">End Date</label>
                   <input
-                      id="name"
-                      v-model="event.end_date"
-                      type="datetime-local"
-                      class="form-control"
-                      placeholder="Enter end date"
+                    id="name"
+                    v-model="event.end_date"
+                    type="datetime-local"
+                    class="form-control"
+                    placeholder="Enter end date"
                   />
                 </div>
               </div>
@@ -569,7 +597,7 @@ export default {
         <div class="text-right">
           <button type="submit" class="btn btn-success">Save</button>
           <b-button class="ml-1" variant="light" @click="hideModal"
-          >Close</b-button
+            >Close</b-button
           >
         </div>
       </form>
@@ -577,10 +605,10 @@ export default {
 
     <!-- Edit Modal -->
     <b-modal
-        v-model="eventModal"
-        title="Edit Event"
-        title-class="text-black font-18"
-        hide-footer
+      v-model="eventModal"
+      title="Edit Event"
+      title-class="text-black font-18"
+      hide-footer
     >
       <form @submit.prevent="editSubmit">
         <div class="row">
@@ -588,12 +616,12 @@ export default {
             <div class="form-group">
               <label for="name">Event Name</label>
               <input
-                  id="name"
-                  v-model="editableEvent.name"
-                  type="text"
-                  class="form-control"
-                  placeholder="Enter name"
-                  required
+                id="name"
+                v-model="editableEvent.name"
+                type="text"
+                class="form-control"
+                placeholder="Enter name"
+                required
               />
             </div>
           </div>
@@ -603,12 +631,12 @@ export default {
                 <div class="form-group">
                   <label for="name">Start Date</label>
                   <input
-                      id="name"
-                      v-model="editableEvent.start_date"
-                      type="datetime-local"
-                      class="form-control"
-                      placeholder="Enter start date"
-                      required
+                    id="name"
+                    v-model="editableEvent.start_date"
+                    type="datetime-local"
+                    class="form-control"
+                    placeholder="Enter start date"
+                    required
                   />
                 </div>
               </div>
@@ -616,11 +644,11 @@ export default {
                 <div class="form-group">
                   <label for="name">End Date</label>
                   <input
-                      id="name"
-                      v-model="editableEvent.end_date"
-                      type="datetime-local"
-                      class="form-control"
-                      placeholder="Enter end date"
+                    id="name"
+                    v-model="editableEvent.end_date"
+                    type="datetime-local"
+                    class="form-control"
+                    placeholder="Enter end date"
                   />
                 </div>
               </div>
@@ -629,7 +657,7 @@ export default {
         </div>
         <div class="d-flex justify-content-between">
           <b-button type="button" variant="danger" @click="deleteEvent"
-          >Delete Event</b-button
+            >Delete Event</b-button
           >
           <button type="submit" class="btn btn-success">Save</button>
         </div>

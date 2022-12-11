@@ -30,16 +30,27 @@ export default {
           active: true,
         },
       ],
-      calendarWeekends: true,
-      calendarPlugins: [
-        dayGridPlugin,
-        timeGridPlugin,
-        interactionPlugin,
-        bootstrapPlugin,
-        listPlugin,
-      ],
-      themeSystem: 'bootstrap',
-      calendarEvents: [],
+      calendarOptions: {
+        initialView: 'dayGridMonth',
+        dayMaxEventRows: true,
+        eventTimeFormat: {
+          hour: 'numeric',
+          minute: '2-digit',
+          meridiem: 'short',
+        },
+        weekends: true,
+        events: [],
+        plugins: [
+          dayGridPlugin,
+          timeGridPlugin,
+          interactionPlugin,
+          bootstrapPlugin,
+          listPlugin,
+        ],
+        // themeSystem: 'bootstrap',
+      },
+      
+      // themeSystem: 'bootstrap',
       event: {},
     }
   },
@@ -94,7 +105,7 @@ export default {
                 ? 'bg-soft-warning text-warning'
                 : 'bg-soft-secondary text-secondary',
           }
-          this.calendarEvents = [...this.calendarEvents, ...[event]]
+          this.calendarOptions.events = [...this.calendarOptions.events, ...[event]]
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -199,28 +210,7 @@ export default {
             <div class="app-calendar">
               <FullCalendar
                 ref="fullCalendar"
-                default-view="dayGridMonth"
-                :header="{
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                }"
-                :button-text="{
-                  today: 'Today',
-                  month: 'Month',
-                  week: 'Week',
-                  day: 'Day',
-                  list: 'List',
-                  prev: 'Prev',
-                  next: 'Next',
-                }"
-                :bootstrap-font-awesome="false"
-                :editable="true"
-                :droppable="true"
-                :plugins="calendarPlugins"
-                :events="calendarEvents"
-                :weekends="calendarWeekends"
-                :theme-system="themeSystem"
+                :options="calendarOptions"
               />
             </div>
           </div>

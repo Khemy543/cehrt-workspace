@@ -92,10 +92,10 @@ export default {
         })
 
         if (respoonse) {
-          this.workFlows.push(respoonse.data.workflow)
+          this.projectTypes.push(respoonse.data.projectType)
           this.show = false
           this.vloading = false;
-          this.$bvToast.toast('Work flow created successfully', {
+          this.$bvToast.toast('Project type created successfully', {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
@@ -343,7 +343,6 @@ export default {
       :value="show"
       :project-type="projectType"
       :form-title="formTitle"
-      :loading="vloading"
       @input="show = $event"
     />
 

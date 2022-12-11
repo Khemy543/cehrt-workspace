@@ -31,16 +31,41 @@ export default {
           active: true,
         },
       ],
-      calendarWeekends: true,
-      calendarPlugins: [
-        dayGridPlugin,
-        timeGridPlugin,
-        interactionPlugin,
-        bootstrapPlugin,
-        listPlugin,
-      ],
-      themeSystem: 'bootstrap',
-      calendarEvents: [],
+      calendarOptions: {
+        initialView: 'dayGridMonth',
+        dayMaxEventRows: true,
+        eventTimeFormat: {
+          hour: 'numeric',
+          minute: '2-digit',
+          meridiem: 'short',
+        },
+        weekends: true,
+        events: [],
+        plugins: [
+          dayGridPlugin,
+          timeGridPlugin,
+          interactionPlugin,
+          bootstrapPlugin,
+          listPlugin,
+        ],
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
+        },
+        'button-text': {
+          today: 'Today',
+          month: 'Month',
+          week: 'Week',
+          day: 'Day',
+          list: 'List',
+          prev: 'Prev',
+          next: 'Next',
+        },
+        eventClick: (e) => this.editEvent(e),
+        dateClick: (e) => this.dateClicked(e)
+        // themeSystem: 'bootstrap',
+      },
       userLeaveRequest: [],
       createModal: false,
       showmodal: false,
@@ -179,7 +204,7 @@ export default {
                     : 'bg-soft-secondary text-secondary',
               }
             })
-          this.calendarEvents = [...this.calendarEvents, ...requestedLeaves]
+          this.calendarOptions.events = [...this.calendarOptions.events, ...requestedLeaves]
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -222,7 +247,7 @@ export default {
             }
           })
 
-          this.calendarEvents = [...this.calendarEvents, ...approvedLeaves]
+          this.calendarOptions.events = [...this.calendarOptions.events, ...approvedLeaves]
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -250,7 +275,7 @@ export default {
             reason,
             status,
           } = response.data.leave
-          this.calendarEvents = this.calendarEvents.concat({
+          this.calendarOptions.events = this.calendarOptions.events.concat({
             id,
             title: `${user} (${type})`,
             start: dateFormate(startDate),
@@ -320,11 +345,11 @@ export default {
         )
 
         if (response) {
-          const index = this.calendarEvents.findIndex(
+          const index = this.calendarOptions.events.findIndex(
             (event) => event.id === this.editevent.id
           )
           const { type } = this.editevent
-          this.$set(this.calendarEvents, index, {
+          this.$set(this.calendarOptions.events, index, {
             id: this.editevent.id,
             title: this.editevent.name,
             start: this.editevent.start_date,
@@ -398,7 +423,7 @@ export default {
             )
 
             if (response) {
-              this.calendarEvents = this.calendarEvents.filter(
+              this.calendarOptions.events = this.calendarOptions.events.filter(
                 (x) => '' + x.id !== '' + this.edit.id
               )
               this.eventModal = false
@@ -434,7 +459,7 @@ export default {
     editEvent(info) {
       if (info.event.startEditable) {
         this.edit = info.event
-        const index = this.calendarEvents.findIndex(
+        const index = this.calendarOptions.events.findIndex(
           (item) => item.id === Number(this.edit.id)
         )
         this.editevent = {
@@ -442,7 +467,7 @@ export default {
           type: this.edit.title.split('(')[1].split(' ')[0],
           start_date: dateFormate(this.edit.start),
           end_date: this.edit.end && dateFormate(this.edit.end) || "",
-          reason: this.calendarEvents[index].reason,
+          reason: this.calendarOptions.events[index].reason,
         }
         this.eventModal = true
       }
@@ -570,30 +595,7 @@ export default {
             <div class="app-calendar">
               <FullCalendar
                 ref="fullCalendar"
-                default-view="dayGridMonth"
-                :header="{
-                  left: 'prev,next today',
-                  center: 'title',
-                  right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-                }"
-                :button-text="{
-                  today: 'Today',
-                  month: 'Month',
-                  week: 'Week',
-                  day: 'Day',
-                  list: 'List',
-                  prev: 'Prev',
-                  next: 'Next',
-                }"
-                :bootstrap-font-awesome="false"
-                :editable="true"
-                :droppable="true"
-                :plugins="calendarPlugins"
-                :events="calendarEvents"
-                :theme-system="themeSystem"
-                :weekends="calendarWeekends"
-                @dateClick="dateClicked"
-                @eventClick="editEvent"
+                :options="calendarOptions"
               />
             </div>
           </div>

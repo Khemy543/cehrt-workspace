@@ -4,10 +4,6 @@
     :title="formTitle"
     title-class="font-18"
     hide-footer
-    :cancel-disabled="loading"
-    :hide-header-close="loading"
-    :no-close-on-backdrop="loading"
-    :no-close-on-esc="loading"
   >
     <form @submit.prevent="action(form)">
       <b-form-group id="input-group-1" label="Title" label-for="input-1">
