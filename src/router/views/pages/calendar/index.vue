@@ -5,7 +5,11 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import bootstrapPlugin from '@fullcalendar/bootstrap'
 import listPlugin from '@fullcalendar/list'
-import { calendarFormat, isDateAfter } from '@src/utils/format-date.js'
+import {
+  calendarFormat,
+  isDateAfter,
+  formateDate,
+} from '@src/utils/format-date.js'
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
@@ -56,6 +60,14 @@ export default {
       },
       users: [],
       selectedUser: {},
+      detailModal: false,
+      subtasks: [],
+      tasks: [],
+      reviewTask: [],
+      reviewSubTask: [],
+      proposalTasks: [],
+      proposalSubtask: [],
+      task: {},
     }
   },
   created() {
@@ -65,6 +77,7 @@ export default {
     this.getUsers()
   },
   methods: {
+    formateDate,
     formateEndDate(date) {
       var newdate = new Date(date)
       newdate.setDate(newdate.getDate() + 1)
@@ -188,32 +201,41 @@ export default {
             proposal_report_tasks: proposalTasks,
             proposal_report_subtask: proposalSubtask,
           } = response.data
+
+          this.reviewTask = reviewTask
+          this.reviewSubTask = reviewSubTask
+          this.proposalTasks = proposalTasks
+          this.proposalSubtask = proposalSubtask
+          this.subtasks = subtasks
+          this.tasks = tasks
+
           const vReviewTasks = reviewTask.map((item) => {
             return {
               id: `review-task-${item.id}`,
-              display:'list-item',
+              display: 'list-item',
               title: item.name,
-              url: `/project/task/${item.id}/details?hasSubTask=${item.has_subtask}&subtask=false`,
+              // url: `/project/task/${item.id}/details?hasSubTask=${item.has_subtask}&subtask=false`,
               start: isDateAfter(item.start_date, item.end_date)
                 ? this.formateEndDate(item.end_date)
                 : item.start_date,
               end: this.formateEndDate(item.end_date),
-              editable: false,
+              editable: true,
               className: 'bg-info text-white',
+              mydata: item,
             }
           })
 
           const vSubTaskReview = reviewSubTask.map((item) => {
             return {
               id: `review-subtask-${item.id}`,
-              display:'list-item',
+              display: 'list-item',
               title: item.name,
-              url: `/project/task/${item.id}/details?hasSubTask=false&subtask=true`,
+              // url: `/project/task/${item.id}/details?hasSubTask=false&subtask=true`,
               start: isDateAfter(item.start_date, item.end_date)
                 ? this.formateEndDate(item.end_date)
                 : item.start_date,
               end: this.formateEndDate(item.end_date),
-              editable: false,
+              editable: true,
               className: 'bg-info text-white',
             }
           })
@@ -222,11 +244,11 @@ export default {
             subtasks.map((item) => {
               return (
                 {
-                  id: `subtask-${item.id}`,
-                  display:'list-item',
+                  id: `user-subtask-${item.id}`,
+                  display: 'list-item',
                   title: `${item.name} ( ${item.status})`,
-                  editable: false,
-                  url: `/project/task/${item.id}/details?hasSubTask=false&subtask=true`,
+                  editable: true,
+                  // url: `/project/task/${item.id}/details?hasSubTask=false&subtask=true`,
                   start: isDateAfter(item.start_date, item.end_date)
                     ? this.formateEndDate(item.end_date)
                     : item.start_date,
@@ -240,11 +262,11 @@ export default {
             tasks &&
             tasks.map((item) => {
               return {
-                id: `task-${item.id}`,
-                display:'list-item',
+                id: `user-task-${item.id}`,
+                display: 'list-item',
                 title: `${item.name} ( ${item.status} )`,
-                editable: false,
-                url: `/project/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
+                editable: true,
+                // url: `/project/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
                 start: isDateAfter(item.start_date, item.end_date)
                   ? this.formateEndDate(item.end_date)
                   : item.start_date,
@@ -258,10 +280,10 @@ export default {
             proposalTasks.map((item) => {
               return {
                 id: `proposal-task-${item.id}`,
-                display:'list-item',
+                display: 'list-item',
                 title: `${item.name} ( ${item.status} )`,
-                editable: false,
-                url: `/proposal/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
+                editable: true,
+                // url: `/proposal/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
                 start: isDateAfter(item.start_date, item.end_date)
                   ? this.formateEndDate(item.end_date)
                   : item.start_date,
@@ -275,10 +297,10 @@ export default {
             proposalSubtask.map((item) => {
               return {
                 id: `proposal-subtask-${item.id}`,
-                display:'list-item',
+                display: 'list-item',
                 title: `${item.name} ( ${item.status} )`,
-                editable: false,
-                url: `/proposal/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
+                editable: true,
+                // url: `/proposal/task/${item.id}/details?hasSubTask=${item.hasSubtask}&subtask=false`,
                 start: isDateAfter(item.start_date, item.end_date)
                   ? this.formateEndDate(item.end_date)
                   : item.start_date,
@@ -481,6 +503,52 @@ export default {
      */
     editEvent(info) {
       if (info.event.startEditable) {
+        if (info.event.id.includes('task')) {
+          const eventId = info.event.id.split('-')[2]
+
+          if (info.event.id.includes('review-task')) {
+            this.task = this.reviewTask.find(
+              (task) => task.id === Number(eventId)
+            )
+            this.task.url = `/project/task/${this.task.id}/details?hasSubTask=${this.task.has_subtask}&subtask=false`
+          }
+
+          if (info.event.id.includes('user-task')) {
+            this.task = this.tasks.find((task) => task.id === Number(eventId));
+            this.task.url = `/project/task/${this.task.id}/details?hasSubTask=${this.task.hasSubtask}&subtask=false`;
+          }
+
+          if (info.event.id.includes('user-subtask')) {
+            this.task = this.subtasks.find(
+              (task) => task.id === Number(eventId)
+            )
+            this.task.url = `/project/task/${this.task.id}/details?hasSubTask=false&subtask=true`;
+          }
+
+          if (info.event.id.includes('review-subtask')) {
+            this.task = this.reviewSubTask.find(
+              (task) => task.id === Number(eventId)
+            )
+            this.task.url = `/project/task/${this.task.id}/details?hasSubTask=false&subtask=true`;
+          }
+
+          if (info.event.id.includes('proposal-task')) {
+            this.task = this.proposalTasks.find(
+              (task) => task.id === Number(eventId)
+            );
+            this.task.url = `/proposal/task/${this.task.id}/details?hasSubTask=${this.task.hasSubtask}&subtask=false`;
+          }
+
+          if (info.event.id.includes('proposal-subtask')) {
+            this.task = this.proposalSubtask.find(
+              (task) => task.id === Number(eventId)
+            );
+            this.task.url = `/proposal/task/${this.task.id}/details?hasSubTask=${this.task.hasSubtask}&subtask=false`;
+          }
+
+          this.detailModal = true
+          return
+        }
         this.edit = info.event
         this.editableEvent = {
           id: this.edit.id.split('-')[1],
@@ -608,6 +676,8 @@ export default {
                 :events="calendarEvents"
                 :theme-system="themeSystem"
                 :weekends="calendarWeekends"
+                :displayEventTime="false"
+                eventDisplay="list-item"
                 @dateClick="dateClicked"
                 @eventClick="editEvent"
               />
@@ -677,6 +747,108 @@ export default {
       </form>
     </b-modal>
 
+    <!-- details modal -->
+    <b-modal v-model="detailModal" title="Task Details" hide-footer>
+      <h4 style="font-size: 20px;">{{ task.project && task.project.name }}</h4>
+      <p>{{ task.deliverable && task.deliverable.name }}</p>
+
+      <hr />
+
+      <div class="d-flex justify-content-between items-align-center mb-2">
+        <h6 class="mr-5" style="color: #848484;">Task</h6>
+        <h6>{{ task.name }}</h6>
+      </div>
+
+      <div class="d-flex justify-content-between items-align-center mb-2">
+        <h6 style="color: #848484;">Assignee</h6>
+        <div
+          :id="`test-assignee`"
+          class="rounded-circle default-avatar member-overlap-item d-flex justify-content-center align-items-center"
+          style="cursor: pointer;"
+        >
+          <b-tooltip
+            :target="`test-assignee`"
+            triggers="hover"
+            placement="bottom"
+            >Kwabena Mamphey</b-tooltip
+          >
+          KM
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between items-align-center mb-2">
+        <h6 style="color: #848484;">Reviewer</h6>
+        <div
+          :id="`test-assignee`"
+          class="rounded-circle default-avatar member-overlap-item d-flex justify-content-center align-items-center"
+          style="cursor: pointer;"
+        >
+          <b-tooltip
+            :target="`test-assignee`"
+            triggers="hover"
+            placement="bottom"
+            >Kwabena Mamphey</b-tooltip
+          >
+          KM
+        </div>
+      </div>
+
+      <div class="d-flex justify-content-between items-align-center mb-2">
+        <h6 style="color: #848484;">Priority</h6>
+        <div
+          style="align-self: start; margin-top: 10px;"
+          class="badge"
+          :class="
+            task.priority === 'high'
+              ? 'badge-danger'
+              : task.priority === 'medium'
+              ? 'badge-warning'
+              : ''
+          "
+          >{{ task.priority }}</div
+        >
+      </div>
+
+      <div class="d-flex justify-content-between items-align-center mb-2">
+        <h6 style="color: #848484;">Status</h6>
+        <div
+          style="align-self: start; margin-top: 10px;"
+          class="badge"
+          :class="
+            task.status === 'active'
+              ? 'badge-success'
+              : task.status === 'pending'
+              ? 'badge-warinig'
+              : task.status === 'hold'
+              ? 'badge-danger'
+              : 'badge-primary'
+          "
+          >{{
+            task.status === 'active'
+              ? 'On going'
+              : task.status === 'pending'
+              ? 'Pending'
+              : task.status === 'hold'
+              ? 'On hold'
+              : task.status && task.status.split('-').join(' ')
+          }}</div
+        >
+      </div>
+
+      <div class="d-flex justify-content-between items-align-center mb-2">
+        <h6 style="color: #848484;">Due Date</h6>
+        <h6
+          ><i class="uil-calendar-slash mr-1 text-danger"></i
+          >{{ task.end_date && formateDate(task.end_date) }}</h6
+        >
+      </div>
+
+      <hr />
+      <div class="d-flex justify-content-end">
+        <router-link type="submit" class="btn btn-primary" :to="task.url">View Task</router-link>
+      </div>
+    </b-modal>
+
     <!-- Edit Modal -->
     <b-modal
       v-model="eventModal"
@@ -739,3 +911,17 @@ export default {
     </b-modal>
   </Layout>
 </template>
+<style scoped>
+.default-avatar {
+  background-color: #5369f8;
+  font-weight: 500;
+  color: #fff;
+  font-size: 14px;
+}
+
+.default-avatar,
+.member-overlap-item {
+  height: 36px;
+  width: 36px;
+}
+</style>
