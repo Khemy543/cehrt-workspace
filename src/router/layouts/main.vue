@@ -2,15 +2,17 @@
 import { layoutComputed, authMethods } from '@state/helpers'
 import Topbar from '@components/topbar'
 import SideBar from '@components/side-bar'
+import AnnouncementBar from '@/src/components/AnnouncementBar.vue'
 /* import Footer from '@components/footer' */
 
 export default {
-  components: { Topbar, SideBar },
+  components: { Topbar, SideBar, AnnouncementBar },
   data() {
     return {
       isMenuCondensed: false,
       isMobileMenuOpened: false,
       form: {},
+      width: -350,
     }
   },
   computed: {
@@ -19,13 +21,13 @@ export default {
       return this.$store ? this.$store.state.auth.currentUser : {} || {}
     },
     show() {
-      return this.user.must_change_password ? this.user.must_change_password === 1 : false
+      return this.user.must_change_password
+        ? this.user.must_change_password === 1
+        : false
     },
-    department(){
-        return this.$store
-        ? this.$store.state.auth.userDepartment
-        : {} || {}
-    }
+    department() {
+      return this.$store ? this.$store.state.auth.userDepartment : {} || {}
+    },
   },
   created: () => {
     document.body.classList.remove('authentication-bg')
@@ -43,6 +45,9 @@ export default {
   },
   methods: {
     ...authMethods,
+    setWidth(value) {
+      this.width = value
+    },
     toggleMenu() {
       document.body.classList.toggle('left-side-menu-condensed')
       this.isMenuCondensed = !this.isMenuCondensed
@@ -62,17 +67,17 @@ export default {
       document.body.classList.remove('right-bar-enabled')
     },
     tryChangePassword() {
-		const { newPassword, confirmPassword} = this.form;
+      const { newPassword, confirmPassword } = this.form
 
-		if(newPassword !== confirmPassword) {
-			return this.$bvToast.toast('Passwords do not match!', {
-            title: 'Error',
-            autoHideDelay: 5000,
-            appendToast: false,
-            variant: 'danger',
-          })
-		}
-	
+      if (newPassword !== confirmPassword) {
+        return this.$bvToast.toast('Passwords do not match!', {
+          title: 'Error',
+          autoHideDelay: 5000,
+          appendToast: false,
+          variant: 'danger',
+        })
+      }
+
       return this.changePassword({ ...this.form, firstTime: true })
         .then((data) => {
           this.$bvToast.toast('Password changed successfully', {
@@ -80,7 +85,7 @@ export default {
             autoHideDelay: 5000,
             appendToast: false,
             variant: 'success',
-          });
+          })
 
           setTimeout(() => {
             window.location.reload()
@@ -101,12 +106,19 @@ export default {
 
 <template>
   <div id="wrapper">
-    <Topbar :user="user" :is-menu-opened="isMobileMenuOpened" :department="department"/>
+    <Topbar
+      :user="user"
+      :is-menu-opened="isMobileMenuOpened"
+      :department="department"
+      :width="width"
+      @set-width="setWidth"
+    />
     <SideBar
       :is-condensed="isMenuCondensed"
       :user="user"
       :department="department"
     />
+    <AnnouncementBar @set-width="setWidth" :width="width" />
     <b-modal
       :visible="show"
       title="Change Password"

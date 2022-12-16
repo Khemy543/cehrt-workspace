@@ -56,6 +56,10 @@ th.fc-day-header {
   }
 }
 
+.fc .fc-popover {
+  z-index: 100 !important;
+}
+
 .fc {
   th.fc-widget-header {
     padding: 10px 0;

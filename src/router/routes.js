@@ -466,6 +466,17 @@ const leaveRequestRoutes = [
   },
 ] */
 
+const announcementRoutes = [
+  {
+    path: '/admin/announcements',
+    name: "announcements",
+    meta: { authRequired: true },
+    icon: "volume-2",
+    department: "Administration",
+    component: () => lazyLoadView(import('@views/pages/administrator/announcement/index.vue'))
+  }
+]
+
 const financeRoutes = [
   {
     path: '/finance/project',
@@ -501,7 +512,8 @@ const appsRoutes = [
   ...recycleRoutes,
   // ...projectPlanRoutes,
   // ...trainingRouts,
-  ...financeRoutes
+  ...financeRoutes,
+  ...announcementRoutes
 ]
 
 // pages

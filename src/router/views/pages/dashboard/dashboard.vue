@@ -11,17 +11,8 @@ import listPlugin from '@fullcalendar/list'
 
 import StatChart from '@components/widget-stat-chart'
 
-import {
-  revenueAreaChart,
-  targetsBarChart,
-  salesDonutChart,
-  ordersData,
-} from './data'
-import { calendarFormat } from '@utils/format-date'
+import { calendarFormat, formateDateTime } from '@utils/format-date'
 
-/**
- * Dashboard-1 Component
- */
 export default {
   page: {
     title: 'Dashboard',
@@ -72,7 +63,6 @@ export default {
       createModal: false,
       showModal: false,
       eventModal: false,
-      categories: [],
       submitted: false,
       submit: false,
       newEventData: {},
@@ -80,10 +70,6 @@ export default {
       deleteId: {},
       event: {},
       editableEvent: {},
-      revenueAreaChart: revenueAreaChart,
-      targetsBarChart: targetsBarChart,
-      salesDonutChart: salesDonutChart,
-      ordersData: ordersData,
 
       maxHeight: '328px',
       statChart: [
@@ -118,6 +104,11 @@ export default {
       ],
       projectData: [],
       proposalData: [],
+      companyEvents: [],
+      reports: [],
+      deliverables: [],
+      viewDetailsModal: false,
+      eventObject: {}
     }
   },
   computed: {
@@ -131,6 +122,7 @@ export default {
     this.getDashData()
   },
   methods: {
+    formateDateTime,
     dateClicked(info) {
       if (this.$store.state.auth.userDepartment.name !== 'Administration') {
         return
@@ -141,6 +133,28 @@ export default {
     },
     editEvent(info) {
       if (this.$store.state.auth.userDepartment.name !== 'Administration') {
+        const eventId = info.event.id.split('-')[1]
+        if(info.event.startEditable) {
+          if(info.event.id.includes('event')) {
+            const eventObject = this.companyEvents.find((vevent) => Number(vevent.id) === Number(eventId));
+            this.eventObject = eventObject;
+            this.viewDetailsModal = true;
+          }
+
+          if(info.event.id.includes('deliverable')) {
+            const eventObject = this.deliverables.find(dev => Number(dev.id) === Number(eventId));
+            this.eventObject = eventObject;
+            this.eventObject.url = ''
+            this.viewDetailsModal = true
+          }
+
+          if(info.event.id.includes('report')) {
+            const eventObject = this.reports.find((report) => Number(report.id) === Number(eventId));
+            this.eventObject = eventObject;
+            this.eventObject.url = ''
+            this.viewDetailsModal = true;
+          }
+        }
         return
       }
       if (info.event.startEditable) {
@@ -181,25 +195,29 @@ export default {
           this.projectData = projectList
           this.proposalData = proposalList
           const vDeliverables = deliverable.map((item) => ({
-            id: `deliverable${item.id}`,
+            id: `deliverable-${item.id}`,
             title: `${item.project_name} (${item.deliverable_name})`,
             start: item.deadline,
-            editable: false,
+            editable: true,
             className: 'bg-danger text-white',
             allDay: true,
           }))
-          const vProjectTypes = proposalReport.map((item) => ({
-            id: `projectType${item.id}`,
+          const vReports = proposalReport.map((item) => ({
+            id: `report-${item.id}`,
             title: `${item.proposal_title} (${item.proposal_type.report_title})`,
             start: calendarFormat(item.deadline),
             className: 'bg-success text-white',
             allDay: true,
+            editable: true
           }))
           this.calendarOptions.events = [
             ...this.calendarOptions.events,
             ...vDeliverables,
-            ...vProjectTypes,
-          ]
+            ...vReports,
+          ];
+
+          this.reports = proposalReport;
+          this.deliverables = deliverable;
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -221,12 +239,13 @@ export default {
               title: item.name,
               start: item.start_date,
               end: item.end_date,
-              editable: false,
+              editable: true,
               className: 'bg-primary text-white',
               allDay: false,
             }
           })
-          this.calendarOptions.events = [...this.calendarOptions.events, ...vEvents]
+          this.calendarOptions.events = [...this.calendarOptions.events, ...vEvents];
+          this.companyEvents = response.data;
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -601,6 +620,40 @@ export default {
           >
         </div>
       </form>
+    </b-modal>
+
+
+    <b-modal v-model="viewDetailsModal" title="Event Details" hide-footer>
+      <h4 style="font-size: 20px;">{{ eventObject.name || eventObject.project_name }}</h4>
+      <p>{{ eventObject.description || eventObject.deliverable_name }}</p>
+      <hr />
+
+      <div v-if="eventObject.start_date" class="d-flex justify-content-between items-align-center mb-2">
+        <h6 style="color: #848484;">Start Date</h6>
+        <h6
+          ><i class="uil-calender mr-1 text-success"></i
+          >{{ eventObject.start_date && formateDateTime(eventObject.start_date) }}</h6
+        >
+      </div>
+
+      <div class="d-flex justify-content-between items-align-center mb-2">
+        <h6 style="color: #848484;">Deadline</h6>
+        <h6 v-if="eventObject.end_date"
+          ><i class="uil-calendar-slash mr-1 text-danger"></i
+          >{{ eventObject.end_date && formateDateTime(eventObject.end_date) }}</h6
+        >
+        <h6 v-if="eventObject.deadline"
+          ><i class="uil-calendar-slash mr-1 text-danger"></i
+          >{{ eventObject.deadline && formateDateTime(eventObject.deadline) }}</h6
+        >
+      </div>
+
+      <hr />
+      <div class="d-flex justify-content-end">
+        <button type="submit" class="btn btn-primary" @click="viewDetailsModal = false"
+          >Close</button
+        >
+      </div>
     </b-modal>
 
     <!-- Edit Modal -->

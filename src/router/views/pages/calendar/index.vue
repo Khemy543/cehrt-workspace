@@ -107,6 +107,12 @@ export default {
       newdate.setDate(newdate.getDate() + 1)
       return newdate
     },
+    getInitials(name) {
+      return name && name
+        .match(/\b(\w)/g)
+        .join('')
+        .toUpperCase()
+    },
     async getUsers() {
       try {
         const response = await this.$http.get(`/fetch/all-staff`)
@@ -547,7 +553,7 @@ export default {
             this.task = this.reviewTask.find(
               (task) => task.id === Number(eventId)
             )
-            this.task.url = `/project/task/${this.task.id}/details?hasSubTask=${this.task.has_subtask}&subtask=false`
+            this.task.url = `/project/task/${this.task.id}/details?hasSubTask=${this.task.hasSubtask}&subtask=false`
           }
 
           if (info.event.id.includes('user-task')) {
@@ -761,7 +767,6 @@ export default {
     <b-modal v-model="detailModal" title="Task Details" hide-footer>
       <h4 style="font-size: 20px;">{{ task.project && task.project.name }}</h4>
       <p>{{ task.deliverable && task.deliverable.name }}</p>
-
       <hr />
 
       <div class="d-flex justify-content-between items-align-center mb-2">
@@ -780,9 +785,9 @@ export default {
             :target="`test-assignee`"
             triggers="hover"
             placement="bottom"
-            >Kwabena Mamphey</b-tooltip
+            >{{ task.assignee && task.assignee.name }}</b-tooltip
           >
-          KM
+          {{ getInitials(task.assignee && task.assignee.name) }}
         </div>
       </div>
 
@@ -797,9 +802,9 @@ export default {
             :target="`test-assignee`"
             triggers="hover"
             placement="bottom"
-            >Kwabena Mamphey</b-tooltip
+            >{{ task.reviewer && task.reviewer.name }}</b-tooltip
           >
-          KM
+          {{ getInitials(task.reviewer && task.reviewer.name) }}
         </div>
       </div>
 

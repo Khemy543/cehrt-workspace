@@ -1,5 +1,5 @@
 // https://date-fns.org/docs/format
-import { isAfter, addBusinessDays, differenceInCalendarDays, formatISO9075, format, differenceInBusinessDays } from 'date-fns'
+import { isAfter, addBusinessDays, differenceInCalendarDays, formatISO9075, format, differenceInBusinessDays, formatRFC7231 } from 'date-fns'
 
 export const dateFormate = (date) => {
   return formatISO9075(new Date(date), { representation: 'date' })
@@ -30,4 +30,8 @@ export const getAddedDate = (date, days) => {
 
 export const getDifferenceInBusinessDays = (later, earlier) => {
   return differenceInBusinessDays(new Date(later), new Date(earlier))
+}
+
+export const formateDateTime = (date) => {
+  return formatRFC7231(new Date(date))
 }
