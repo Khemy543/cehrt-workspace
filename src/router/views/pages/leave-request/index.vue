@@ -138,7 +138,7 @@ export default {
     totalSickLeave() {
       return this.userLeaveRequest
         .filter((evt) => evt.type === 'Sick' && evt.user === this.username)
-        .map((evt) => this.getDifference(evt.end, evt.start) + 1)
+        .map((evt) => this.getDifference(evt.end_date, evt.start_date) + 1)
         .reduce((accumlator, evt) => {
           return accumlator + evt
         }, 0)

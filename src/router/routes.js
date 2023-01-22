@@ -1,4 +1,4 @@
-import store from '@state/store';
+import store from '@state/store'
 
 // auth related routes
 const authRoutes = [
@@ -152,34 +152,65 @@ const libraryRoutes = [
     },
     children: [
       {
-        name: "projects-library",
-        path: "projects",
-        icon: "",
+        name: 'projects-library',
+        path: 'projects',
+        icon: '',
         component: () =>
-          lazyLoadView(import('@/src/router/views/pages/consulting/library/projects/projects.vue')),
+          lazyLoadView(
+            import(
+              '@/src/router/views/pages/consulting/library/projects/projects.vue'
+            )
+          ),
       },
       {
-        name: "projects-files-library",
-        path: "projects/:id/files",
+        name: 'projects-files-library',
+        path: 'projects/:id/files',
         invisible: true,
-        icon: "",
+        icon: '',
         component: () =>
-          lazyLoadView(import('@/src/router/views/pages/consulting/library/projects/files.vue')),
+          lazyLoadView(
+            import(
+              '@/src/router/views/pages/consulting/library/projects/files.vue'
+            )
+          ),
       },
       {
-        name: "Proposals",
-        path: "proposals-library",
-        icon: "",
+        name: 'Proposals',
+        path: 'proposals-library',
+        icon: '',
         component: () =>
-          lazyLoadView(import('@/src/router/views/pages/consulting/library/proposals/proposals.vue')),
+          lazyLoadView(
+            import(
+              '@/src/router/views/pages/consulting/library/proposals/proposals.vue'
+            )
+          ),
       },
       {
-        name: "proposals-files-library",
-        path: "proposal/:id/files",
+        name: 'proposals-files-library',
+        path: 'proposal/:id/files',
         invisible: true,
-        component:() => lazyLoadView(import('@/src/router/views/pages/consulting/library/proposals/files.vue'))
-      }
-    ]
+        component: () =>
+          lazyLoadView(
+            import(
+              '@/src/router/views/pages/consulting/library/proposals/files.vue'
+            )
+          ),
+      },
+      {
+        name: 'Resources',
+        path: 'resources',
+        icon: '',
+        meta: {
+          link: true,
+          href:
+            'https://onedrive.live.com/?id=EB3548181CF4DC64%211584&cid=EB3548181CF4DC64',
+        },
+        component: () =>
+          lazyLoadView(
+            import('@/src/router/views/pages/consulting/resources.vue')
+          ),
+      },
+    ],
   },
 ]
 
@@ -199,7 +230,6 @@ const workFlowRoutes = [
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
 ]
-
 
 const projectTypes = [
   {
@@ -224,8 +254,7 @@ const roles = [
     header: 'Setups',
     meta: { authRequired: true },
     // create a container component
-    component: () =>
-      lazyLoadView(import('@views/pages/consulting/roles.vue')),
+    component: () => lazyLoadView(import('@views/pages/consulting/roles.vue')),
     props: (route) => ({ user: store.state.auth.currentUser || {} }),
   },
 ]
@@ -269,7 +298,9 @@ const proposalRoutes = [
     name: 'Proposal Task List',
     meta: { authRequired: true },
     component: () =>
-      lazyLoadView(import('@views/pages/consulting/proposals/tasks/task-board')),
+      lazyLoadView(
+        import('@views/pages/consulting/proposals/tasks/task-board')
+      ),
   },
   {
     path: '/proposal/task/:id/details',
@@ -371,9 +402,10 @@ const adminProjectRoutes = [
   },
   {
     path: '/admin/project/:id/details',
-    name: "Projects Admin details",
+    name: 'Projects Admin details',
     meta: { authRequired: true },
-    component: () => lazyLoadView(import('@views/pages/administrator/project/details.vue')),
+    component: () =>
+      lazyLoadView(import('@views/pages/administrator/project/details.vue')),
   },
   {
     path: '/admin/proposal-management',
@@ -388,18 +420,20 @@ const adminProjectRoutes = [
   },
   {
     path: '/admin/proposals/:id/details',
-    name: "Proposal admin details",
+    name: 'Proposal admin details',
     meta: { authRequired: true },
-    component: () => lazyLoadView(import('@views/pages/administrator/proposals/details.vue'))
+    component: () =>
+      lazyLoadView(import('@views/pages/administrator/proposals/details.vue')),
   },
   {
-    path: "/admin/leave-report",
-    name: "Leave Report",
+    path: '/admin/leave-report',
+    name: 'Leave Report',
     meta: { authRequired: true },
     icon: 'book-open',
     department: 'Administration',
-    component: () => lazyLoadView(import('@views/pages/administrator/leave/index.vue'))
-  }
+    component: () =>
+      lazyLoadView(import('@views/pages/administrator/leave/index.vue')),
+  },
 ]
 
 const profileRoute = [
@@ -469,37 +503,40 @@ const leaveRequestRoutes = [
 const announcementRoutes = [
   {
     path: '/admin/announcements',
-    name: "announcements",
+    name: 'announcements',
     meta: { authRequired: true },
-    icon: "volume-2",
-    department: "Administration",
-    component: () => lazyLoadView(import('@views/pages/administrator/announcement/index.vue'))
-  }
+    icon: 'volume-2',
+    department: 'Administration',
+    component: () =>
+      lazyLoadView(import('@views/pages/administrator/announcement/index.vue')),
+  },
 ]
 
 const financeRoutes = [
   {
     path: '/finance/project',
-    name: "projects-finance",
+    name: 'projects-finance',
     meta: { authRequired: true },
     icon: 'briefcase',
     department: 'Finance',
-    component: () => lazyLoadView(import('@views/pages/finance/projects/index.vue')),
+    component: () =>
+      lazyLoadView(import('@views/pages/finance/projects/index.vue')),
   },
   {
     path: '/finance/project/:id/details',
-    name: "rojects-finance-details",
+    name: 'rojects-finance-details',
     meta: { authRequired: true },
-    component: () => lazyLoadView(import('@views/pages/finance/projects/details.vue')),
+    component: () =>
+      lazyLoadView(import('@views/pages/finance/projects/details.vue')),
   },
   {
     path: '/finance/project/:id/project-plan',
     name: 'finance-project-plan',
     meta: { authRequired: true },
-    component: () => lazyLoadView(import('@views/pages/finance/projects/project-plan.vue'))
-  }
+    component: () =>
+      lazyLoadView(import('@views/pages/finance/projects/project-plan.vue')),
+  },
 ]
-
 
 const appsRoutes = [
   ...calendarAppsRoutes,
@@ -513,7 +550,7 @@ const appsRoutes = [
   // ...projectPlanRoutes,
   // ...trainingRouts,
   ...financeRoutes,
-  ...announcementRoutes
+  ...announcementRoutes,
 ]
 
 // pages
@@ -705,7 +742,7 @@ const authProtectedRoutes = [
   ...appsRoutes,
   ...workFlowRoutes,
   ...projectTypes,
-  ...roles
+  ...roles,
   /* ...pagesRoutes, */
   // ...uiRoutes,
   /* ...formsRoutes,
