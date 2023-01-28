@@ -131,6 +131,16 @@ export default {
               show: false,
             },
           },
+          /* xaxis: {
+            axisBorder: {
+              show: true,
+              color: '#78909C',
+              height: 1,
+              width: '100%',
+              offsetX: 0,
+              offsetY: 0,
+            },
+          }, */
           plotOptions: {
             bar: {
               horizontal: false,
@@ -179,7 +189,7 @@ export default {
               },
               {
                 y: 100,
-                x: 'Income',
+                x: 'Surplus/Deficit',
                 fillColor: '#43d39e',
               },
             ],
@@ -212,7 +222,7 @@ export default {
     },
   },
   created() {
-    this.getProjectDetials();
+    this.getProjectDetials()
   },
   methods: {
     toggleEdit() {
@@ -234,17 +244,17 @@ export default {
         {
           name: 'Amount',
           data: [
-            {
+            /* {
               y: this.getExpenditure(),
               x: 'Total',
               fillColor: '#5369f8',
-            },
+            }, */
             {
               y: this.getSumOfProfessionalFees(),
               x: `Prof. Fee - ${(
                 (this.getSumOfProfessionalFees() / this.getExpenditure()) *
                 100
-              ).toPrecision(4)}%`,
+              ).toFixed(2)}%`,
               fillColor: '#43d39e',
             },
             {
@@ -253,7 +263,7 @@ export default {
                 (this.contractForm.expenditure_reimbursable /
                   this.getExpenditure()) *
                 100
-              ).toPrecision(4)}%`,
+              ).toFixed(2)}%`,
               fillColor: '#f77e53',
             },
             {
@@ -262,7 +272,7 @@ export default {
                 (this.contractForm.expenditure_finders_fee /
                   this.getExpenditure()) *
                 100
-              ).toPrecision(4)}%`,
+              ).toFixed(2)}%`,
               fillColor: '#FF4560',
             },
             {
@@ -279,8 +289,7 @@ export default {
       ]
 
       this.income.series =
-        this.getAmountPaid() !== '0.00' &&
-        Number(this.getAmountPaid()) > Number(this.getExpenditure())
+        this.getAmountPaid() !== '0.00'
           ? [
               {
                 name: 'Amount',
@@ -295,25 +304,24 @@ export default {
                     x: `Expenditure - ${(
                       (this.getExpenditure() / this.getAmountPaid()) *
                       100
-                    ).toPrecision(4)}%`,
+                    ).toFixed(2)}%`,
                     fillColor: '#f77e53',
                   },
                   {
                     y: (this.getAmountPaid() - this.getExpenditure()).toFixed(
                       2
                     ),
-                    x: `Income - ${(
+                    x: `Surplus/Deficit (${(
                       ((this.getAmountPaid() - this.getExpenditure()) /
                         this.getAmountPaid()) *
                       100
-                    ).toPrecision(4)}%`,
+                    ).toFixed(2)}%)`,
                     fillColor: '#43d39e',
                   },
                 ],
               },
             ]
-          : Number(this.getAmountPaid()) < Number(this.getExpenditure())
-          ? [
+          : [
               {
                 name: 'Amount',
                 data: [
@@ -329,29 +337,7 @@ export default {
                   },
                   {
                     y: 0,
-                    x: 'Income',
-                    fillColor: '#43d39e',
-                  },
-                ],
-              },
-            ]
-          : [
-              {
-                name: 'Amount',
-                data: [
-                  {
-                    y: 0,
-                    x: 'Amount Paid',
-                    fillColor: '#5369f8',
-                  },
-                  {
-                    y: this.getExpenditure(),
-                    x: 'Expenditure',
-                    fillColor: '#f77e53',
-                  },
-                  {
-                    y: 0,
-                    x: 'Income',
+                    x: 'Surplus/Deficit',
                     fillColor: '#43d39e',
                   },
                 ],
@@ -400,7 +386,9 @@ export default {
     },
 
     getDelivarbleTax(deliverable) {
-      const total = Number(deliverable.vat_nhil_get_fund || 0) + Number(deliverable.with_holding_tax || 0)
+      const total =
+        Number(deliverable.vat_nhil_get_fund || 0) +
+        Number(deliverable.with_holding_tax || 0)
       return total.toFixed(2)
     },
 
@@ -1339,7 +1327,6 @@ export default {
           </div>
 
           <OutStandingPayments />
-
         </div>
         <div class="col-xl-6">
           <div class="card">

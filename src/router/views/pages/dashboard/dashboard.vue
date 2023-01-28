@@ -526,11 +526,11 @@ export default {
           <div class="card-body">
             <h5 class="card-title mt-0 mb-0 header-title">Proposals</h5>
             <div class="table-responsive mt-4 mb-0">
-              <table class="table table-hover table-nowrap mb-0">
+              <table class="table mb-0">
                 <thead scope="col" class="thead-white">
                   <tr>
                     <th scope="col">#</th>
-                    <th scope="col" style="max-width: 200px;">Proposal Name</th>
+                    <th scope="col">Proposal Name</th>
                     <th scope="col">Client</th>
                     <th scope="col">Proposal Type</th>
                     <th scope="col">Action</th>

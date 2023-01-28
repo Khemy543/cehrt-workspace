@@ -46,7 +46,7 @@ export default {
       vProject: null,
       showProjectDeletionModal: false,
       projectId: null,
-      vloading: false
+      vloading: false,
     }
   },
   computed: {
@@ -91,7 +91,7 @@ export default {
       this.projectId = id
     },
     async createProject(form) {
-      this.vloading = true;
+      this.vloading = true
       try {
         const response = await this.$http.post(`/save/old/project`, {
           ...form,
@@ -134,7 +134,7 @@ export default {
     },
     async updateProject(form) {
       try {
-        this.vloading = true;
+        this.vloading = true
         const response = await this.$http.patch(`/export/${form.id}/project`, {
           ...form,
           coordinator_id: this.$store.state.auth.currentUser.id,
@@ -157,7 +157,7 @@ export default {
           this.show = false
           this.editting = false
           this.vProject = null
-          this.vloading = false;
+          this.vloading = false
         }
       } catch (error) {
         if (error.response) {
@@ -264,9 +264,9 @@ export default {
                   <tr>
                     <th scope="col">#</th>
                     <th scope="col">Project</th>
-                    <th scope="col">Country</th>
                     <th scope="col">Region</th>
                     <th scope="col">District</th>
+                    <th scope="col">Sector</th>
                     <th scope="col">Year</th>
                     <th scope="col">Client</th>
                     <th scope="col">Type</th>
@@ -281,9 +281,11 @@ export default {
                   >
                     <th scope="row">{{ getNumber(index) }}</th>
                     <td>{{ item.name }}</td>
-                    <td>{{ item.country || 'N/A' }}</td>
                     <td>{{ getProjectRegions(item.regions) }}</td>
                     <td>{{ item.district || 'N/A' }}</td>
+                    <td>{{
+                      (item.project_sector && item.project_sector.name) || 'N/A'
+                    }}</td>
                     <td>{{ new Date(item.end_date).getFullYear() }}</td>
                     <td>{{ item.client }}</td>
                     <td>{{
