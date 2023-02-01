@@ -86,6 +86,30 @@ export default {
 
       return subTasks
     },
+    getAllDeliverableTasks(tasks) {
+      const AllTasks = []
+      let count = 1
+      let subcount = 1
+      tasks.forEach((task) => {
+        AllTasks.push({
+          ...task,
+          subtask: false,
+          number: count,
+        })
+
+        task.subtasks.forEach((subtask) => {
+          AllTasks.push({
+            ...subtask,
+            subtask: true,
+            number: `${count}.${subcount}`,
+          })
+          subcount++
+        })
+
+        count++
+      })
+      return AllTasks
+    },
     showSubmitModal() {
       this.submitModal = true
     },
@@ -389,10 +413,12 @@ export default {
                       </thead>
                       <tbody>
                         <tr
-                          v-for="(task, index) in deliverable.tasks"
+                          v-for="task in getAllDeliverableTasks(
+                            deliverable.tasks
+                          )"
                           :key="`task-${task.id}`"
                         >
-                          <th scope="row">{{ index + 1 }}</th>
+                          <th scope="row">{{ task.number }}</th>
                           <td>{{ task.name }}</td>
                           <td>{{ task.assignee || 'N/A' }}</td>
                           <td>
@@ -440,8 +466,7 @@ export default {
                             )
                           }}</td>
                         </tr>
-
-                        <tr
+                        <!-- <tr
                           v-for="(task, index) in getDeliverableSubtasks(
                             deliverable.tasks
                           )"
@@ -496,7 +521,7 @@ export default {
                               )
                             )
                           }}</td>
-                        </tr>
+                        </tr> -->
 
                         <tr>
                           <td></td>

@@ -386,6 +386,13 @@ const projectAppsRoutes = [
     component: () =>
       lazyLoadView(import('@views/pages/consulting/project/tasks/task-list')),
   },
+  {
+    path: '/project/:id/view-project-plan',
+    name: 'view-project-plan',
+    meta: { authRequired: true },
+    component: () =>
+      lazyLoadView(import('@views/pages/finance/projects/project-plan.vue')),
+  },
 ]
 
 const adminProjectRoutes = [
@@ -528,14 +535,7 @@ const financeRoutes = [
     meta: { authRequired: true },
     component: () =>
       lazyLoadView(import('@views/pages/finance/projects/details.vue')),
-  },
-  {
-    path: '/finance/project/:id/project-plan',
-    name: 'finance-project-plan',
-    meta: { authRequired: true },
-    component: () =>
-      lazyLoadView(import('@views/pages/finance/projects/project-plan.vue')),
-  },
+  }
 ]
 
 const appsRoutes = [

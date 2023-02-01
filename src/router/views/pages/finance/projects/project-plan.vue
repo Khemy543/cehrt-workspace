@@ -182,7 +182,7 @@ export default {
                     <h6>This project has no deliverbles</h6>
                     <router-link
                       id="btn-new-event"
-                      :to="`/project/details/${$route.params.id}`"
+                      :to="department.name === 'Finance' ? `/finance/project/${$route.params.id}/details` : `/project/details/${$route.params.id}`"
                       class="btn btn-danger"
                       >Go back to Project</router-link
                     >

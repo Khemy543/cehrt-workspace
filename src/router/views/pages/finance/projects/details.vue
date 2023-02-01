@@ -838,7 +838,7 @@ export default {
                 <div class="col-md-6 d-flex justify-content-end">
                   <div>
                     <router-link
-                      :to="`/finance/project/${project.id}/project-plan`"
+                      :to="`/project/${project.id}/view-project-plan`"
                       type="button"
                       class="btn btn-warning mx-4 "
                       >View Project Plan</router-link

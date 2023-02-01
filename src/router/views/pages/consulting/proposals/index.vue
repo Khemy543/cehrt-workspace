@@ -94,7 +94,7 @@ export default {
         })
 
         if (response) {
-          this.proposals.push(response.data.proposal)
+          this.proposals.unshift(response.data.proposal)
           this.show = false
           this.$bvToast.toast('Proposal created successfully', {
             title: 'Success',

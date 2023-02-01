@@ -636,18 +636,18 @@ export default {
                 </div>
 
                 <div
-                  v-if="isCoordinator"
                   class="col-sm-4 col-xl-6 text-sm-right"
                 >
                   <router-link
-                    :to="`/project/${project.id}/project-plan`"
+                    :to="isCoordinator ? `/project/${project.id}/project-plan` : `/project/${project.id}/view-project-plan`"
                     class="btn-group ml-2 d-none d-sm-inline-block"
                   >
                     <button type="button" class="btn btn-soft-info btn-sm">
                       <i class="uil uil-edit mr-1"></i>View Project Plan
                     </button>
                   </router-link>
-                  <div class="btn-group ml-2 d-none d-sm-inline-block">
+                  <div 
+                  v-if="isCoordinator" class="btn-group ml-2 d-none d-sm-inline-block">
                     <button
                       type="button"
                       class="btn btn-soft-success btn-sm"
@@ -656,7 +656,8 @@ export default {
                       <i class="uil uil-edit mr-1"></i>Export to Library
                     </button>
                   </div>
-                  <div class="btn-group ml-2 d-none d-sm-inline-block">
+                  <div 
+                  v-if="isCoordinator" class="btn-group ml-2 d-none d-sm-inline-block">
                     <button
                       type="button"
                       class="btn btn-soft-primary btn-sm"
@@ -665,7 +666,8 @@ export default {
                       <i class="uil uil-edit mr-1"></i>Edit
                     </button>
                   </div>
-                  <div class="btn-group d-none d-sm-inline-block ml-1">
+                  <div 
+                  v-if="isCoordinator" class="btn-group d-none d-sm-inline-block ml-1">
                     <button
                       type="button"
                       class="btn btn-soft-danger btn-sm"
@@ -675,7 +677,7 @@ export default {
                     </button>
                   </div>
                 </div>
-                <div v-else class="col-sm-4 col-xl-6 text-sm-right"></div>
+                <!-- <div v-else class="col-sm-4 col-xl-6 text-sm-right"></div> -->
               </div>
               <div class="row py-1">
                 <!-- Widget -->

@@ -393,7 +393,7 @@ export default {
       show: false,
       editting: false,
       showCreateProject: false,
-      vloading: false
+      vloading: false,
     }
   },
   computed: {
@@ -537,13 +537,28 @@ export default {
     },
     async createProjectFromProposal(form) {
       try {
+        const data = await graph.createProjectFolder({
+          name: form.name,
+          folder: {},
+          '@microsoft.graph.conflictBehavior': 'replace',
+        })
+
+        const subData = await graph.createProjectMediaFolder(
+          {
+            name: 'Media',
+            folder: {},
+            '@microsoft.graph.conflictBehavior': 'replace',
+          },
+          data.id
+        )
         const response = await this.$http.post(`/create/project`, {
           ...form,
           proposal_id: this.$route.params.id,
+          onedrive_id: data.id, images_path: subData.webUrl
         })
 
         if (response) {
-          this.$bvToast.toast('Project deliverable created successfully', {
+          this.$bvToast.toast('Project created successfully', {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
@@ -649,7 +664,7 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
-      this.vloading = false
+        this.vloading = false
       }
     },
 
