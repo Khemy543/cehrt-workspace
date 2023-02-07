@@ -414,6 +414,7 @@ export default {
       editorOptions: {
         theme: 'bubble',
       },
+      editting: false,
       form: {
         project_type_id: '',
         project_sector_id: '',

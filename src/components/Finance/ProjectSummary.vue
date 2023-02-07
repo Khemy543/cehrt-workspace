@@ -4,7 +4,9 @@
       <div class="card-body">
         <div class="d-flex justify-content-between align-items-center">
           <h6 class="mt-0 header-title">Summary of Project Finances </h6>
-          <button class="btn btn-primary" @click="toggleEdit">Edit</button>
+          <button v-if="!isLibrary" class="btn btn-primary" @click="toggleEdit"
+            >Edit</button
+          >
         </div>
 
         <div class="contact-details mt-5">
@@ -76,7 +78,7 @@
           </div>
         </div>
 
-        <div class=" mt-5">
+        <div v-if="!isLibrary" class=" mt-5">
           <h4
             >Amount Paid By Client
             <span>({{ formateMoney(amountPaid) }})</span></h4
@@ -121,7 +123,7 @@
             </table>
           </div>
 
-          <div class="mt-5">
+          <div v-if="!isLibrary" class="mt-5">
             <h4>Invoice</h4>
             <div class="table-responsive mb-0">
               <table class="table mb-0">
@@ -187,7 +189,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div v-if="!isLibrary" class="row">
       <div class="col-md-6">
         <div class="mt-3 card">
           <div class="card-body">
@@ -239,6 +241,10 @@ export default {
     deliverables: {
       type: Array,
       default: () => [],
+    },
+    isLibrary: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

@@ -666,8 +666,7 @@ export default {
                       <i class="uil uil-edit mr-1"></i>Edit
                     </button>
                   </div>
-                  <div 
-                  v-if="isCoordinator" class="btn-group d-none d-sm-inline-block ml-1">
+                  <div class="btn-group d-none d-sm-inline-block ml-1">
                     <button
                       type="button"
                       class="btn btn-soft-danger btn-sm"

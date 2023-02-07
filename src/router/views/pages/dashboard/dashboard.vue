@@ -57,7 +57,7 @@ export default {
           next: 'Next',
         },
         eventClick: (e) => this.editEvent(e),
-        dateClick: (e) => this.dateClicked(e)
+        dateClick: (e) => this.dateClicked(e),
         // themeSystem: 'bootstrap',
       },
       createModal: false,
@@ -108,7 +108,7 @@ export default {
       reports: [],
       deliverables: [],
       viewDetailsModal: false,
-      eventObject: {}
+      eventObject: {},
     }
   },
   computed: {
@@ -128,44 +128,54 @@ export default {
         return
       }
       this.newEventData = info
+      this.event.start_date = calendarFormat(info.dateStr)
       this.showModal = true
-      this.event.start_date = info.dateStr
     },
     editEvent(info) {
-      if (this.$store.state.auth.userDepartment.name !== 'Administration') {
-        const eventId = info.event.id.split('-')[1]
-        if(info.event.startEditable) {
-          if(info.event.id.includes('event')) {
-            const eventObject = this.companyEvents.find((vevent) => Number(vevent.id) === Number(eventId));
-            this.eventObject = eventObject;
-            this.viewDetailsModal = true;
+      if (
+        this.$store.state.auth.userDepartment.name === 'Administration' &&
+        info.event.id.includes('event')
+      ) {
+        if (info.event.startEditable) {
+          this.edit = info.event
+          this.editableEvent = {
+            id: this.edit.id.split('-')[1],
+            name: this.edit.title,
+            start_date: calendarFormat(this.edit.start),
+            end_date: calendarFormat(this.edit.end),
           }
-
-          if(info.event.id.includes('deliverable')) {
-            const eventObject = this.deliverables.find(dev => Number(dev.id) === Number(eventId));
-            this.eventObject = eventObject;
-            this.eventObject.url = ''
-            this.viewDetailsModal = true
-          }
-
-          if(info.event.id.includes('report')) {
-            const eventObject = this.reports.find((report) => Number(report.id) === Number(eventId));
-            this.eventObject = eventObject;
-            this.eventObject.url = ''
-            this.viewDetailsModal = true;
-          }
+          this.eventModal = true
         }
         return
       }
+
+      const eventId = info.event.id.split('-')[1]
       if (info.event.startEditable) {
-        this.edit = info.event
-        this.editableEvent = {
-          id: this.edit.id.split('-')[1],
-          name: this.edit.title,
-          start_date: calendarFormat(this.edit.start),
-          end_date: calendarFormat(this.edit.end),
+        if (info.event.id.includes('event')) {
+          const eventObject = this.companyEvents.find(
+            (vevent) => Number(vevent.id) === Number(eventId)
+          )
+          this.eventObject = eventObject
+          this.viewDetailsModal = true
         }
-        this.eventModal = true
+
+        if (info.event.id.includes('deliverable')) {
+          const eventObject = this.deliverables.find(
+            (dev) => Number(dev.id) === Number(eventId)
+          )
+          this.eventObject = eventObject
+          this.eventObject.url = ''
+          this.viewDetailsModal = true
+        }
+
+        if (info.event.id.includes('report')) {
+          const eventObject = this.reports.find(
+            (report) => Number(report.id) === Number(eventId)
+          )
+          this.eventObject = eventObject
+          this.eventObject.url = ''
+          this.viewDetailsModal = true
+        }
       }
     },
     async getDashData() {
@@ -208,16 +218,16 @@ export default {
             start: calendarFormat(item.deadline),
             className: 'bg-success text-white',
             allDay: true,
-            editable: true
+            editable: true,
           }))
           this.calendarOptions.events = [
             ...this.calendarOptions.events,
             ...vDeliverables,
             ...vReports,
-          ];
+          ]
 
-          this.reports = proposalReport;
-          this.deliverables = deliverable;
+          this.reports = proposalReport
+          this.deliverables = deliverable
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -244,8 +254,11 @@ export default {
               allDay: false,
             }
           })
-          this.calendarOptions.events = [...this.calendarOptions.events, ...vEvents];
-          this.companyEvents = response.data;
+          this.calendarOptions.events = [
+            ...this.calendarOptions.events,
+            ...vEvents,
+          ]
+          this.companyEvents = response.data
         }
       } catch (error) {
         this.$bvToast.toast('Something happened, Please try again later', {
@@ -455,10 +468,7 @@ export default {
           <div class="card-body">
             <div class="app-calendar">
               <div style="height: 60vh; overflow:scroll;">
-                <FullCalendar
-                  ref="fullCalendar"
-                  :options="calendarOptions"
-                />
+                <FullCalendar ref="fullCalendar" :options="calendarOptions" />
               </div>
             </div>
           </div>
@@ -622,17 +632,23 @@ export default {
       </form>
     </b-modal>
 
-
     <b-modal v-model="viewDetailsModal" title="Event Details" hide-footer>
-      <h4 style="font-size: 20px;">{{ eventObject.name || eventObject.project_name }}</h4>
+      <h4 style="font-size: 20px;">{{
+        eventObject.name || eventObject.project_name
+      }}</h4>
       <p>{{ eventObject.description || eventObject.deliverable_name }}</p>
       <hr />
 
-      <div v-if="eventObject.start_date" class="d-flex justify-content-between items-align-center mb-2">
+      <div
+        v-if="eventObject.start_date"
+        class="d-flex justify-content-between items-align-center mb-2"
+      >
         <h6 style="color: #848484;">Start Date</h6>
         <h6
           ><i class="uil-calender mr-1 text-success"></i
-          >{{ eventObject.start_date && formateDateTime(eventObject.start_date) }}</h6
+          >{{
+            eventObject.start_date && formateDateTime(eventObject.start_date)
+          }}</h6
         >
       </div>
 
@@ -640,17 +656,24 @@ export default {
         <h6 style="color: #848484;">Deadline</h6>
         <h6 v-if="eventObject.end_date"
           ><i class="uil-calendar-slash mr-1 text-danger"></i
-          >{{ eventObject.end_date && formateDateTime(eventObject.end_date) }}</h6
+          >{{
+            eventObject.end_date && formateDateTime(eventObject.end_date)
+          }}</h6
         >
         <h6 v-if="eventObject.deadline"
           ><i class="uil-calendar-slash mr-1 text-danger"></i
-          >{{ eventObject.deadline && formateDateTime(eventObject.deadline) }}</h6
+          >{{
+            eventObject.deadline && formateDateTime(eventObject.deadline)
+          }}</h6
         >
       </div>
 
       <hr />
       <div class="d-flex justify-content-end">
-        <button type="submit" class="btn btn-primary" @click="viewDetailsModal = false"
+        <button
+          type="submit"
+          class="btn btn-primary"
+          @click="viewDetailsModal = false"
           >Close</button
         >
       </div>

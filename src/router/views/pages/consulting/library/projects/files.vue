@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid'
 import File from '@/src/components/file.vue'
 import { slashDateFormate } from '@/src/utils/format-date.js'
 import formateAmount from '@src/utils/formate-money.js'
+import ProjectSummary from '@/src/components/Finance/ProjectSummary.vue'
 
 export default {
   page: {
@@ -19,6 +20,7 @@ export default {
     Layout,
     PageHeader,
     AddFileToLibrary,
+    ProjectSummary,
     File,
   },
   props: {
@@ -49,6 +51,8 @@ export default {
       invoice: [],
       timeSheet: [],
       show: false,
+      financeDeliverables: [],
+      contractForm: {},
       adminFiles: [
         {
           id: 'contract',
@@ -81,6 +85,143 @@ export default {
           name: 'Insurance',
         },
       ],
+      income: {
+        chartOptions: {
+          chart: {
+            type: 'bar',
+            toolbar: {
+              show: false,
+            },
+          },
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '45%',
+            },
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent'],
+          },
+          legend: {
+            show: false,
+          },
+          grid: {
+            row: {
+              colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+              opacity: 0.2,
+            },
+            borderColor: '#f3f4f7',
+          },
+          tooltip: {
+            y: {
+              formatter: function(val) {
+                return 'GHS ' + formateAmount(val)
+              },
+            },
+          },
+        },
+        series: [
+          {
+            name: 'Amount',
+            data: [
+              {
+                y: 100,
+                x: 'Amount Paid',
+                fillColor: '#5369f8',
+              },
+              {
+                y: 100,
+                x: 'Expenditure',
+                fillColor: '#f77e53',
+              },
+              {
+                y: 100,
+                x: 'Surplus/Deficit',
+                fillColor: '#43d39e',
+              },
+            ],
+          },
+        ],
+      },
+      expenditure: {
+        chartOptions: {
+          chart: {
+            type: 'bar',
+            stacked: true,
+            toolbar: {
+              show: false,
+            },
+          },
+          plotOptions: {
+            bar: {
+              horizontal: false,
+              columnWidth: '45%',
+            },
+          },
+          dataLabels: {
+            enabled: false,
+          },
+          stroke: {
+            show: true,
+            width: 2,
+            colors: ['transparent'],
+          },
+          legend: {
+            show: false,
+          },
+          grid: {
+            row: {
+              colors: ['transparent', 'transparent'], // takes an array which will be repeated on columns
+              opacity: 0.2,
+            },
+            borderColor: '#f3f4f7',
+          },
+          tooltip: {
+            y: {
+              formatter: function(val) {
+                return 'GHS ' + formateAmount(val)
+              },
+            },
+          },
+        },
+        series: [
+          {
+            name: 'Amount',
+            data: [
+              {
+                y: 100,
+                x: 'Amount Paid',
+                fillColor: '#5369f8',
+              },
+              {
+                y: 100,
+                x: 'Professional Fee',
+                fillColor: '#43d39e',
+              },
+              {
+                y: 100,
+                x: 'Reimbursables',
+                fillColor: '#f77e53',
+              },
+              {
+                y: 100,
+                x: "Finder's Fee",
+                fillColor: '#FF4560',
+              },
+              {
+                y: 100,
+                x: 'Miscellaneous',
+                fillColor: '#FF4560',
+              },
+            ],
+          },
+        ],
+      },
     }
   },
   computed: {
@@ -101,6 +242,15 @@ export default {
         (this.project.project_type && this.project.project_type.deliverables) ||
         []
       )
+    },
+    contractAmount() {
+      const {
+        contract_amount_profession_fees: profFess,
+        contract_amount_reimbursable: rem,
+        contract_amount_tax_amount: tax,
+      } = this.contractForm
+      const total = Number(profFess) + Number(rem) + Number(tax)
+      return total.toFixed(2)
     },
     combindedFiles() {
       return [...this.library, ...this.correspondents]
@@ -143,6 +293,145 @@ export default {
     this.getProjectDeliverables()
   },
   methods: {
+    getAmountPaid() {
+      let total = 0
+      for (const n of this.financeDeliverables) {
+        if (n.deliverable_fee_amount_paid) {
+          total = total + Number(n.deliverable_fee_amount_paid)
+        }
+      }
+      return total.toFixed(2)
+    },
+
+    getSumOfProfessionalFees() {
+      let total = 0
+      for (const n of this.financeDeliverables) {
+        if (n.deliverable_professional_fees) {
+          total = total + Number(n.deliverable_professional_fees)
+        }
+      }
+      return total.toFixed(2)
+    },
+    getExpenditure() {
+      const {
+        expenditure_reimbursable: rem,
+        expenditure_finders_fee: fee,
+        expenditure_miscellaneous: mel,
+      } = this.contractForm
+      let total = Number(rem) + Number(fee) + Number(mel)
+
+      for (const n of this.financeDeliverables) {
+        if (n.deliverable_professional_fees) {
+          total = total + Number(n.deliverable_professional_fees)
+        }
+      }
+      return total.toFixed(2)
+    },
+    updateChart() {
+      console.log('updating chart...')
+      this.expenditure.series = [
+        {
+          name: 'Amount',
+          data: [
+            /* {
+              y: this.getExpenditure(),
+              x: 'Total',
+              fillColor: '#5369f8',
+            }, */
+            {
+              y: this.getSumOfProfessionalFees(),
+              x: `Prof. Fee - ${(
+                (this.getSumOfProfessionalFees() / this.getExpenditure()) *
+                100
+              ).toFixed(2)}%`,
+              fillColor: '#43d39e',
+            },
+            {
+              y: this.contractForm.expenditure_reimbursable || 0,
+              x: `Reimb. - ${(
+                (this.contractForm.expenditure_reimbursable /
+                  this.getExpenditure()) *
+                100
+              ).toFixed(2)}%`,
+              fillColor: '#f77e53',
+            },
+            {
+              y: this.contractForm.expenditure_finders_fee || 0,
+              x: `Finder's Fee - ${(
+                (this.contractForm.expenditure_finders_fee /
+                  this.getExpenditure()) *
+                100
+              ).toFixed(2)}%`,
+              fillColor: '#FF4560',
+            },
+            {
+              y: this.contractForm.expenditure_miscellaneous || 0,
+              x: `Tax - ${(
+                (this.contractForm.expenditure_miscellaneous /
+                  this.getExpenditure()) *
+                100
+              ).toFixed(2)}%`,
+              fillColor: '#FFD700',
+            },
+          ],
+        },
+      ]
+      this.income.series =
+        this.getAmountPaid() !== '0.00'
+          ? [
+              {
+                name: 'Amount',
+                data: [
+                  {
+                    y: this.getAmountPaid(),
+                    x: 'Amount Paid',
+                    fillColor: '#5369f8',
+                  },
+                  {
+                    y: this.getExpenditure(),
+                    x: `Expenditure - ${(
+                      (this.getExpenditure() / this.getAmountPaid()) *
+                      100
+                    ).toFixed(2)}%`,
+                    fillColor: '#f77e53',
+                  },
+                  {
+                    y: (this.getAmountPaid() - this.getExpenditure()).toFixed(
+                      2
+                    ),
+                    x: `Surplus/Deficit (${(
+                      ((this.getAmountPaid() - this.getExpenditure()) /
+                        this.getAmountPaid()) *
+                      100
+                    ).toFixed(2)}%)`,
+                    fillColor: '#43d39e',
+                  },
+                ],
+              },
+            ]
+          : [
+              {
+                name: 'Amount',
+                data: [
+                  {
+                    y: this.getAmountPaid(),
+                    x: 'Amount Paid',
+                    fillColor: '#5369f8',
+                  },
+                  {
+                    y: this.getExpenditure(),
+                    x: 'Expenditure',
+                    fillColor: '#f77e53',
+                  },
+                  {
+                    y: 0,
+                    x: 'Surplus/Deficit',
+                    fillColor: '#43d39e',
+                  },
+                ],
+              },
+            ]
+    },
     deleteFile(file) {
       this.$swal({
         title: 'Are you sure you want to delete file?',
@@ -154,14 +443,13 @@ export default {
       }).then(async ({ isConfirmed, isDenied }) => {
         if (isConfirmed) {
           try {
-            const response = await this.$http.delete(`/delete/${file.id}/deliverable`);
+            const response = await this.$http.delete(
+              `/delete/${file.id}/deliverable`
+            )
 
-            if(response) {
-              
+            if (response) {
             }
-          } catch (error) {
-            
-          }
+          } catch (error) {}
         }
       })
     },
@@ -435,6 +723,7 @@ export default {
             if (response.data.insurance) {
               this.library.push(insurance)
             }
+
             response.data.deliverables.forEach((item) => {
               this.library.push({
                 id: uuidv4(),
@@ -448,6 +737,38 @@ export default {
                 document_path: item.timesheet,
               })
             })
+
+            this.contractForm = {
+              contract_amount_profession_fees:
+                response.data.contract_amount_profession_fees || 0,
+              contract_amount_reimbursable:
+                response.data.contract_amount_reimbursable || 0,
+              contract_amount_tax_amount:
+                response.data.contract_amount_tax_amount || 0,
+              expenditure_finders_fee:
+                response.data.expenditure_finders_fee || 0,
+              expenditure_miscellaneous:
+                response.data.expenditure_miscellaneous || 0,
+              expenditure_reimbursable:
+                response.data.expenditure_reimbursable || 0,
+              project_tax_amount: response.data.project_tax_amount || 0,
+              withholding_tax: response.data.withholding_tax || 0,
+            }
+
+            this.financeDeliverables = response.data.deliverables.map(
+              (item) => ({
+                deliverable_fee_amount_paid:
+                  item.deliverable_fee_amount_paid || 0,
+                amount_paid_percentage: item.amount_paid_percentage || 0,
+                vat_nhil_get_fund: item.vat_nhil_get_fund || 0,
+                with_holding_tax: item.with_holding_tax || 0,
+                name: item.name,
+                id: item.id,
+                deliverable_professional_fees:
+                  item.deliverable_professional_fees || 0,
+              })
+            )
+            this.updateChart()
           }
 
           if (department.name === 'Consultancy') {
@@ -500,6 +821,7 @@ export default {
       <b-spinner type="grow" variant="primary"></b-spinner>
     </div>
     <div v-else class="row">
+      {{ getAmountPaid() }}
       <div class="col-lg-12">
         <div class="card">
           <div class="card-body">
@@ -682,6 +1004,64 @@ export default {
           </div>
         </div>
       </div>
+      
+
+      <!-- finance graph -->
+      <div v-if="isFinance" class="col-12">
+
+        <div class="row">
+        <div class="col-12">
+          <ProjectSummary
+            :project="{
+              deliverables: financeDeliverables,
+            }"
+            :deliverables="financeDeliverables"
+            :contract-amount="contractAmount"
+            :amount-paid="getAmountPaid()"
+            :expenditure="getExpenditure()"
+            :is-library="true"
+          />
+        </div>
+      </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title mt-0 pb-2 header-title">Income Graph</h5>
+                <!-- Sales donut chart -->
+                <apexchart
+                  ref="incomeChart"
+                  type="bar"
+                  height="304"
+                  :series="income.series"
+                  :options="income.chartOptions"
+                ></apexchart>
+                <!-- end sales chart -->
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-body">
+                <h5 class="card-title mt-0 pb-2 header-title"
+                  >Expenditure Graph</h5
+                >
+                <!-- Sales donut chart -->
+                <apexchart
+                  type="bar"
+                  height="304"
+                  :series="expenditure.series"
+                  :options="expenditure.chartOptions"
+                ></apexchart>
+                <!-- end sales chart -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- finance chart end -->
 
       <div class="col-12">
         <div class="card">

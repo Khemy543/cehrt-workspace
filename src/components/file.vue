@@ -21,7 +21,7 @@ export default {
   name: 'File',
   props: {
     id: {
-      type: Number,
+      type: [Number, String],
       default: null,
     },
     name: {
