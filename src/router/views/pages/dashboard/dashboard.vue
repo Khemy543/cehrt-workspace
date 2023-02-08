@@ -115,6 +115,9 @@ export default {
     department() {
       return this.$store ? this.$store.state.auth.userDepartment : {} || {}
     },
+    isAdmin() {
+      return this.$store.state.auth.userDepartment.name === 'Administration'
+    },
   },
 
   created() {
@@ -132,7 +135,7 @@ export default {
       this.showModal = true
     },
     editEvent(info) {
-      if (
+      /* if (
         this.$store.state.auth.userDepartment.name === 'Administration' &&
         info.event.id.includes('event')
       ) {
@@ -142,12 +145,12 @@ export default {
             id: this.edit.id.split('-')[1],
             name: this.edit.title,
             start_date: calendarFormat(this.edit.start),
-            end_date: calendarFormat(this.edit.end),
+            end_date: this.edit.end ? calendarFormat(this.edit.end) : null,
           }
           this.eventModal = true
         }
         return
-      }
+      } */
 
       const eventId = info.event.id.split('-')[1]
       if (info.event.startEditable) {
@@ -155,7 +158,8 @@ export default {
           const eventObject = this.companyEvents.find(
             (vevent) => Number(vevent.id) === Number(eventId)
           )
-          this.eventObject = eventObject
+          this.eventObject = { ...eventObject, is_event: true }
+          this.edit = info.event
           this.viewDetailsModal = true
         }
 
@@ -343,8 +347,8 @@ export default {
             title: name,
             start: startDate,
             end: date,
-            editable: false,
-            className: 'bg-danger text-white',
+            editable: true,
+            className: 'bg-primary text-white',
             allDay: false,
           })
           this.event = {}
@@ -421,6 +425,19 @@ export default {
       this.submitted = false
       this.showModal = false
       this.event = {}
+    },
+
+    openEditForm() {
+      if (this.edit.startEditable) {
+        this.editableEvent = {
+          id: this.edit.id.split('-')[1],
+          name: this.edit.title,
+          start_date: calendarFormat(this.edit.start),
+          end_date: this.edit.end ? calendarFormat(this.edit.end) : null,
+        }
+        this.viewDetailsModal = false
+        this.eventModal = true
+      }
     },
 
     createProjectUrl(id) {
@@ -652,15 +669,12 @@ export default {
         >
       </div>
 
-      <div class="d-flex justify-content-between items-align-center mb-2">
+      <div
+        v-if="eventObject.deadline"
+        class="d-flex justify-content-between items-align-center mb-2"
+      >
         <h6 style="color: #848484;">Deadline</h6>
-        <h6 v-if="eventObject.end_date"
-          ><i class="uil-calendar-slash mr-1 text-danger"></i
-          >{{
-            eventObject.end_date && formateDateTime(eventObject.end_date)
-          }}</h6
-        >
-        <h6 v-if="eventObject.deadline"
+        <h6
           ><i class="uil-calendar-slash mr-1 text-danger"></i
           >{{
             eventObject.deadline && formateDateTime(eventObject.deadline)
@@ -668,11 +682,31 @@ export default {
         >
       </div>
 
+      <div
+        v-if="eventObject.end_date"
+        class="d-flex justify-content-between items-align-center mb-2"
+      >
+        <h6 style="color: #848484;">End Date</h6>
+        <h6
+          ><i class="uil-calendar-slash mr-1 text-danger"></i
+          >{{
+            eventObject.end_date && formateDateTime(eventObject.end_date)
+          }}</h6
+        >
+      </div>
+
       <hr />
       <div class="d-flex justify-content-end">
         <button
+          v-if="isAdmin && eventObject.is_event"
           type="submit"
-          class="btn btn-primary"
+          class="btn btn-primary mr-3"
+          @click="openEditForm"
+          >Edit</button
+        >
+        <button
+          type="submit"
+          class="btn btn-danger"
           @click="viewDetailsModal = false"
           >Close</button
         >
