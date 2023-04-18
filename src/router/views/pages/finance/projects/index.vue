@@ -29,7 +29,8 @@ export default {
     }
   },
   created() {
-    this.getProjects()
+    this.getProjects();
+    document.addEventListener('scroll', this.checkIsVisible);
   },
   methods: {
     async getProjects(link) {
@@ -52,7 +53,15 @@ export default {
         })
       }
     },
-  }
+    checkIsVisible() {
+      const rect = this.$refs['project-list'].getBoundingClientRect();
+      if (rect.bottom <= window.innerHeight) {
+        if(this.links.next && !this.loading) {
+          this.getProjects(this.links.next)
+        }
+      }
+    },
+  },
 }
 </script>
 
@@ -75,11 +84,7 @@ export default {
       </div> -->
     </div>
 
-    <div v-if="loading" class=" d-flex justify-content-center">
-      <b-spinner type="grow" size="sm" variant="primary"></b-spinner>
-    </div>
-
-    <div v-else class="row">
+    <div ref="project-list" class="row">
       <OtherProjectCard
         v-for="project in projectData"
         :key="project.id"
@@ -87,23 +92,19 @@ export default {
       />
     </div>
 
-    <div v-if="links.next" class="row mb-3 mt-2">
-      <div class="col-12">
-        <div class="text-center">
-          <div class="btn btn-white" @click="getProjects(links.next)">
-            <feather
-              type="loader"
-              class="icon-dual icon-xs mr-2 align-middle"
-            ></feather
-            >Load more
-          </div>
-        </div>
-      </div>
+    <div v-if="loading" class=" d-flex justify-content-center">
+      <b-spinner type="grow" size="sm" variant="primary"></b-spinner>
     </div>
 
-
-    <div v-if="!loading && projectData.length <= 0" class=" w-100 d-flex justify-content-center">
-      <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
+    <div
+      v-if="!loading && projectData.length <= 0"
+      class=" w-100 d-flex justify-content-center"
+    >
+      <img
+        :src="require('@assets/svgs/empty.svg')"
+        alt="no projects"
+        style="width:30%"
+      />
     </div>
   </Layout>
 </template>

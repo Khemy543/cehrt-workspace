@@ -373,14 +373,13 @@ export default {
     },
 
     getTaxAmount() {
-      let total = 0
+      let total = 0;
+      console.log(this.deliverables)
       for (const n of this.deliverables) {
-        if (n.deliverable_fee_amount_paid) {
           total =
             total +
             Number(n.vat_nhil_get_fund || 0) +
-            Number(n.with_holding_tax || 0)
-        }
+            Number(n.with_holding_tax || 0);
       }
       return total.toFixed(2)
     },

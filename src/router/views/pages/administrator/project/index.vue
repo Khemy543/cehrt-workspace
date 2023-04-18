@@ -2,10 +2,10 @@
   <Layout>
     <PageHeader :title="title" :items="items" />
 
-    <div v-if="loading" class=" d-flex justify-content-center">
+    <!-- <div v-if="loading" class=" d-flex justify-content-center">
       <b-spinner type="grow" size="sm" variant="primary"></b-spinner>
-    </div>
-    <div v-else class="row">
+    </div> -->
+    <div class="row">
       <div class="col">
         <div class="card">
           <div class="card-body">
@@ -15,7 +15,7 @@
                   <div class="col-md-3 col-xl-6"> </div>
                 </div>
 
-                <div class="row">
+                <div ref="project-list" class="row">
                   <OtherProjectCard
                     v-for="project in projectData"
                     :key="project.id"
@@ -23,21 +23,12 @@
                   />
                 </div>
 
-                <div v-if="links.next" class="row mb-3 mt-2">
-                  <div class="col-12">
-                    <div class="text-center">
-                      <div
-                        class="btn btn-white"
-                        @click="getProjects(links.next)"
-                      >
-                        <feather
-                          type="loader"
-                          class="icon-dual icon-xs mr-2 align-middle"
-                        ></feather
-                        >Load more
-                      </div>
-                    </div>
-                  </div>
+                <div v-if="loading" class=" d-flex justify-content-center">
+                  <b-spinner
+                    type="grow"
+                    size="sm"
+                    variant="primary"
+                  ></b-spinner>
                 </div>
 
                 <div
@@ -178,6 +169,7 @@ export default {
   created() {
     this.getDeletionRequest()
     this.getProjects()
+    document.addEventListener('scroll', this.checkIsVisible)
   },
   methods: {
     async getDeletionRequest() {
@@ -218,7 +210,14 @@ export default {
         })
       }
     },
-
+    checkIsVisible() {
+      const rect = this.$refs['project-list'].getBoundingClientRect()
+      if (rect.bottom <= window.innerHeight) {
+        if (this.links.next && !this.loading) {
+          this.getProjects(this.links.next)
+        }
+      }
+    },
     showRejectModal(request) {
       this.selectedRequest = request
       this.show = true

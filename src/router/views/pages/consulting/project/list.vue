@@ -3,8 +3,8 @@ import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
 import CreateProjectModal from '@components/CreateProjectModal.vue'
 import ProjectCard from '@components/project-card.vue'
-import ProjectTable from "@components/ProjectTable";
-import graph from '@/src/msalConfig/graph';
+import ProjectTable from '@components/ProjectTable'
+import graph from '@/src/msalConfig/graph'
 
 export default {
   page: {
@@ -37,22 +37,25 @@ export default {
       },
       gridView: true,
       formtitle: 'Create New Project',
-      status: ''
+      status: '',
     }
   },
   created() {
     this.getProjects()
+    document.addEventListener('scroll', this.checkIsVisible);
   },
   methods: {
     async getProjects(link = null, status = '') {
       try {
-        this.loading = true;
-        this.status = status;
-        const response = await this.$http.get(link || `/fetch/projects?project_status=${status}`)
+        this.loading = true
+        this.status = status
+        const response = await this.$http.get(
+          link || `/fetch/projects?project_status=${status}`
+        )
 
         if (response) {
           const { data, links, meta } = response.data
-          if(meta.current_page === 1) {
+          if (meta.current_page === 1) {
             this.projectData = []
           }
           this.projectData = [...this.projectData, ...data]
@@ -68,34 +71,52 @@ export default {
         })
       }
     },
+    checkIsVisible() {
+      const rect = this.$refs['project-list'].getBoundingClientRect()
+      if (rect.bottom <= window.innerHeight) {
+        if (this.links.next && !this.loading) {
+          this.getProjects(this.links.next)
+        }
+      }
+    },
     closeModal() {
       this.show = false
     },
     async addNewProject(form) {
       try {
-        this.vloading = true;
+        this.vloading = true
         const data = await graph.createProjectFolder({
           name: form.name,
-          folder: { },
-          '@microsoft.graph.conflictBehavior': 'replace'
-        });
+          folder: {},
+          '@microsoft.graph.conflictBehavior': 'replace',
+        })
 
-        const subData = await graph.createProjectMediaFolder({
-          name: 'Media',
-          folder: { },
-          '@microsoft.graph.conflictBehavior': 'replace'
-        }, data.id);
-        
-        const response = await this.$http.post('/create/project', {...form, onedrive_id: data.id, images_path: subData.webUrl});
+        const subData = await graph.createProjectMediaFolder(
+          {
+            name: 'Media',
+            folder: {},
+            '@microsoft.graph.conflictBehavior': 'replace',
+          },
+          data.id
+        )
+
+        const response = await this.$http.post('/create/project', {
+          ...form,
+          onedrive_id: data.id,
+          images_path: subData.webUrl,
+        })
 
         if (response) {
           this.form = {}
 
-          this.projectData = [{...response.data.project, assignees: []}, ...this.projectData]
+          this.projectData = [
+            { ...response.data.project, assignees: [] },
+            ...this.projectData,
+          ]
 
           this.closeModal()
 
-          this.vloading = false;
+          this.vloading = false
 
           this.$bvToast.toast('New project added successfully', {
             title: 'Success',
@@ -125,7 +146,7 @@ export default {
           variant: 'danger',
           toastClass: 'text-white',
         })
-        this.vloading = false;
+        this.vloading = false
       }
     },
   },
@@ -155,15 +176,40 @@ export default {
             <button type="button" class="btn" :class="status === 'completed' ? 'btn-primary' : 'btn-white'" @click="getProjects(null, 'completed')">Finished</button>
           </div> -->
           <div class="btn-group ml-2 d-none d-sm-inline-block">
-            <button type="button" class="btn btn-sm" :class="!gridView ? 'btn-white' : 'btn-primary'" @click="gridView = true">
+            <button
+              type="button"
+              class="btn btn-sm"
+              :class="!gridView ? 'btn-white' : 'btn-primary'"
+              @click="gridView = true"
+            >
               <i class="uil uil-apps"></i>
             </button>
           </div>
           <div class="btn-group d-none d-sm-inline-block">
-            <button type="button" class="btn btn-sm" :class="gridView ? 'btn-white' : 'btn-primary'" @click="gridView = false">
+            <button
+              type="button"
+              class="btn btn-sm"
+              :class="gridView ? 'btn-white' : 'btn-primary'"
+              @click="gridView = false"
+            >
               <i class="uil uil-align-left-justify"></i>
             </button>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div ref="project-list" class="row">
+      <div class="col-12">
+        <div v-if="gridView" class="row">
+          <ProjectCard
+            v-for="project in projectData"
+            :key="project.id"
+            :project="project"
+          />
+        </div>
+        <div v-else>
+          <ProjectTable :projects="projectData" />
         </div>
       </div>
     </div>
@@ -172,42 +218,19 @@ export default {
       <b-spinner type="grow" size="sm" variant="primary"></b-spinner>
     </div>
 
-    <div v-else class="row">
-      <div class="col-12">
-      <div v-if="gridView" class="row">
-        <ProjectCard
-            v-for="project in projectData"
-            :key="project.id"
-            :project="project"
-        />
-      </div>
-      <div v-else>
-        <ProjectTable :projects="projectData" />
-      </div>
-      </div>
-    </div>
-
-    <div v-if="links.next" class="row mb-3 mt-2">
-      <div class="col-12">
-        <div class="text-center">
-          <div class="btn btn-white" @click="getProjects(links.next, status)">
-            <feather
-              type="loader"
-              class="icon-dual icon-xs mr-2 align-middle"
-            ></feather
-            >Load more
-          </div>
-        </div>
-      </div>
-    </div>
-
-
-    <div v-if="!loading && projectData.length <= 0" class=" w-100 d-flex justify-content-center">
-      <img :src="require('@assets/svgs/empty.svg')" alt="no projects" style="width:30%" />
+    <div
+      v-if="!loading && projectData.length <= 0"
+      class=" w-100 d-flex justify-content-center"
+    >
+      <img
+        :src="require('@assets/svgs/empty.svg')"
+        alt="no projects"
+        style="width:30%"
+      />
     </div>
 
     <CreateProjectModal
-      :value="show" 
+      :value="show"
       :form-title="formtitle"
       :close="closeModal"
       :action="addNewProject"
