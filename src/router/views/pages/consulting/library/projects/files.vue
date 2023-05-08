@@ -328,7 +328,6 @@ export default {
       return total.toFixed(2)
     },
     updateChart() {
-      console.log('updating chart...')
       this.expenditure.series = [
         {
           name: 'Amount',
@@ -458,26 +457,19 @@ export default {
     async addFile(form) {
       try {
         this.uploading = true
-        const deliverable = this.formattedDeliverables.find(
-          (item) => item.id === form.project_type_deliverable_id
-        )
-
-        const fileName = form.file_key
+        const fileName = form.file_key === 'corespondents' ? form.file_name : form.file_key
           .split('_')
           .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
           .join(' ')
-
-        const extension = form.file.name.split('.').pop()
+        const extension = form.file.name.split('.').pop();
 
         const data = await graph.createProjectUploadSession({
-          fileName: `${(deliverable && deliverable.deliverable_name) ||
-            fileName}.${extension}`,
+          fileName: `${fileName}.${extension}`,
           fileContent: form.file,
           folder: this.project.name,
         })
         const uploadData = await graph.uploadFileInChunk({
-          fileName: `${(deliverable && deliverable.deliverable_name) ||
-            fileName}.${extension}`,
+          fileName: `${fileName}.${extension}`,
           fileContent: form.file,
           uploadUrl: data.uploadUrl,
         })
@@ -828,23 +820,23 @@ export default {
             <div class="d-flex justify-content-between">
               <div>
                 <h4 class="mt-0">
-                  Project: {{ project.name }}
-                  <div
-                    class="badge font-size-13 font-weight-normal ml-3"
-                    :class="
-                      project.status === 'pending'
-                        ? ' badge-warning'
-                        : project.status === 'ongoing'
-                        ? 'badge-primary'
-                        : project.status === 'overdue'
-                        ? 'badge-danger'
-                        : 'badge-success'
-                    "
-                    >{{ project.status }}</div
-                  >
+                  <span class="mr-3">Project: {{ project.name }}</span>
                 </h4>
+                <div
+                  class="badge font-size-13 font-weight-normal mt-1"
+                  :class="
+                    project.status === 'pending'
+                      ? ' badge-warning'
+                      : project.status === 'ongoing'
+                      ? 'badge-primary'
+                      : project.status === 'overdue'
+                      ? 'badge-danger'
+                      : 'badge-success'
+                  "
+                  >{{ project.status }}</div
+                >
               </div>
-              <div>
+              <div style="flex-shrink: 0;">
                 <button
                   type="button"
                   class="btn btn-danger mr-4 mb-3 mb-sm-0"
@@ -855,20 +847,20 @@ export default {
               </div>
             </div>
 
-            <div class="text-muted">
+            <div class="text-muted mt-2">
               <div
-                class="badge badge-soft-primary font-size-13 font-weight-normal"
+                class="badge badge-soft-primary font-size-13 font-weight-normal mb-1 mr-1"
               >
                 {{ project.project_sector && project.project_sector.name }}
               </div>
 
               <div
-                class="badge badge-soft-success font-size-13 font-weight-normal ml-1"
+                class="badge badge-soft-success font-size-13 font-weight-normal mr-1 mb-1"
                 >{{ project.project_type && project.project_type.name }}</div
               >
 
               <div
-                class="badge badge-soft-danger font-size-13 font-weight-normal ml-1"
+                class="badge badge-soft-danger font-size-13 font-weight-normal mb-1"
                 ><i class="uil-user text-danger"></i> Client :
                 {{ project.client }}</div
               >
@@ -1004,25 +996,23 @@ export default {
           </div>
         </div>
       </div>
-      
 
       <!-- finance graph -->
       <div v-if="isFinance" class="col-12">
-
         <div class="row">
-        <div class="col-12">
-          <ProjectSummary
-            :project="{
-              deliverables: financeDeliverables,
-            }"
-            :deliverables="financeDeliverables"
-            :contract-amount="contractAmount"
-            :amount-paid="getAmountPaid()"
-            :expenditure="getExpenditure()"
-            :is-library="true"
-          />
+          <div class="col-12">
+            <ProjectSummary
+              :project="{
+                deliverables: financeDeliverables,
+              }"
+              :deliverables="financeDeliverables"
+              :contract-amount="contractAmount"
+              :amount-paid="getAmountPaid()"
+              :expenditure="getExpenditure()"
+              :is-library="true"
+            />
+          </div>
         </div>
-      </div>
 
         <div class="row">
           <div class="col-md-6">

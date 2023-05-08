@@ -189,12 +189,12 @@ export default {
       }).then(async ({ isConfirmed, isDenied }) => {
         if (isConfirmed) {
           try {
+            await graph.deleteFolder({ onedriveId: vItem.onedrive_id })
             const response = await this.$http.delete(
               `/delete/${vItem.id}/proposal`
             )
 
             if (response) {
-              await graph.deleteFolder({ onedriveId: vItem.onedrive_id })
               this.proposals = this.proposals.filter(
                 (item) => item.id !== vItem.id
               )
@@ -261,13 +261,11 @@ export default {
                       <div
                         class="d-flex justify-content-between align-items-center"
                       >
-                        
-
-                      <h5>
-                            <a href="javascript: void(0)" class="text-dark">{{
-                              vProposal.title
-                            }}</a>
-                          </h5>
+                        <h5>
+                          <a href="javascript: void(0)" class="text-dark">{{
+                            vProposal.title
+                          }}</a>
+                        </h5>
                         <b-dropdown
                           variant="link"
                           toggle-class="p-0 text-muted arrow-none"
@@ -297,9 +295,9 @@ export default {
                           <div class="d-flex my-3">
                             <i class="uil-user text-danger mr-1"></i>
                             <p
-                            class="text-uppercase font-size-12 text-primary"
-                            >{{ vProposal.client }}</p
-                          >
+                              class="text-uppercase font-size-12 text-primary"
+                              >{{ vProposal.client }}</p
+                            >
                           </div>
 
                           <div

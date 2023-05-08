@@ -44,9 +44,6 @@ export default {
 				// merging each step model into the final model
 				this.finalModel = Object.assign({}, this.finalModel, model)
 			}
-		},
-		addStaff(){
-			console.log('add-staff:',this.finalModel)
 		}
 	},
 }

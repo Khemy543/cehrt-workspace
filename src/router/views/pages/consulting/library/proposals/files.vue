@@ -22,6 +22,7 @@
                         <button
                           type="button"
                           class="btn btn-danger mr-4 mb-3 mb-sm-0"
+                          style="flex-shrink: 0;"
                           @click="openModal"
                         >
                           <i class="uil-plus mr-1"></i> Add File
@@ -321,7 +322,6 @@ export default {
           this.show = false
         }
       } catch (error) {
-        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {

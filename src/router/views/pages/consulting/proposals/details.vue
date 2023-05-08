@@ -437,15 +437,15 @@ export default {
       }).then(async ({ isConfirmed, isDenied }) => {
         if (isConfirmed) {
           try {
+            await graph.moveProposalToLibrary({
+                onedriveId: this.proposal.onedrive_id,
+                name: this.proposal.title,
+              })
             const response = await this.$http.patch(
               `/export/${this.$route.params.id}}/proposal`
             )
 
             if (response) {
-              await graph.moveProposalToLibrary({
-                onedriveId: this.proposal.onedrive_id,
-                name: this.proposal.title,
-              })
               this.$bvToast.toast('Project exported to library successfully', {
                 title: 'Success',
                 autoHideDelay: 5000,

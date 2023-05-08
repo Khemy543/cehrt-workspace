@@ -10,11 +10,7 @@
     :no-close-on-esc="loading"
   >
     <form @submit.prevent="action({ ...form, file, filename })">
-      <b-form-group
-        id="input-group-1"
-        label="File Name"
-        label-for="input-1"
-      >
+      <b-form-group id="input-group-1" label="File Name" label-for="input-1">
         <b-form-select
           v-if="isConsulting"
           v-model="form.project_type_deliverable_id"
@@ -44,6 +40,21 @@
             >{{ vfile.name }}</option
           >
         </b-form-select>
+      </b-form-group>
+      <b-form-group
+        v-if="form.file_key === 'corespondents'"
+        id="input-group-1"
+        label="File name"
+        label-for="input-1"
+      >
+        <b-form-input
+          id="input-1"
+          v-model="form.file_name"
+          type="text"
+          required
+          placeholder="File name"
+        >
+        </b-form-input>
       </b-form-group>
       <b-form-group id="input-group-1" label="Upload File" label-for="input-1">
         <input id="input-1" type="file" @change="onFileChange" />

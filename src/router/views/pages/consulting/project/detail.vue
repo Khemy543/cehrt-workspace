@@ -8,6 +8,8 @@ import CreateDeliverable from '@components/CreateDeliverable'
 import ProjectDeletionModal from '../../../../../components/ProjectDeletionModal.vue'
 import ExportProjectForm from '@/src/components/ExportProjectForm.vue'
 import File from '@/src/components/file.vue'
+import { VueEditor } from 'vue2-editor'
+import 'quill/dist/quill.bubble.css'
 
 export default {
   page: {
@@ -21,10 +23,14 @@ export default {
     CreateDeliverable,
     ProjectDeletionModal,
     ExportProjectForm,
-    File
-},
+    File,
+    VueEditor,
+  },
   data() {
     return {
+      editorOptions: {
+        theme: 'bubble',
+      },
       show: false,
       showExport: false,
       formtitle: 'Edit Project',
@@ -237,7 +243,7 @@ export default {
     },
     async editProject(form) {
       try {
-        this.vloading = true;
+        this.vloading = true
         const response = await this.$http.put(
           `/update/${this.project.id}/project`,
           form
@@ -250,7 +256,7 @@ export default {
           })
           this.project = response.data.project
 
-          this.show = false;
+          this.show = false
           this.vloading = false
 
           this.$bvToast.toast('Project edited successfully', {
@@ -388,19 +394,23 @@ export default {
     },
 
     async EditDeliverable(form) {
-      this.vloading = true;
+      this.vloading = true
       try {
-        let uploadData = null;
+        let uploadData = null
 
         if (form.file) {
           const data = await graph.uploadProjectFile({
-            fileName: `${form.project_type_deliverable.deliverable_name}.${this.extension(form.file)}`,
+            fileName: `${
+              form.project_type_deliverable.deliverable_name
+            }.${this.extension(form.file)}`,
             fileContent: form.file,
             folder: this.project.name,
           })
-  
+
           uploadData = await graph.uploadFileInChunk({
-            fileName: `${form.project_type_deliverable.deliverable_name}.${this.extension(form.file)}`,
+            fileName: `${
+              form.project_type_deliverable.deliverable_name
+            }.${this.extension(form.file)}`,
             fileContent: form.file,
             uploadUrl: data.uploadUrl,
           })
@@ -411,7 +421,7 @@ export default {
           {
             ...form,
             project_type_deliverable_id: form.project_type_deliverable.id,
-            document_path: uploadData ? uploadData.webUrl : form.document_path
+            document_path: uploadData ? uploadData.webUrl : form.document_path,
           }
         )
 
@@ -441,7 +451,7 @@ export default {
           appendToast: false,
           variant: 'danger',
         })
-      this.vloading = false
+        this.vloading = false
       }
     },
 
@@ -535,7 +545,7 @@ export default {
     },
     async exportToLibrary(form) {
       try {
-        this.vloading = true;
+        this.vloading = true
         const { associated_consultants: consultants } = form
 
         let newFormData = { ...form }
@@ -559,7 +569,7 @@ export default {
             appendToast: false,
             variant: 'success',
           })
-          this.vloading = false;
+          this.vloading = false
           this.$router.push('/project/list')
         }
       } catch (error) {
@@ -635,19 +645,23 @@ export default {
                   </div>
                 </div>
 
-                <div
-                  class="col-sm-4 col-xl-6 text-sm-right"
-                >
+                <div class="col-sm-4 col-xl-6 text-sm-right">
                   <router-link
-                    :to="isCoordinator ? `/project/${project.id}/project-plan` : `/project/${project.id}/view-project-plan`"
+                    :to="
+                      isCoordinator
+                        ? `/project/${project.id}/project-plan`
+                        : `/project/${project.id}/view-project-plan`
+                    "
                     class="btn-group ml-2 d-none d-sm-inline-block"
                   >
                     <button type="button" class="btn btn-soft-info btn-sm">
                       <i class="uil uil-edit mr-1"></i>View Project Plan
                     </button>
                   </router-link>
-                  <div 
-                  v-if="isCoordinator" class="btn-group ml-2 d-none d-sm-inline-block">
+                  <div
+                    v-if="isCoordinator"
+                    class="btn-group ml-2 d-none d-sm-inline-block"
+                  >
                     <button
                       type="button"
                       class="btn btn-soft-success btn-sm"
@@ -656,8 +670,10 @@ export default {
                       <i class="uil uil-edit mr-1"></i>Export to Library
                     </button>
                   </div>
-                  <div 
-                  v-if="isCoordinator" class="btn-group ml-2 d-none d-sm-inline-block">
+                  <div
+                    v-if="isCoordinator"
+                    class="btn-group ml-2 d-none d-sm-inline-block"
+                  >
                     <button
                       type="button"
                       class="btn btn-soft-primary btn-sm"
@@ -843,20 +859,22 @@ export default {
                     </div>
                     <div class="media-body">
                       <h5 class="mt-0 font-size-15">{{ com.user }}</h5>
-                      <p class="text-muted mb-1">
-                        {{ com.comment }}
-                      </p>
+                      <p class="text-muted mb-1" v-html="com.comment" />
                     </div>
                   </div>
 
                   <form class="media" @submit.prevent="sendComment">
-                    <div class="media-body">
-                      <input
+                    <div class="media-body" style="margin-right: 5px;">
+                      <vue-editor
                         v-model="comment"
-                        type="text"
-                        class="form-control input-sm"
+                        :editor-options="editorOptions"
                         placeholder="Some text value..."
-                      />
+                      ></vue-editor>
+                    </div>
+                    <div class="float-right">
+                      <button type="submit" class="btn btn-success">
+                        <i class="uil uil-message mr-1"></i>
+                      </button>
                     </div>
                   </form>
                 </b-tab>
@@ -864,7 +882,7 @@ export default {
                   <h5 class="mb-3 header-title">Attached Files</h5>
                   <div class="d-flex align-items-center mt-2">
                     <div v-for="dev in projectDeliverables" :key="dev.id">
-                      <File 
+                      <File
                         :path="dev.document_path"
                         :name="dev.project_type_deliverable.deliverable_name"
                         type="word"
@@ -1026,7 +1044,9 @@ export default {
 
           <div class="card">
             <div class="card-body">
-              <h6 class="mt-0 header-title">View and upload project media and documents</h6>
+              <h6 class="mt-0 header-title"
+                >View and upload project media and documents</h6
+              >
 
               <div class="wrapper">
                 <a
@@ -1049,10 +1069,12 @@ export default {
       :deliverable="vDeliverable"
       :editting="editting"
       :loading="vloading"
-      @input="($event) => { 
-        showCreateDeliverable = $event;
-        vDeliverable = null
-      }"
+      @input="
+        ($event) => {
+          showCreateDeliverable = $event
+          vDeliverable = null
+        }
+      "
     />
 
     <ProjectDeletionModal
@@ -1137,5 +1159,10 @@ export default {
   height: 1rem;
   line-height: 4rem;
   vertical-align: middle;
+}
+
+::v-deep .media-body .ql-editor {
+  max-height: 150px !important;
+  min-height: unset !important;
 }
 </style>

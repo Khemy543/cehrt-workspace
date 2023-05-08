@@ -74,8 +74,6 @@ export const actions = {
       auth.configure('3082b7e9-5aca-4942-a4a3-1a796b8bf037', false)
       // Restore any cached or saved local user
       commit('GRAPH_USER', auth.user())
-
-      console.log(`configured ${auth.isConfigured()}`)
       return user
     })
   },
@@ -161,8 +159,6 @@ export const actions = {
       auth.configure('3082b7e9-5aca-4942-a4a3-1a796b8bf037', false)
       // Restore any cached or saved local user
       commit('GRAPH_USER', auth.user())
-
-      console.log(`configured ${auth.isConfigured()}`)
       return user
     } catch (error) {
       if (error.response && error.response.status === 401) {

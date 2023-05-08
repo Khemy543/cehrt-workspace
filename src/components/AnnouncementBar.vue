@@ -3,7 +3,6 @@
     class="sidebar"
     :style="{ right: `${width}px` }"
     :class="{ 'padding-show': width >= 0 }"
-    v-click-outside="clickOutside"
   >
     <div class="top">
       <h5>Announcements</h5>
@@ -12,9 +11,9 @@
 
     <div class="mt-4">
       <div
-        class="announcement-card "
         v-for="announcement in announcements"
         :key="announcement.id"
+        class="announcement-card "
       >
         <p class="date">{{ formateDateTime( announcement.created_at || new Date()) }}</p>
         <h5>{{ announcement.title }}</h5>
@@ -66,9 +65,6 @@ export default {
     formateDateTime,
     closeNav() {
       this.$emit('set-width', -350)
-    },
-    clickOutside() {
-      console.log(this.width)
     },
     async getAnnouncements(link = null) {
       try {

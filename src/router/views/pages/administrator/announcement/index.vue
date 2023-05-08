@@ -1,7 +1,6 @@
 <script>
 import appConfig from '@src/app.config'
 import Layout from '@layouts/main'
-import PageHeader from '@components/page-header'
 import { VueEditor } from 'vue2-editor'
 import 'quill/dist/quill.bubble.css'
 export default {
@@ -12,7 +11,6 @@ export default {
   },
   components: {
     Layout,
-    PageHeader,
     VueEditor,
   },
   props: {
@@ -55,7 +53,7 @@ export default {
         const response = await this.$http.get('admin/announcement')
 
         if (response) {
-          const { data, meta } = response.data
+          const { data } = response.data
 
           this.announcements = data
         }
@@ -89,7 +87,6 @@ export default {
           this.form = {}
         }
       } catch (error) {
-        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -124,7 +121,6 @@ export default {
           })
         }
       } catch (error) {
-        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,

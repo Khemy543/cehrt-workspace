@@ -374,7 +374,6 @@ export default {
 
     getTaxAmount() {
       let total = 0;
-      console.log(this.deliverables)
       for (const n of this.deliverables) {
           total =
             total +
