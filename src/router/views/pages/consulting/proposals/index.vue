@@ -189,12 +189,12 @@ export default {
       }).then(async ({ isConfirmed, isDenied }) => {
         if (isConfirmed) {
           try {
-            await graph.deleteFolder({ onedriveId: vItem.onedrive_id })
             const response = await this.$http.delete(
               `/delete/${vItem.id}/proposal`
             )
 
             if (response) {
+              await graph.deleteFolder({ onedriveId: vItem.onedrive_id })
               this.proposals = this.proposals.filter(
                 (item) => item.id !== vItem.id
               )

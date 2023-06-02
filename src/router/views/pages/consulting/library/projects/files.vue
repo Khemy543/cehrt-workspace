@@ -457,11 +457,14 @@ export default {
     async addFile(form) {
       try {
         this.uploading = true
-        const fileName = form.file_key === 'corespondents' ? form.file_name : form.file_key
-          .split('_')
-          .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
-          .join(' ')
-        const extension = form.file.name.split('.').pop();
+        const fileName =
+          form.file_key === 'corespondents'
+            ? form.file_name
+            : form.file_key
+                .split('_')
+                .map((item) => item.charAt(0).toUpperCase() + item.slice(1))
+                .join(' ')
+        const extension = form.file.name.split('.').pop()
 
         const data = await graph.createProjectUploadSession({
           fileName: `${fileName}.${extension}`,
@@ -479,7 +482,12 @@ export default {
         let url = `/project/${this.$route.params.id}/create-deliverable`
         if (form.file_key) {
           if (form.file_key === 'corespondents') {
-            requestData[form.file_key] = [uploadData.webUrl]
+            requestData[form.file_key] = [
+              {
+                corespondent_path: uploadData.webUrl,
+                name: fileName,
+              },
+            ]
           } else {
             requestData[form.file_key] = uploadData.webUrl
           }

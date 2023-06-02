@@ -4,19 +4,21 @@ import Layout from '@layouts/main'
 import PageHeader from '@components/page-header'
 import graph from '@/src/msalConfig/graph'
 import File from '@/src/components/file.vue'
+import AddCorrespondentModal from '@/src/components/Admin/AddCorrespondentModal.vue'
 
 export default {
   page: {
     title: 'Projects',
     meta: [{ name: 'description', content: appConfig.description }],
   },
-  components: { Layout, PageHeader, File },
+  components: { Layout, PageHeader, File, AddCorrespondentModal },
   data() {
     return {
       loading: true,
       project: {},
       contractForm: {},
       title: 'Project Overview',
+      show: false,
       items: [
         {
           text: 'Cehrt',
@@ -94,12 +96,18 @@ export default {
       await this.saveProjectData({
         apiKey: key,
         value: uploadData.webUrl,
+        fileName
       })
     },
-    async saveProjectData({ apiKey, value }) {
+    async saveProjectData({ apiKey, value, fileName }) {
       let requestData = {}
       if (apiKey === 'corespondents') {
-        requestData[apiKey] = [value]
+        requestData[apiKey] = [
+          {
+            name: fileName,
+            corespondent_path: value,
+          },
+        ]
       } else {
         requestData[apiKey] = value
       }
@@ -203,8 +211,7 @@ export default {
             toastClass: 'text-white',
           })
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     },
     async removeContractFile() {
       try {
@@ -301,10 +308,7 @@ export default {
       return null
     },
     addNewCorrespondant() {
-      this.correspondents.push({
-        id: this.correspondents[this.correspondents.length - 1].id + 1,
-        file: null,
-      })
+      this.show = true;
     },
     async deleteCorrespondent(id) {
       try {
@@ -578,47 +582,15 @@ export default {
                         "
                       >
                         <File
-                          :name="`correspondence-${index + 1}`"
+                          :name="correspondents[index].name"
                           type="pdf"
                           :path="
                             createUrl(correspondents[index].corespondent_path)
                           "
                         />
                       </div>
-                      <div v-else>
-                        <input
-                          ref="contract"
-                          type="file"
-                          @change="
-                            (e) =>
-                              handleChangeCorrespondent(
-                                e,
-                                correspondents[index]
-                              )
-                          "
-                        />
-                      </div>
                     </div>
                     <div class="d-flex">
-                      <button
-                        v-if="
-                          correspondents[index] &&
-                            typeof correspondents[index].corespondent_path ===
-                              'object'
-                        "
-                        type="button"
-                        class="btn btn-soft-primary btn-sm mx-2"
-                        @click="
-                          handleFileUpload({
-                            fileName: `Correspondent${index + 1}.${extension(
-                              correspondents[index].corespondent_path
-                            )}`,
-                            file: correspondents[index].corespondent_path,
-                            key: 'corespondents',
-                          })
-                        "
-                        >Save</button
-                      >
                       <button
                         v-if="correspondents[index].corespondent_path"
                         type="button"
@@ -639,7 +611,7 @@ export default {
                         Permit
                       </h5>
                       <div v-if="createUrl(permitFile)">
-                        <File 
+                        <File
                           name="Permit"
                           type="pdf"
                           :path="createUrl(permitFile)"
@@ -684,7 +656,7 @@ export default {
                         Review Comment
                       </h5>
                       <div v-if="createUrl(reviewFile)">
-                        <File 
+                        <File
                           name="Review-comment"
                           type="word"
                           :path="createUrl(reviewFile)"
@@ -730,6 +702,11 @@ export default {
         </div>
       </div>
     </div>
+    <AddCorrespondentModal
+      :action="handleFileUpload"
+      :value="show"
+      @input="show = $event"
+    />
   </Layout>
 </template>
 <style scoped>
