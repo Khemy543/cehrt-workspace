@@ -813,7 +813,6 @@ export default {
       <b-spinner type="grow" variant="primary"></b-spinner>
     </div>
     <div v-else class="row">
-      {{ getAmountPaid() }}
       <div class="col-lg-12">
         <div class="card">
           <div class="card-body">
