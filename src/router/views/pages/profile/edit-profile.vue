@@ -20,7 +20,6 @@ export default {
     this.form = { ...this.user }
   },
   methods: {
-
     browse() {
       this.$refs['file'].click()
     },
@@ -30,22 +29,28 @@ export default {
 
     async handleSubmitUpdateProfile() {
       try {
-        /* const formData = new FormData()
-        for (const key in this.form) {
-          formData.append(`${key}`, this.form[key])
-        }
-
-        formData.append('_method', 'PUT') */
-
-        const departmentIds = this.form.departments.map(department => department.id);
-        const postionsIds = this.form.position.map(post => post.id)
+        const departmentIds = this.form.departments.map(
+          (department) => department.id
+        )
+        const postionsIds = this.form.position.map((post) => post.id)
 
         const response = await this.$http.put(
           `auth/${this.form.id}/account/update`,
-          { ...this.form, department_ids: departmentIds, position_ids: postionsIds }
+          {
+            ...this.form,
+            department_ids: departmentIds,
+            position_ids: postionsIds,
+          }
         )
 
         if (response) {
+          this.$store.dispatch('auth/setCurrentUser', response.data.staff)
+          this.$bvToast.toast('Profile updated successfully', {
+            title: 'Success',
+            autoHideDelay: 5000,
+            appendToast: false,
+            variant: 'success',
+          })
         }
       } catch (error) {
         const { status, data } = error.response
@@ -82,7 +87,7 @@ export default {
             class="mr-2 d-flex align-items-center rounded-circle justify-content-center bg-primary text-white font-weight-bold position-relative"
           >
             {{ initials }}
-           <!--  <div
+            <!--  <div
               class="position-absolute bg-secondary rounded-circle d-flex justify-content-center align-items-center"
               style=" top:-2px; right:-2px;height:25px; width:25px; cursor:pointer;"
               @click="browse"

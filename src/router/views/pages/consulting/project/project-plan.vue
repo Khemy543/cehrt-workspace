@@ -30,6 +30,7 @@ export default {
       ],
       loading: false,
       project: {},
+      projectDeliverable: [],
       submitModal: false,
       form: {
         principal: '',
@@ -58,9 +59,6 @@ export default {
           (position) => position.name === 'Principal Consultant'
         ) && this.$route.query.isPrincipalConsultant === 'true'
       )
-    },
-    projectDeliverable() {
-      return this.project.deliverable || []
     },
     department() {
       return this.$store ? this.$store.state.auth.userDepartment : {} || {}
@@ -102,6 +100,7 @@ export default {
             ...subtask,
             subtask: true,
             number: `${count}.${subcount}`,
+            parentId: task.id
           })
           subcount++
         })
@@ -139,7 +138,11 @@ export default {
         )
 
         if (response) {
-          this.project = response.data
+          this.project = {
+            name: response.data.name,
+            id: response.data.id
+          }
+          this.projectDeliverable = response.data.deliverable
           this.loading = false
         }
       } catch (error) {
@@ -163,12 +166,26 @@ export default {
         {}
       )
     },
+
+    setTaskAllocatedDays(deliverableIndex, task, day){
+      const deliverable = this.projectDeliverable[deliverableIndex];
+      if(task.parentId) {
+        const taskIndex = deliverable.tasks.findIndex((devTask) => devTask.id === task.parentId);
+        const subTaskIndex = deliverable.tasks[taskIndex].subtasks.findIndex((subtask) => subtask.id === task.id);
+        const newTask = {...deliverable.tasks[taskIndex].subtasks[subTaskIndex], allocated_days: Number(day)}
+        deliverable.tasks[taskIndex].subtasks.splice(subTaskIndex, 1, newTask)
+      }else{
+        const taskIndex = deliverable.tasks.findIndex((devTask) => devTask.id === task.id)
+        const newTask = {...deliverable.tasks[taskIndex], allocated_days: Number(day) }
+        deliverable.tasks.splice(taskIndex, 1, newTask);
+      }
+    },
     async saveDetails(task) {
       const tempTask = { ...task, amount: task.rate * task.allocated_days }
-
+      
       try {
         const response = await this.$http.put(
-          `/update/${task.id}/task`,
+          `/update/${task.id}/${task.parentId ? 'sub-task' : 'task'}`,
           tempTask
         )
 
@@ -388,7 +405,7 @@ export default {
                 </div>
                 <div v-else>
                   <div
-                    v-for="deliverable in projectDeliverable"
+                    v-for="(deliverable, index) in projectDeliverable"
                     :key="deliverable.id"
                     class="mt-4"
                   >
@@ -422,10 +439,11 @@ export default {
                             <td>
                               <div style="width:100px;">
                                 <b-form-input
-                                  v-model="task.allocated_days"
+                                  :value="task.allocated_days"
                                   type="number"
                                   placeholder="0"
                                   required
+                                  @input="($event) => setTaskAllocatedDays(index, task, $event)"
                                   @blur="saveDetails(task)"
                                 ></b-form-input>
                               </div>
@@ -453,7 +471,6 @@ export default {
                               >{{ task.rate_currency }}
                               {{ amountFormat(task.rate) || 'N/A' }}</td
                             >
-
                             <td>{{
                               amountFormat(
                                 getAmount(

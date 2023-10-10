@@ -63,6 +63,10 @@ export const actions = {
     dispatch('validate')
   },
 
+  setCurrentUser({ commit }, payload){
+    commit('SET_CURRENT_USER', payload)
+  },
+
   // Logs in the current user.
   logIn({ commit, dispatch, getters }, { email, password } = {}) {
     if (getters.loggedIn) return dispatch('validate')

@@ -279,8 +279,8 @@ export default {
             </div>
             <div class="row">
               <div class="col-md-6">
-                <b-form-group id="SNNIT_number" label="Ghana Card ID" label-for="SNNIT_number">
-                  <b-form-input id="SNNIT_number" v-model="form.SNNIT_number" type="text" placeholder="Ghana Card ID">
+                <b-form-group id="Ghana_Card_number" label="Ghana Card ID" label-for="Ghana_Card_number">
+                  <b-form-input id="Ghana_Card_number" v-model="form.ghana_card_number" type="text" placeholder="Ghana Card ID">
                   </b-form-input>
                 </b-form-group>
               </div>
