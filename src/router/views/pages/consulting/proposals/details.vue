@@ -438,9 +438,9 @@ export default {
         if (isConfirmed) {
           try {
             await graph.moveProposalToLibrary({
-                onedriveId: this.proposal.onedrive_id,
-                name: this.proposal.title,
-              })
+              onedriveId: this.proposal.onedrive_id,
+              name: this.proposal.title,
+            })
             const response = await this.$http.patch(
               `/export/${this.$route.params.id}}/proposal`
             )
@@ -554,17 +554,31 @@ export default {
         const response = await this.$http.post(`/create/project`, {
           ...form,
           proposal_id: this.$route.params.id,
-          onedrive_id: data.id, images_path: subData.webUrl
+          onedrive_id: data.id,
+          images_path: subData.webUrl,
         })
 
         if (response) {
+          if (form.export_to_library) {
+            await graph.moveProposalToLibrary({
+              onedriveId: this.proposal.onedrive_id,
+              name: this.proposal.title,
+            })
+            await this.$http.patch(`/export/${this.$route.params.id}}/proposal`)
+          }
+
           this.$bvToast.toast('Project created successfully', {
             title: 'Success',
             autoHideDelay: 5000,
             appendToast: false,
             variant: 'success',
           })
-          this.$router.push('/project/list')
+
+          this.showCreateProject = false;
+
+          if (form.export_to_library) {
+            this.$router.push('/project/list')
+          }
         }
       } catch (error) {
         if (error.response) {

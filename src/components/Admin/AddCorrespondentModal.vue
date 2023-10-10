@@ -13,7 +13,7 @@
       <b-form-group id="input-group-1" label="File name" label-for="input-1">
         <b-form-input
           id="input-1"
-          v-model="form.filename"
+          v-model="form.fileName"
           type="text"
           required
           placeholder="File name"

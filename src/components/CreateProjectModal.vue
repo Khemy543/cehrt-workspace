@@ -105,16 +105,16 @@
             ></b-form-input>
           </b-form-group>
         </div>
-        <!-- <div class="col-6">
-          <b-form-group id="input-group-1" label="Date Due" label-for="input-1">
-            <b-form-input
-              id="input-1"
-              v-model="form.end_date"
-              type="date"
-              required
-            ></b-form-input>
-          </b-form-group>
-        </div> -->
+        <div class="col-6">
+          <b-form-checkbox
+            id="checkbox-1"
+            v-model="form.export_to_library"
+            name="checkbox-1"
+            style="margin-top: 35px;"
+          >
+            Export to library
+          </b-form-checkbox>
+        </div>
       </div>
       <button v-if="!loading" type="submit" class="btn btn-primary"
         >Submit</button
@@ -153,6 +153,7 @@ export default {
   data() {
     return {
       form: {
+        export_to_library: false,
         project_type_id: '',
         project_sector_id: '',
         coordinator_id: '',

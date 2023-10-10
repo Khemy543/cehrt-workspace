@@ -124,6 +124,7 @@ export default {
           )
         }
       } catch (error) {
+        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -180,6 +181,7 @@ export default {
           ]
         }
       } catch (error) {
+        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -192,7 +194,7 @@ export default {
     async getEvents() {
       try {
         this.calendarOptions.events = this.calendarOptions.events.filter(
-          (event) => !event.id.includes('event')
+          (event) => !`${event.id}`.includes('event')
         )
         const response = await this.$http.get(
           `/fetch/${this.selectedUser.id ||
@@ -217,6 +219,7 @@ export default {
           ]
         }
       } catch (error) {
+        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -228,7 +231,7 @@ export default {
     async getDashboardData() {
       try {
         this.calendarOptions.events = this.calendarOptions.events.filter(
-          (event) => !event.id.includes('task')
+          (event) => !`${event.id}`.includes('task')
         )
 
         const response = await this.$http.get(
@@ -363,6 +366,7 @@ export default {
           ]
         }
       } catch (error) {
+        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -405,6 +409,7 @@ export default {
           })
         }
       } catch (error) {
+        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -469,6 +474,7 @@ export default {
           })
         }
       } catch (error) {
+        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -523,6 +529,7 @@ export default {
               })
             }
           } catch (error) {
+        console.log(error)
             this.$bvToast.toast('Something happened, please try again later', {
               title: 'Error',
               autoHideDelay: 5000,

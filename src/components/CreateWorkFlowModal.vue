@@ -83,7 +83,7 @@ export default {
         name: '',
         tasks: [
           {
-            fake_id: 1,
+            fake_id: `#${1}`,
             task_name: '',
           },
         ],
@@ -105,7 +105,7 @@ export default {
       this.form.name = (newValue && newValue.name) || ''
       this.form.tasks = (newValue && newValue.work_flow_tasks) || [
         {
-          fake_id: 1,
+          fake_id: `#${1}`,
           task_name: '',
         },
       ]
@@ -116,7 +116,7 @@ export default {
       const lastIndex = this.form.tasks.length - 1
       if (this.form.tasks[lastIndex].task_name !== '') {
         this.form.tasks.push({
-          fake_id: `#${lastIndex + 1}`,
+          fake_id: `#${1}`,
           task_name: '',
         })
       } else {

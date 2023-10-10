@@ -333,7 +333,6 @@ export default {
         <h4 class="mb-1 mt-0">Project Plan</h4>
       </div>
     </div>
-
     <div v-if="loading" class="d-flex justify-content-center">
       <b-spinner type="grow" size="sm" variant="primary"></b-spinner>
     </div>
@@ -387,86 +386,85 @@ export default {
                     >
                   </div>
                 </div>
-
-                <div
-                  v-for="deliverable in projectDeliverable"
-                  v-else
-                  :key="deliverable.id"
-                  class="mt-4"
-                >
-                  <h5>{{ deliverable.name }}</h5>
-
-                  <h6 v-if="deliverable.tasks.length <= 0" class="mt-2"
-                    >This Deliverable has no task</h6
+                <div v-else>
+                  <div
+                    v-for="deliverable in projectDeliverable"
+                    :key="deliverable.id"
+                    class="mt-4"
                   >
-                  <div v-else class="w-100">
-                    <table class="table mb-0">
-                      <thead class="thead-light">
-                        <tr>
-                          <th scope="col">#</th>
-                          <th scope="col">Task</th>
-                          <th scope="col">Assignee</th>
-                          <th scope="col">Days Allocated</th>
-                          <th scope="col">Rate</th>
-                          <th scope="col">Amount</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr
-                          v-for="task in getAllDeliverableTasks(
-                            deliverable.tasks
-                          )"
-                          :key="`task-${task.id}`"
-                        >
-                          <th scope="row">{{ task.number }}</th>
-                          <td>{{ task.name }}</td>
-                          <td>{{ task.assignee || 'N/A' }}</td>
-                          <td>
-                            <div style="width:100px;">
-                              <b-form-input
-                                v-model="task.allocated_days"
-                                type="number"
-                                placeholder="0"
-                                required
-                                @blur="saveDetails(task)"
-                              ></b-form-input>
-                            </div>
-                          </td>
-                          <td
-                            v-if="
-                              getConsultingRole(task.assignee_position).name ===
-                                'External Consultant'
-                            "
-                            style="width:200px"
-                          >
-                            <div style="display: flex; align-items: center">
-                              <div>GHS</div>
-                              <b-form-input
-                                v-model="task.rate"
-                                type="text"
-                                placeholder="0"
-                                required
-                                class=" mx-2"
-                                @blur="saveDetails(task)"
-                              ></b-form-input>
-                            </div>
-                          </td>
-                          <td v-else
-                            >{{ task.rate_currency }}
-                            {{ amountFormat(task.rate) || 'N/A' }}</td
-                          >
+                    <h5>{{ deliverable.name }}</h5>
 
-                          <td>{{
-                            amountFormat(
-                              getAmount(
-                                task.allocated_days,
-                                task.rate,
-                                task.ExtractRawComponents
+                    <h6 v-if="deliverable.tasks.length <= 0" class="mt-2"
+                      >This Deliverable has no task</h6
+                    >
+                    <div v-else class="w-100">
+                      <table class="table mb-0">
+                        <thead class="thead-light">
+                          <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Task</th>
+                            <th scope="col">Assignee</th>
+                            <th scope="col">Days Allocated</th>
+                            <th scope="col">Rate</th>
+                            <th scope="col">Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr
+                            v-for="task in getAllDeliverableTasks(
+                              deliverable.tasks
+                            )"
+                            :key="`task-${task.id}`"
+                          >
+                            <th scope="row">{{ task.number }}</th>
+                            <td>{{ task.name }}</td>
+                            <td>{{ task.assignee || 'N/A' }}</td>
+                            <td>
+                              <div style="width:100px;">
+                                <b-form-input
+                                  v-model="task.allocated_days"
+                                  type="number"
+                                  placeholder="0"
+                                  required
+                                  @blur="saveDetails(task)"
+                                ></b-form-input>
+                              </div>
+                            </td>
+                            <td
+                              v-if="
+                                getConsultingRole(task.assignee_position)
+                                  .name === 'External Consultant'
+                              "
+                              style="width:200px"
+                            >
+                              <div style="display: flex; align-items: center">
+                                <div>GHS</div>
+                                <b-form-input
+                                  v-model="task.rate"
+                                  type="text"
+                                  placeholder="0"
+                                  required
+                                  class=" mx-2"
+                                  @blur="saveDetails(task)"
+                                ></b-form-input>
+                              </div>
+                            </td>
+                            <td v-else
+                              >{{ task.rate_currency }}
+                              {{ amountFormat(task.rate) || 'N/A' }}</td
+                            >
+
+                            <td>{{
+                              amountFormat(
+                                getAmount(
+                                  task.allocated_days,
+                                  task.rate,
+                                  task.ExtractRawComponents
+                                )
                               )
-                            )
-                          }}</td>
-                        </tr>
-                        <!-- <tr
+                            }}</td>
+                          </tr>
+                          <!-- <tr
                           v-for="(task, index) in getDeliverableSubtasks(
                             deliverable.tasks
                           )"
@@ -523,31 +521,31 @@ export default {
                           }}</td>
                         </tr> -->
 
-                        <tr>
-                          <td></td>
-                          <td>Total</td>
-                          <td></td>
-                          <td
-                            >{{
-                              getTotalDaysAllocated(deliverable.tasks)
-                            }}
-                            days</td
-                          >
-                          <td></td>
-                          <td
-                            >GHS
-                            {{
-                              amountFormat(
-                                getDeliverableTotalPrice(deliverable.tasks)
-                              )
-                            }}</td
-                          >
-                        </tr>
-                      </tbody>
-                    </table>
+                          <tr>
+                            <td></td>
+                            <td>Total</td>
+                            <td></td>
+                            <td
+                              >{{
+                                getTotalDaysAllocated(deliverable.tasks)
+                              }}
+                              days</td
+                            >
+                            <td></td>
+                            <td
+                              >GHS
+                              {{
+                                amountFormat(
+                                  getDeliverableTotalPrice(deliverable.tasks)
+                                )
+                              }}</td
+                            >
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
-
                 <div v-if="projectDeliverable.length > 0" class="mt-4">
                   <h4>Project Total: GHS {{ amountFormat(getTotal()) }}</h4>
                 </div>

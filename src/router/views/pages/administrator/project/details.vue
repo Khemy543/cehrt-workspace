@@ -19,6 +19,7 @@ export default {
       contractForm: {},
       title: 'Project Overview',
       show: false,
+      uploadLoading: false,
       items: [
         {
           text: 'Cehrt',
@@ -81,6 +82,7 @@ export default {
     },
 
     async handleFileUpload({ fileName, file, key }) {
+      this.uploadLoading = true;
       const data = await graph.uploadProjectFile({
         fileName,
         fileContent: file,
@@ -98,6 +100,8 @@ export default {
         value: uploadData.webUrl,
         fileName
       })
+      this.uploadLoading = false;
+      this.show = false;
     },
     async saveProjectData({ apiKey, value, fileName }) {
       let requestData = {}
@@ -573,16 +577,14 @@ export default {
                     class="media d-flex justify-content-between align-items-center mb-2"
                   >
                     <div class="media-body overflow-hidden">
-                      <h5 class="font-size-14 mt-2 mb-1">
-                        {{ deliverable.name }}
-                      </h5>
+                      
                       <div
                         v-if="
                           createUrl(correspondents[index].corespondent_path)
                         "
                       >
                         <File
-                          :name="correspondents[index].name"
+                          :name="correspondents[index].name || `Correspondent (${index + 1})`"
                           type="pdf"
                           :path="
                             createUrl(correspondents[index].corespondent_path)
@@ -705,6 +707,7 @@ export default {
     <AddCorrespondentModal
       :action="handleFileUpload"
       :value="show"
+      :loading="uploadLoading"
       @input="show = $event"
     />
   </Layout>

@@ -603,7 +603,7 @@ export default {
             corespondent.corespondents.forEach((file, index) => {
               this.correspondents.push({
                 id: uuidv4(),
-                name: `Correspondent (${index + 1})`,
+                name: file.name || `Correspondent (${index + 1})`,
                 document_path: file.corespondent_path,
               })
             })
@@ -697,7 +697,7 @@ export default {
             response.data.corespondents.forEach((file, index) => {
               this.correspondents.push({
                 id: uuidv4(),
-                name: `Correspondent (${index + 1})`,
+                name: file.name || `Correspondent (${index + 1})`,
                 document_path: file.corespondent_path,
               })
             })
