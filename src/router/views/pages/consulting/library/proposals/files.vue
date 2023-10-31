@@ -308,7 +308,7 @@ export default {
               this.correspondents.push({
                 id: uuidv4(),
                 name: `Correspondent (${index + 1})`,
-                path: file.corespondent_path,
+                path: file.correspondent_path,
               })
             })
           }
@@ -435,7 +435,7 @@ export default {
               this.correspondents.push({
                 id: file.id,
                 name: `Correspondent (${index + 1})`,
-                path: file.corespondent_path,
+                path: file.correspondent_path,
               })
             })
 

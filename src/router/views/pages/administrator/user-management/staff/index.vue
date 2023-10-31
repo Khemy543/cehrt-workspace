@@ -34,6 +34,14 @@ export default {
       loading: false,
     }
   },
+  computed: {
+    activeUsers() {
+      return this.staff.filter((user) => user.is_active)
+    },
+    blockedUsers() {
+      return this.staff.filter((user) => !user.is_active)
+    },
+  },
   created() {
     this.fetchStaff()
   },
@@ -145,88 +153,169 @@ export default {
         <div class="card" style="overflow-x: auto">
           <div class="card-body">
             <div class=" d-flex justify-content-between">
-            <div>
-              <h4 class="header-title mt-0 mb-1">View Staff</h4>
-              <p class="sub-header">
-                View all staff members
-              </p> </div
-            ><div>
-              <router-link
-                to="/user-management/add-staff"
-                type="button"
-                class="btn btn-danger mr-4 mb-3 mb-sm-0"
-              >
-                <i class="uil-plus mr-1"></i> Add Staff
-              </router-link>
+              <div>
+                <h4 class="header-title mt-0 mb-1">View Staff</h4>
+                <p class="sub-header">
+                  View all staff members
+                </p> </div
+              ><div>
+                <router-link
+                  to="/user-management/add-staff"
+                  type="button"
+                  class="btn btn-danger mr-4 mb-3 mb-sm-0"
+                >
+                  <i class="uil-plus mr-1"></i> Add Staff
+                </router-link>
+              </div>
             </div>
-            </div>
-
-            <div class="">
-              <table class="table mb-0">
-                <thead class="thead-light">
-                  <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Preferred Name</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Phone</th>
-                    <th scope="col">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="user in staff" :key="user.id">
-                    <th scope="row">{{ user.staff_id }}</th>
-                    <td>
-                      <i
-                        v-if="user.is_active === 0"
-                        class="uil uil-lock mr-2"
-                      ></i>
-                      <i v-else class="uil uil-unlock-alt mr-2"></i>
-                      {{ user.firstname }} {{ user.lastname }}
-                      {{ user.other_names }}</td
-                    >
-                    <td>{{ user.preferred_name }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>{{ user.phone_number }}</td>
-                    <td>
-                      <b-dropdown
-                        variant="link"
-                        class=" position-absolute"
-                        toggle-class="p-0 text-muted arrow-none"
-                        right
-                      >
-                        <template v-slot:button-content>
-                          <i class="uil uil-ellipsis-v font-size-14"></i>
-                        </template>
-                        <b-dropdown-item
-                          :to="`/user-management/staff/${user.id}/view-staff`"
-                          variant="secondary"
-                          ><i class="uil uil-exit mr-2"></i
-                          >View</b-dropdown-item
+            <b-tabs pills class="navtab-bg">
+              <b-tab title="Active Users" active>
+                <div class="">
+                  <table class="table mb-0">
+                    <thead class="thead-light">
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Preferred Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="user in activeUsers" :key="user.id">
+                        <th scope="row">{{ user.staff_id }}</th>
+                        <td>
+                          <i
+                            v-if="user.is_active === 0"
+                            class="uil uil-lock mr-2 text-danger"
+                          ></i>
+                          <i
+                            v-else
+                            class="uil uil-unlock-alt mr-2 text-success"
+                          ></i>
+                          {{ user.firstname }} {{ user.lastname }}
+                          {{ user.other_names }}</td
                         >
-                        <b-dropdown-divider></b-dropdown-divider>
-                        <b-dropdown-item
-                          v-if="user.is_active === 0"
-                          href="javascript: void(0);"
-                          variant="success"
-                          @click="activateAccount(user)"
+                        <td>{{ user.preferred_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.phone_number }}</td>
+                        <td>
+                          <b-dropdown
+                            variant="link"
+                            class=" position-absolute"
+                            toggle-class="p-0 text-muted arrow-none"
+                            right
+                          >
+                            <template v-slot:button-content>
+                              <i class="uil uil-ellipsis-v font-size-14"></i>
+                            </template>
+                            <b-dropdown-item
+                              :to="
+                                `/user-management/staff/${user.id}/view-staff`
+                              "
+                              variant="secondary"
+                              ><i class="uil uil-exit mr-2"></i
+                              >View</b-dropdown-item
+                            >
+                            <b-dropdown-divider></b-dropdown-divider>
+                            <b-dropdown-item
+                              v-if="user.is_active === 0"
+                              href="javascript: void(0);"
+                              variant="success"
+                              @click="activateAccount(user)"
+                            >
+                              <i class="uil uil-unlock-alt mr-2"></i>Activate
+                            </b-dropdown-item>
+                            <b-dropdown-item
+                              v-else
+                              href="javascript: void(0);"
+                              variant="danger"
+                              @click="deactivateAccount(user)"
+                            >
+                              <i class="uil uil-lock mr-2"></i>Deactivate
+                            </b-dropdown-item>
+                          </b-dropdown>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </b-tab>
+              <b-tab title="Blocked List">
+                <div class="">
+                  <table class="table mb-0">
+                    <thead class="thead-light">
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Preferred Name</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Phone</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="user in blockedUsers" :key="user.id">
+                        <th scope="row">{{ user.staff_id }}</th>
+                        <td>
+                          <i
+                            v-if="user.is_active === 0"
+                            class="uil uil-lock mr-2 text-danger"
+                          ></i>
+                          <i
+                            v-else
+                            class="uil uil-unlock-alt mr-2 text-success"
+                          ></i>
+                          {{ user.firstname }} {{ user.lastname }}
+                          {{ user.other_names }}</td
                         >
-                          <i class="uil uil-unlock-alt mr-2"></i>Activate
-                        </b-dropdown-item>
-                        <b-dropdown-item
-                          v-else
-                          href="javascript: void(0);"
-                          variant="danger"
-                          @click="deactivateAccount(user)"
-                        >
-                          <i class="uil uil-lock mr-2"></i>Deactivate
-                        </b-dropdown-item>
-                      </b-dropdown>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+                        <td>{{ user.preferred_name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.phone_number }}</td>
+                        <td>
+                          <b-dropdown
+                            variant="link"
+                            class=" position-absolute"
+                            toggle-class="p-0 text-muted arrow-none"
+                            right
+                          >
+                            <template v-slot:button-content>
+                              <i class="uil uil-ellipsis-v font-size-14"></i>
+                            </template>
+                            <b-dropdown-item
+                              :to="
+                                `/user-management/staff/${user.id}/view-staff`
+                              "
+                              variant="secondary"
+                              ><i class="uil uil-exit mr-2"></i
+                              >View</b-dropdown-item
+                            >
+                            <b-dropdown-divider></b-dropdown-divider>
+                            <b-dropdown-item
+                              v-if="user.is_active === 0"
+                              href="javascript: void(0);"
+                              variant="success"
+                              @click="activateAccount(user)"
+                            >
+                              <i class="uil uil-unlock-alt mr-2"></i>Activate
+                            </b-dropdown-item>
+                            <b-dropdown-item
+                              v-else
+                              href="javascript: void(0);"
+                              variant="danger"
+                              @click="deactivateAccount(user)"
+                            >
+                              <i class="uil uil-lock mr-2"></i>Deactivate
+                            </b-dropdown-item>
+                          </b-dropdown>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </b-tab>
+            </b-tabs>
           </div>
         </div>
       </div>

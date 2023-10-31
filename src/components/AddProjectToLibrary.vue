@@ -142,13 +142,15 @@
       <div class="row">
         <div class="col-md-6">
           <b-form-group label="Project Summary / Narrative Description">
-            <b-form-textarea
-              id="input-1"
-              v-model="form.description"
-              placeholder="Description of project"
-              rows="4"
-            >
-            </b-form-textarea>
+            <div id="task-desc" style="height: 100px; position: relative; z-index: 10;">
+              <vue-editor
+                id="input-1"
+                v-model="form.description"
+                placeholder="Description of project"
+                :editor-options="editorOptions"
+              >
+              </vue-editor>
+            </div>
           </b-form-group>
         </div>
         <div class="col-md-6">
@@ -406,8 +408,8 @@ export default {
     },
     loading: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {

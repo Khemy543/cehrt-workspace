@@ -880,7 +880,7 @@ export default {
               >
             </div>
 
-            <p class=" mt-1">{{ project.description }}</p>
+            <p class=" mt-1" v-html="project.description"/>
 
             <h6 class="mt-3 header-title">Service Description</h6>
 

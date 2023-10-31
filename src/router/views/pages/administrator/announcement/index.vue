@@ -205,38 +205,42 @@ export default {
           >
             <div class="card border h-100">
               <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                  <h5>
-                    <a href="javascript: void(0)" class="text-dark">{{
-                      announcement.title
-                    }}</a>
-                  </h5>
-                  <b-dropdown
-                    variant="link"
-                    toggle-class="p-0 text-muted arrow-none"
-                    right
+                <div style="overflow: hidden; height: 100%;">
+                  <div
+                    class="d-flex justify-content-between align-items-center"
                   >
-                    <template v-slot:button-content>
-                      <i class="uil uil-ellipsis-v font-size-14"></i>
-                    </template>
-                    <b-dropdown-item
-                      href="javascript: void(0);"
-                      variant="secondary"
-                      @click="openModal(announcement)"
+                    <h5>
+                      <a href="javascript: void(0)" class="text-dark">{{
+                        announcement.title
+                      }}</a>
+                    </h5>
+                    <b-dropdown
+                      variant="link"
+                      toggle-class="p-0 text-muted arrow-none"
+                      right
                     >
-                      <i class="uil uil-edit mr-2"></i>Edit
-                    </b-dropdown-item>
-                    <b-dropdown-item
-                      href="javascript: void(0);"
-                      variant="danger"
-                      @click="deleteAnnouncement(announcement)"
-                    >
-                      <i class="uil uil-trash-alt mr-2"></i>Delete
-                    </b-dropdown-item>
-                  </b-dropdown>
-                </div>
+                      <template v-slot:button-content>
+                        <i class="uil uil-ellipsis-v font-size-14"></i>
+                      </template>
+                      <b-dropdown-item
+                        href="javascript: void(0);"
+                        variant="secondary"
+                        @click="openModal(announcement)"
+                      >
+                        <i class="uil uil-edit mr-2"></i>Edit
+                      </b-dropdown-item>
+                      <b-dropdown-item
+                        href="javascript: void(0);"
+                        variant="danger"
+                        @click="deleteAnnouncement(announcement)"
+                      >
+                        <i class="uil uil-trash-alt mr-2"></i>Delete
+                      </b-dropdown-item>
+                    </b-dropdown>
+                  </div>
 
-                <p class="mt-2" v-html="announcement.message"></p>
+                  <p class="mt-2" v-html="announcement.message"></p>
+                </div>
               </div>
             </div>
           </div>
