@@ -73,6 +73,7 @@ export default {
     },
 
     async createProposal(form) {
+      console.log(form, "here")
       try {
         const data = await graph.createProposalFolder({
           name: form.title,
@@ -104,6 +105,7 @@ export default {
           })
         }
       } catch (error) {
+        console.log(error)
         if (error.response) {
           let message = 'Something happened, Please try again later'
           const { status, data } = error.response

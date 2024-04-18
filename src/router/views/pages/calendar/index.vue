@@ -108,10 +108,13 @@ export default {
       return newdate
     },
     getInitials(name) {
-      return name && name
-        .match(/\b(\w)/g)
-        .join('')
-        .toUpperCase()
+      return (
+        name &&
+        name
+          .match(/\b(\w)/g)
+          .join('')
+          .toUpperCase()
+      )
     },
     async getUsers() {
       try {
@@ -124,7 +127,6 @@ export default {
           )
         }
       } catch (error) {
-        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -181,7 +183,6 @@ export default {
           ]
         }
       } catch (error) {
-        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -204,13 +205,14 @@ export default {
         if (response) {
           const vEvents = response.data.map((item) => {
             return {
+              className: 'bg-danger text-white',
+              allDay: false,
               id: `event-${item.id}`,
               display: 'block',
               title: item.name,
-              startRecur: item.start_date,
-              endRecur: item.end_date,
+              start: item.start_date,
+              end: item.end_date,
               editable: true,
-              className: 'bg-info',
             }
           })
           this.calendarOptions.events = [
@@ -219,7 +221,6 @@ export default {
           ]
         }
       } catch (error) {
-        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -366,7 +367,6 @@ export default {
           ]
         }
       } catch (error) {
-        console.log(error)
         this.$bvToast.toast('Something happened, Please try again later', {
           title: 'Error',
           autoHideDelay: 5000,
@@ -391,7 +391,7 @@ export default {
           } = response.data.event
           var date = new Date(endDate)
           date.setDate(date.getDate() + 1)
-          this.events = this.events.concat({
+          this.calendarOptions.events = this.calendarOptions.events.concat({
             id: `event-${id}`,
             title: name,
             start: startDate,
@@ -409,7 +409,6 @@ export default {
           })
         }
       } catch (error) {
-        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -451,10 +450,10 @@ export default {
         )
 
         if (response) {
-          const index = this.events.findIndex(
+          const index = this.calendarOptions.events.findIndex(
             (event) => event.id === `event-${this.editableEvent.id}`
           )
-          this.$set(this.events, index, {
+          this.$set(this.calendarOptions.events, index, {
             id: `event-${this.editableEvent.id}`,
             title: this.editableEvent.name,
             start: this.editableEvent.start_date,
@@ -474,7 +473,6 @@ export default {
           })
         }
       } catch (error) {
-        console.log(error)
         if (error.response) {
           const { status, data } = error.response
           if (status === 422) {
@@ -517,7 +515,7 @@ export default {
             )
 
             if (response) {
-              this.events = this.events.filter(
+              this.calendarOptions.events = this.calendarOptions.events.filter(
                 (x) => '' + x.id !== '' + this.edit.id
               )
               this.eventModal = false
@@ -529,7 +527,6 @@ export default {
               })
             }
           } catch (error) {
-        console.log(error)
             this.$bvToast.toast('Something happened, please try again later', {
               title: 'Error',
               autoHideDelay: 5000,
@@ -617,7 +614,7 @@ export default {
     },
     selectUser(user) {
       this.selectedUser = user
-      this.events = []
+      this.calendarOptions.events = []
       this.getDashboardData()
       this.getEvents()
       this.getLeaveRequests()
@@ -913,6 +910,7 @@ export default {
               <div class="col-md-6">
                 <div class="form-group">
                   <label for="name">End Date</label>
+                  {{ editableEvent.end_date }}
                   <input
                     id="name"
                     v-model="editableEvent.end_date"

@@ -10,7 +10,7 @@ export const formateDate = (date) => {
 }
 
 export const calendarFormat = (date) => {
-  return formatISO9075(new Date(date))
+  return date ?  formatISO9075(new Date(date)) : null
 }
 
 export const slashDateFormate = (date) => {

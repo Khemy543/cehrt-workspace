@@ -20,11 +20,13 @@ const GRAPH_SCOPES = [
   'openid',
   'profile',
   'email',
+  'group.read.all', 
+  'group.readwrite.all'
 ]
 
 let accessToken
 
-const driveId = 'eb3548181cf4dc64'
+const driveId = 'EB3548181CF4DC64'
 const itemId = 'EB3548181CF4DC64!166'
 const libraryId = 'EB3548181CF4DC64!173'
 

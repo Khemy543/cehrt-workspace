@@ -15,7 +15,7 @@
         :key="announcement.id"
         class="announcement-card "
       >
-        <p class="date">{{ formateDateTime( announcement.created_at || new Date()) }}</p>
+        <p class="date">{{announcement.created_at }}</p>
         <h5>{{ announcement.title }}</h5>
         <p v-html="announcement.message"></p>
       </div>
