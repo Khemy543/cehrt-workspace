@@ -1,4 +1,4 @@
-# Shreyu - Vue based admin template
+# Cehrt Workspace
 
 ### This project is crafted using [vue-enterprise-boilerplate](https://github.com/chrisvfritz/vue-enterprise-boilerplate.git). It's an SPA project using Vue CLI 3.
 
