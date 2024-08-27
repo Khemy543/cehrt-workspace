@@ -405,7 +405,6 @@ async function customPutGraph(apiPath, data, headers) {
   let resp = await fetch(apiPath, {
     method: 'PUT',
     headers: {
-      authorization: `bearer ${accessToken}`,
       'Content-Type': 'application/json',
       ...headers,
     },
