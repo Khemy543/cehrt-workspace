@@ -15,7 +15,7 @@
                   <div class="col-md-3 col-xl-6"> </div>
                 </div>
 
-                <div ref="project-list" class="row">
+                <div ref="projectRef" class="row">
                   <OtherProjectCard
                     v-for="project in projectData"
                     :key="project.id"
@@ -211,7 +211,7 @@ export default {
       }
     },
     checkIsVisible() {
-      const rect = this.$refs['project-list'].getBoundingClientRect()
+      const rect = this.$refs['projectRef'].getBoundingClientRect()
       if (rect.bottom <= window.innerHeight) {
         if (this.links.next && !this.loading) {
           this.getProjects(this.links.next)

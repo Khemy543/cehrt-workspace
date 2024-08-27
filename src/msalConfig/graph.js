@@ -20,8 +20,8 @@ const GRAPH_SCOPES = [
   'openid',
   'profile',
   'email',
-  'group.read.all', 
-  'group.readwrite.all'
+  'group.read.all',
+  'group.readwrite.all',
 ]
 
 let accessToken
@@ -109,12 +109,12 @@ export default {
   },
 
   async copyRenumirationFileToProposal(item) {
-    let resp = await postGraph(
-      `/drives/${driveId}/items/${excelFileId}/copy`,
-      item
-    );
+    let resp = await postGraph(`/drives/${driveId}/items/${excelFileId}/copy`, {
+      ...item,
+      driveId: driveId,
+    })
 
-    if(resp) {
+    if (resp) {
       let data = await resp.json()
       return data
     }
@@ -137,10 +137,14 @@ export default {
       `/drives/${driveId}/items/${itemId}:/Proposals/${folder}/${fileName}:/createUploadSession`,
       {
         item: {
-          "@microsoft.graph.conflictBehavior": "replace",
+          '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
+          fileSize: fileContent.size,
+          description: fileName,
+          driveItemSource: { '@odata.type': 'microsoft.graph.driveItemSource' },
+          mediaSource: { '@odata.type': 'microsoft.graph.mediaSource' },
         },
-        deferCommit: false
+        deferCommit: false,
       }
     )
     if (resp) {
@@ -154,10 +158,10 @@ export default {
       `/drives/${driveId}/items/${itemId}:/Projects/${folder}/${fileName}:/createUploadSession`,
       {
         item: {
-          "@microsoft.graph.conflictBehavior": "replace",
+          '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
         },
-        deferCommit: false
+        deferCommit: false,
       }
     )
     if (resp) {
@@ -202,16 +206,20 @@ export default {
     }
   },
 
-
   async uploadFileInChunk({ fileName, fileContent, uploadUrl }) {
     let nextChunkRange = '0-10000000' // 60MB
     let startChunk = Number(nextChunkRange.split('-')[0])
-    let endChunk = (startChunk + 10000000) > fileContent.size ? fileContent.size : startChunk + 10000000 // 60MB
-    let tempEndChunk = endChunk;
-    let data = null;
-    do{
+    let endChunk =
+      startChunk + 10000000 > fileContent.size
+        ? fileContent.size
+        : startChunk + 10000000 // 60MB
+    let tempEndChunk = endChunk
+    let data = null
+    do {
       const headers = {
-        'Content-Range': `bytes ${startChunk}-${endChunk === fileContent.size - 1 ? fileContent.size : endChunk-1}/${fileContent.size}`,
+        'Content-Range': `bytes ${startChunk}-${
+          endChunk === fileContent.size - 1 ? fileContent.size : endChunk - 1
+        }/${fileContent.size}`,
       }
       const fileChunk = fileContent.slice(startChunk, endChunk)
       let resp = await customPutGraph(uploadUrl, fileChunk, headers)
@@ -219,17 +227,18 @@ export default {
         data = await resp.json()
         nextChunkRange = data.nextExpectedRanges && data.nextExpectedRanges[0]
 
-        if(nextChunkRange) {
+        if (nextChunkRange) {
           startChunk = Number(nextChunkRange.split('-')[0])
           tempEndChunk = startChunk + 10000000 // 60MB - 1 byte
-          endChunk = tempEndChunk > fileContent.size ? fileContent.size : tempEndChunk
-        }else {
-          return data;
+          endChunk =
+            tempEndChunk > fileContent.size ? fileContent.size : tempEndChunk
+        } else {
+          return data
         }
       }
-    } while(endChunk <= fileContent.size)
+    } while (endChunk <= fileContent.size)
 
-    return data;
+    return data
   },
 
   async createFile({ fileName, folder }) {
@@ -237,7 +246,7 @@ export default {
       `/drives/${driveId}/items/${itemId}:/Proposals/${folder}:/workbook/`,
       {
         name: fileName,
-        file: {}
+        file: {},
       }
     )
     if (resp) {
@@ -286,9 +295,9 @@ export default {
   },
 
   async deleteFile({ onedriveId }) {
-    let resp = await deleteGraph(`/drives/${driveId}/items/${onedriveId}`);
+    let resp = await deleteGraph(`/drives/${driveId}/items/${onedriveId}`)
 
-    if(resp) {
+    if (resp) {
       return resp
     }
   },
