@@ -2,7 +2,6 @@
 import Layout from '@layouts/default'
 import { authMethods } from '@state/helpers'
 import appConfig from '@src/app.config'
-import graph from '@/src/msalConfig/graph'
 
 /**
  * Login component
@@ -40,7 +39,6 @@ export default {
 					this.isAuthError = false
 					// Redirect to the originally requested page, or to the home page
 					this.$router.push({ name: 'departments', query : { redirectFrom } })
-					graph.getFiles()
 				})
 				.catch((error) => {
 					this.tryingToLogIn = false
