@@ -73,7 +73,6 @@ export default {
     },
 
     async createProposal(form) {
-      console.log(form, "here")
       try {
         const data = await graph.createProposalFolder({
           name: form.title,

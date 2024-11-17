@@ -2,6 +2,7 @@
 import Layout from '@layouts/default'
 import { authMethods } from '@state/helpers'
 import appConfig from '@src/app.config'
+import graph from '@/src/msalConfig/graph'
 
 /**
  * Logout component

@@ -8,7 +8,7 @@
 
 import auth from './auth'
 
-const GRAPH_BASE = 'https://graph.microsoft.com/beta'
+const GRAPH_BASE = 'https://graph.microsoft.com/v1.0'
 const GRAPH_SCOPES = [
   'user.read',
   'files.read',
@@ -56,6 +56,7 @@ export default {
     let resp = await callGraph(`/me/drive/sharedWithMe`)
     if (resp) {
       let data = await resp.json()
+      console.log(data)
       return data
     }
   },
@@ -111,7 +112,10 @@ export default {
   async copyRenumirationFileToProposal(item) {
     let resp = await postGraph(`/drives/${driveId}/items/${excelFileId}/copy`, {
       ...item,
-      driveId: driveId,
+      parentReference: {
+        driveId,
+        id: item.parentReference.id,
+      },
     })
 
     if (resp) {
