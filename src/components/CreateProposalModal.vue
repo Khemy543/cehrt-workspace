@@ -52,7 +52,10 @@
           >
         </b-form-select>
       </b-form-group>
-      <button type="submit" class="btn btn-primary">Submit</button>
+      <button type="submit" class="btn btn-primary" :disabled="loading">
+        <b-spinner v-if="loading" small variant="white"></b-spinner
+        >Submit</button
+      >
     </form>
   </b-modal>
 </template>
@@ -75,6 +78,10 @@ export default {
     formTitle: {
       type: String,
       required: true,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
     },
   },
   data() {

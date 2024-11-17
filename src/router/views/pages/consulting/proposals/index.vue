@@ -37,6 +37,7 @@ export default {
       ],
       proposals: [],
       loading: false,
+      vloading: false,
       show: false,
       formTitle: 'Create Proposal',
       proposal: null,
@@ -74,6 +75,7 @@ export default {
 
     async createProposal(form) {
       try {
+        this.vloading = true
         const data = await graph.createProposalFolder({
           name: form.title,
           folder: {},
@@ -120,6 +122,8 @@ export default {
             variant: 'danger',
           })
         }
+      }finally {
+        this.vloading = false
       }
     },
 
@@ -341,6 +345,7 @@ export default {
       :proposal="proposal"
       :action="handleSubmit"
       :value="show"
+      :loading="vloading"
       @input="show = $event"
     />
   </Layout>
