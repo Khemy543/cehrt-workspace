@@ -119,13 +119,13 @@ export default {
     })
 
     if (resp) {
-      let data = await resp.json()
-      return data
+      // let data = await resp.json()
+      return resp
     }
   },
 
   async getRenumerationFileLink(id) {
-    let resp = await postGraph(`/drives/${driveId}/items/${id}/createLink`, {
+    let resp = await postGraph(`/drives/${driveId}/items/${itemId}:/Proposals/${id}/World bank renumeration calculator.xlsx:/createLink`, {
       type: 'edit',
       scope: 'anonymous',
     })

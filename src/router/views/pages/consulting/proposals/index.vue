@@ -82,14 +82,12 @@ export default {
           '@microsoft.graph.conflictBehavior': 'replace',
         })
 
-        graph.copyRenumirationFileToProposal({
+        await graph.copyRenumirationFileToProposal({
           parentReference: { id: data.id },
           name: 'World bank renumeration calculator.xlsx',
         })
 
         const { link } = await graph.getRenumerationFileLink(data.name)
-
-        console.log(link)
 
         const response = await this.$http.post('/create/proposal', {
           ...form,
@@ -131,7 +129,9 @@ export default {
 
     async updateProposal(form) {
       try {
-        const fakeForm = { ...form }
+        const fakeForm = {
+          ...form,
+        }
         delete fakeForm['submission_date']
         const response = await this.$http.put(
           `/update/${form.id}/proposal`,
