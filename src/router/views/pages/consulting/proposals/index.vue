@@ -87,14 +87,14 @@ export default {
           name: 'World bank renumeration calculator.xlsx',
         })
 
-        const { link } = await graph.getRenumerationFileLink(data.id)
+        const { link } = await graph.getRenumerationFileLink(data.name)
 
         console.log(link)
 
         const response = await this.$http.post('/create/proposal', {
           ...form,
           onedrive_id: data.id,
-          proposal_path: link?.webUrl || '',
+          proposal_path: link.webUrl,
         })
 
         if (response) {

@@ -125,9 +125,10 @@ export default {
   },
 
   async getRenumerationFileLink(id) {
-    let resp = await callGraph(
-      `/drives/${driveId}/items/${id}/createLink`
-    )
+    let resp = await postGraph(`/drives/${driveId}/items/${id}/createLink`, {
+      type: 'edit',
+      scope: 'anonymous',
+    })
 
     if (resp) {
       let data = await resp.json()
@@ -154,7 +155,7 @@ export default {
         item: {
           '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
-        }
+        },
       }
     )
     if (resp) {
@@ -170,7 +171,7 @@ export default {
         item: {
           '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
-        }
+        },
       }
     )
     if (resp) {
@@ -186,7 +187,7 @@ export default {
         item: {
           '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
-        }
+        },
       }
     )
 
