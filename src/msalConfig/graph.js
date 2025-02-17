@@ -148,7 +148,7 @@ export default {
           driveItemSource: { '@odata.type': 'microsoft.graph.driveItemSource' },
           mediaSource: { '@odata.type': 'microsoft.graph.mediaSource' },
         },
-        deferCommit: false,
+        deferCommit: true,
       }
     )
     if (resp) {
@@ -165,7 +165,7 @@ export default {
           '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
         },
-        deferCommit: false,
+        deferCommit: true,
       }
     )
     if (resp) {
@@ -182,7 +182,7 @@ export default {
           '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
         },
-        deferCommit: false,
+        deferCommit: true,
       }
     )
 
@@ -200,7 +200,7 @@ export default {
           '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
         },
-        deferCommit: false,
+        deferCommit: true,
       }
     )
 
