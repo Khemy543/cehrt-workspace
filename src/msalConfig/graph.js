@@ -124,6 +124,17 @@ export default {
     }
   },
 
+  async getRenumerationFileLink(id) {
+    let resp = await callGraph(
+      `/drives/${driveId}/items/${id}/createLink`
+    )
+
+    if (resp) {
+      let data = await resp.json()
+      return data
+    }
+  },
+
   async createLibraryProposalFolder(item) {
     let resp = await postGraph(
       `/drives/${driveId}/items/${libraryProposalFolderId}/children`,
