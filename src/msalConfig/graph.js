@@ -143,12 +143,7 @@ export default {
         item: {
           '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
-          fileSize: fileContent.size,
-          description: fileName,
-          driveItemSource: { '@odata.type': 'microsoft.graph.driveItemSource' },
-          mediaSource: { '@odata.type': 'microsoft.graph.mediaSource' },
-        },
-        deferCommit: true,
+        }
       }
     )
     if (resp) {
@@ -164,8 +159,7 @@ export default {
         item: {
           '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
-        },
-        deferCommit: true,
+        }
       }
     )
     if (resp) {
@@ -181,8 +175,7 @@ export default {
         item: {
           '@microsoft.graph.conflictBehavior': 'replace',
           name: fileName,
-        },
-        deferCommit: true,
+        }
       }
     )
 
